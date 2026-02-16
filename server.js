@@ -177,6 +177,8 @@ ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus si
 ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus für neue Spieler holen'");
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
+ensureColumn('deals', 'imageUrl', "TEXT DEFAULT ''");
+db.prepare("UPDATE streamer_pages SET title = 'Casinos' WHERE slug = 'shop'").run();
 
 // Insert default superadmin if not exists
 const adminEmail = 'admin@weblone.de';
@@ -849,13 +851,13 @@ app.delete('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
 });
 
 app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
-  const { name, deal, performance, status } = req.body;
+  const { name, deal, performance, status, imageUrl } = req.body;
   if (!name || !deal) {
     return res.status(400).json({ success: false, error: 'name und deal sind erforderlich.' });
   }
   try {
-    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-      .run(req.params.id, name, deal, performance || '0 clicks', status || 'Aktiv');
+    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(req.params.id, name, deal, performance || '0 clicks', status || 'Aktiv', imageUrl || '');
     logAudit(req.superadmin.email, 'deal_create', req.params.id, { dealId: info.lastInsertRowid, name });
     res.json({ success: true, dealId: info.lastInsertRowid });
   } catch (err) {
@@ -864,10 +866,10 @@ app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
 });
 
 app.put('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) => {
-  const { name, deal, performance, status } = req.body;
+  const { name, deal, performance, status, imageUrl } = req.body;
   try {
-    db.prepare('UPDATE deals SET name = ?, deal = ?, performance = ?, status = ? WHERE id = ? AND userId = ?')
-      .run(name, deal, performance, status, req.params.dealId, req.params.id);
+    db.prepare('UPDATE deals SET name = ?, deal = ?, performance = ?, status = ?, imageUrl = ? WHERE id = ? AND userId = ?')
+      .run(name, deal, performance, status, imageUrl || '', req.params.dealId, req.params.id);
     logAudit(req.superadmin.email, 'deal_update', req.params.id, { dealId: req.params.dealId, status });
     res.json({ success: true });
   } catch (err) {
@@ -893,19 +895,19 @@ app.post('/api/superadmin/deal-template/apply', requireSuperadmin, (req, res) =>
 
   const templates = {
     starter: [
-      { name: 'Starter Deal', deal: '100% Bonus bis 100€', performance: '0 clicks', status: 'Aktiv' }
+      { name: 'Starter Deal', deal: '100% Bonus bis 100€', performance: '0 clicks', status: 'Aktiv', imageUrl: '' }
     ],
     pro: [
-      { name: 'VIP Cashback', deal: '15% Weekly Cashback', performance: '0 clicks', status: 'Aktiv' },
-      { name: 'Reload Bonus', deal: '50% bis 500€', performance: '0 clicks', status: 'Aktiv' }
+      { name: 'VIP Cashback', deal: '15% Weekly Cashback', performance: '0 clicks', status: 'Aktiv', imageUrl: '' },
+      { name: 'Reload Bonus', deal: '50% bis 500€', performance: '0 clicks', status: 'Aktiv', imageUrl: '' }
     ]
   };
   const selected = templates[template] || templates.starter;
 
-  const insert = db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)');
+  const insert = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl) VALUES (?, ?, ?, ?, ?, ?)');
   const tx = db.transaction(() => {
     userIds.forEach((userId) => {
-      selected.forEach((d) => insert.run(userId, d.name, d.deal, d.performance, d.status));
+      selected.forEach((d) => insert.run(userId, d.name, d.deal, d.performance, d.status, d.imageUrl || ''));
       logAudit(req.superadmin.email, 'deal_template_apply', userId, { template });
     });
   });
@@ -1232,7 +1234,7 @@ app.post('/api/user/:id/setup', (req, res) => {
       // 7. Create default pages
       const defaultPages = [
         { title: 'Home', slug: '', type: 'system', sortOrder: 1 },
-        { title: 'Shop', slug: 'shop', type: 'system', sortOrder: 2 },
+        { title: 'Casinos', slug: 'shop', type: 'system', sortOrder: 2 },
         { title: 'Hunt', slug: 'hunt', type: 'system', sortOrder: 3 },
         { title: 'Giveaway', slug: 'giveaway', type: 'system', sortOrder: 4 }
       ];
@@ -1574,10 +1576,10 @@ app.get('/api/user/:id/tools/chat-reader/logs', (req, res) => {
 });
 
 app.post('/api/user/:id/deal', (req, res) => {
-  const { name, deal, performance, status } = req.body;
+  const { name, deal, performance, status, imageUrl } = req.body;
   try {
-    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-      .run(req.params.id, name, deal, performance || '0 clicks', status || 'Aktiv');
+    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(req.params.id, name, deal, performance || '0 clicks', status || 'Aktiv', imageUrl || '');
     res.json({ success: true, dealId: info.lastInsertRowid });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -1585,10 +1587,10 @@ app.post('/api/user/:id/deal', (req, res) => {
 });
 
 app.post('/api/user/:id/deal/:dealId', (req, res) => {
-  const { status, name, deal, performance } = req.body;
+  const { status, name, deal, performance, imageUrl } = req.body;
   try {
-    db.prepare('UPDATE deals SET status = ?, name = ?, deal = ?, performance = ? WHERE id = ? AND userId = ?')
-      .run(status, name, deal, performance, req.params.dealId, req.params.id);
+    db.prepare('UPDATE deals SET status = ?, name = ?, deal = ?, performance = ?, imageUrl = ? WHERE id = ? AND userId = ?')
+      .run(status, name, deal, performance, imageUrl || '', req.params.dealId, req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -1895,7 +1897,7 @@ app.get('/api/public/site/:slug', (req, res) => {
     if (!pagesCheck) {
       const defaultPages = [
         { title: 'Home', slug: '', type: 'system', sortOrder: 1 },
-        { title: 'Shop', slug: 'shop', type: 'system', sortOrder: 2 },
+        { title: 'Casinos', slug: 'shop', type: 'system', sortOrder: 2 },
         { title: 'Hunt', slug: 'hunt', type: 'system', sortOrder: 3 },
         { title: 'Giveaway', slug: 'giveaway', type: 'system', sortOrder: 4 }
       ];
