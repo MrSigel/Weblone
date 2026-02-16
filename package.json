@@ -6,13 +6,9 @@
     "dev:backend": "node server.js",
     "dev:frontend": "vite",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-<<<<<<< HEAD
-    "build": "vite build",
-=======
     "check:encoding": "node tools/check-encoding.mjs",
     "autosync": "node tools/auto-sync-github.mjs",
     "build": "npm run check:encoding && vite build",
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
     "start": "node server.js"
   },
   "dependencies": {

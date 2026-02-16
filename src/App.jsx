@@ -52,11 +52,7 @@ const GlobeBackground = () => {
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-<<<<<<< HEAD
         {/* LÃ¤ngengrade */}
-=======
-        {/* L?ngengrade */}
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
         <ellipse cx="300" cy="300" rx="250" ry="250" stroke="white" strokeWidth="0.5" />
         <ellipse cx="300" cy="300" rx="180" ry="250" stroke="white" strokeWidth="0.5" />
         <ellipse cx="300" cy="300" rx="100" ry="250" stroke="white" strokeWidth="0.5" />
@@ -353,17 +349,10 @@ const Home = () => {
             <div className="max-w-4xl">
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-[#EDEDED] mb-8 leading-[1.1]">
                   Die professionelle Zentrale <br />
-<<<<<<< HEAD
                   fÃ¼r deinen <span className="text-indigo-500">Stream.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-[#A1A1A1] mb-12 leading-relaxed max-w-xl">
                   Etabliere deine eigene Marke, verwalte deine Partnerschaften effizient und biete deiner Community ein interaktives Zuhause â€“ Website + Dashboard.
-=======
-                  f?r deinen <span className="text-indigo-500">Stream.</span>
-                </h1>
-                <p className="text-lg md:text-xl text-[#A1A1A1] mb-12 leading-relaxed max-w-xl">
-                  Etabliere deine eigene Marke, verwalte deine Partnerschaften effizient und biete deiner Community ein interaktives Zuhause ? Website + Dashboard.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-16">
                   <Link to="/register" className="bg-[#EDEDED] text-[#050505] px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-[#D4D4D4] transition-all group">
@@ -377,11 +366,7 @@ const Home = () => {
                   transition={{ delay: 0.5, duration: 1 }}
                   className="flex items-center gap-8 pt-8 border-t border-[#1A1A1A]"
                 >
-<<<<<<< HEAD
                   <span className="text-sm font-bold tracking-widest text-[#A1A1A1]">OPTIMIERT FÃœR</span>
-=======
-                  <span className="text-sm font-bold tracking-widest text-[#A1A1A1]">OPTIMIERT F?R</span>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                   <div className="flex items-center gap-6">
                     <a href="https://twitch.tv" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                       <svg className="h-6 w-auto" viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg">
@@ -428,11 +413,7 @@ const Home = () => {
             <SectionHeader 
               label="Features"
               title="Alles, was du zum Wachsen brauchst."
-<<<<<<< HEAD
               subtitle="Eine umfassende Suite an Tools, entwickelt fÃ¼r hÃ¶chste Performance und maximale Conversion."
-=======
-              subtitle="Eine umfassende Suite an Tools, entwickelt f?r h?chste Performance und maximale Conversion."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
           </ScrollReveal>
           <div className="grid md:grid-cols-3 gap-6">
@@ -440,11 +421,7 @@ const Home = () => {
               index={0}
               icon={Globe}
               title="Eigene Creator-Website"
-<<<<<<< HEAD
               description="Erstelle in Minuten eine vollwertige WebprÃ¤senz mit integriertem Shop, Giveaways und Partner-Landingpages."
-=======
-              description="Erstelle in Minuten eine vollwertige Webpr?senz mit integriertem Shop, Giveaways und Partner-Landingpages."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
             <FeatureCard 
               index={1}
@@ -456,11 +433,7 @@ const Home = () => {
               index={2}
               icon={Zap}
               title="Twitch/Kick Anbindung"
-<<<<<<< HEAD
               description="Verbinde deine Accounts direkt. Unser Bot Ã¼bernimmt die Chat-Analyse und liefert Community-Insights."
-=======
-              description="Verbinde deine Accounts direkt. Unser Bot ?bernimmt die Chat-Analyse und liefert Community-Insights."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
             <FeatureCard 
               index={3}
@@ -472,21 +445,13 @@ const Home = () => {
               index={4}
               icon={BarChart3}
               title="Deals & Monetarisierung"
-<<<<<<< HEAD
               description="Nutze vordefinierte Deals und verwalte deine Partnerschaften Ã¼ber ein hochprÃ¤zises Postback-System."
-=======
-              description="Nutze vordefinierte Deals und verwalte deine Partnerschaften ?ber ein hochpr?zises Postback-System."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
             <FeatureCard 
               index={5}
               icon={Activity}
               title="Live-Tracking"
-<<<<<<< HEAD
               description="Behalte deine Einnahmen und Conversions in Echtzeit im Blick â€“ mit chirurgischer PrÃ¤zision."
-=======
-              description="Behalte deine Einnahmen und Conversions in Echtzeit im Blick ? mit chirurgischer Pr?zision."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
           </div>
         </div>
@@ -536,11 +501,7 @@ const Home = () => {
                 <SectionHeader 
                   label="Werde Casino-Streamer"
                   title="Dein Weg zum Slot-Profi."
-<<<<<<< HEAD
                   subtitle="Die grÃ¶ÃŸten Schwierigkeiten als Slot-Streamer sind der Content, ein sauberes Overlay und auch die entsprechenden Sponsoren."
-=======
-                  subtitle="Die gr??ten Schwierigkeiten als Slot-Streamer sind der Content, ein sauberes Overlay und auch die entsprechenden Sponsoren."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 />
                 <motion.p 
                   initial={{ opacity: 0 }}
@@ -549,11 +510,7 @@ const Home = () => {
                   transition={{ delay: 0.3 }}
                   className="text-[#A1A1A1] leading-relaxed mb-8"
                 >
-<<<<<<< HEAD
                   Dennoch ist jeder dieser Punkte notwendig, um einen hoch qualitativen Stream zu bieten. Weblone liefert dir die Infrastruktur, um genau diese HÃ¼rden zu meistern.
-=======
-                  Dennoch ist jeder dieser Punkte notwendig, um einen hoch qualitativen Stream zu bieten. Weblone liefert dir die Infrastruktur, um genau diese H?rden zu meistern.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 </motion.p>
               </div>
             </div>
@@ -572,15 +529,9 @@ const Home = () => {
             />
             <div className="grid md:grid-cols-4 gap-12 text-center">
               {[
-<<<<<<< HEAD
                 { step: '01', title: 'Anmeldung & Check', desc: 'Registriere dich auf Weblone und lass deinen Kanal von unserem Expertenteam prÃ¼fen.' },
                 { step: '02', title: 'Setup & Design', desc: 'Wir richten dein All-in-One Paket ein und erstellen deine personalisierten Overlays & Designs.' },
                 { step: '03', title: 'Deals & Sponsoren', desc: 'WÃ¤hle aus unseren exklusiven Casino-Deals und starte deine profitablen Partnerschaften.' },
-=======
-                { step: '01', title: 'Anmeldung & Check', desc: 'Registriere dich auf Weblone und lass deinen Kanal von unserem Expertenteam pr?fen.' },
-                { step: '02', title: 'Setup & Design', desc: 'Wir richten dein All-in-One Paket ein und erstellen deine personalisierten Overlays & Designs.' },
-                { step: '03', title: 'Deals & Sponsoren', desc: 'W?hle aus unseren exklusiven Casino-Deals und starte deine profitablen Partnerschaften.' },
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 { step: '04', title: 'Live & Profit', desc: 'Geh live mit vollem Support und erhalte deine automatisierten Auszahlungen direkt aufs Dashboard.' }
               ].map((item, i) => (
                 <div 
@@ -603,11 +554,7 @@ const Home = () => {
           <ScrollReveal>
             <SectionHeader 
               label="Benefits"
-<<<<<<< HEAD
               title="Alle Vorteile im Ãœberblick."
-=======
-              title="Alle Vorteile im ?berblick."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             />
           </ScrollReveal>
         </div>
@@ -627,7 +574,6 @@ const Home = () => {
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="flex gap-6">
                   {[
-<<<<<<< HEAD
                     { title: 'Einfach nur Streamen', desc: 'Du kannst dich voll und ganz auf das Streamen konzentrieren. Um alles andere kÃ¼mmern wir uns!' },
                     { title: 'Die Software', desc: 'Wir haben ein komplettes All-in-One Paket nur fÃ¼r Slotstreamer entwickelt. Du profitierst von unserem technischen Know-How!' },
                     { title: 'PÃ¼nktliche Auszahlungen', desc: 'Wir zahlen automatisiert an jedem 15. des Monats Ã¼ber unser Dashboard aus. VerlÃ¤sslich und pÃ¼nktlich.' },
@@ -635,15 +581,6 @@ const Home = () => {
                     { title: 'QualitÃ¤tsberatung', desc: 'RegelmÃ¤ÃŸige Konversationen um gemeinsam LÃ¶sungen zu finden. Kontinuierliche Verbesserung ist das Geheimnis.' },
                     { title: 'Starthilfe', desc: 'Unser Netzwerk aus Slotstreamern hilft jedem Neuling durch Raids, Hosts und Shoutouts.' },
                     { title: 'PersÃ¶nlicher Support', desc: 'Unser Team nimmt sich zu allen Zeiten deinen Problemen an. Ein Ansprechpartner fÃ¼r alle FÃ¤lle.' },
-=======
-                    { title: 'Einfach nur Streamen', desc: 'Du kannst dich voll und ganz auf das Streamen konzentrieren. Um alles andere k?mmern wir uns!' },
-                    { title: 'Die Software', desc: 'Wir haben ein komplettes All-in-One Paket nur f?r Slotstreamer entwickelt. Du profitierst von unserem technischen Know-How!' },
-                    { title: 'P?nktliche Auszahlungen', desc: 'Wir zahlen automatisiert an jedem 15. des Monats ?ber unser Dashboard aus. Verl?sslich und p?nktlich.' },
-                    { title: 'Die besten Casino-Deals', desc: 'Ein einziger Ansprechpartner f?r alle deine Casino-Deals. ?bersichtlich und transparent.' },
-                    { title: 'Qualit?tsberatung', desc: 'Regelm??ige Konversationen um gemeinsam L?sungen zu finden. Kontinuierliche Verbesserung ist das Geheimnis.' },
-                    { title: 'Starthilfe', desc: 'Unser Netzwerk aus Slotstreamern hilft jedem Neuling durch Raids, Hosts und Shoutouts.' },
-                    { title: 'Pers?nlicher Support', desc: 'Unser Team nimmt sich zu allen Zeiten deinen Problemen an. Ein Ansprechpartner f?r alle F?lle.' },
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                     { title: 'Designs', desc: 'Ein Designer plant deinen kompletten Auftritt: Overlays, Banner, Animationen und Alerts.' }
                   ].map((adv, idx) => (
                     <div 
@@ -670,11 +607,7 @@ const Home = () => {
                 <SectionHeader 
                   label="Monetarisierung"
                   title="Wie werde ich bezahlt?"
-<<<<<<< HEAD
                   subtitle="Wir bieten zwei verschiedene MÃ¶glichkeiten an, um deine Einnahmen zu maximieren."
-=======
-                  subtitle="Wir bieten zwei verschiedene M?glichkeiten an, um deine Einnahmen zu maximieren."
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 />
                 <div className="space-y-8">
                   <div className="flex gap-4">
@@ -684,11 +617,7 @@ const Home = () => {
                     <div>
                       <h4 className="text-[#EDEDED] font-bold mb-2">Monatliches Fixum</h4>
                       <p className="text-[#A1A1A1] text-sm leading-relaxed">
-<<<<<<< HEAD
                         Bekannteren Streamern bieten wir eine monatliche Summe an, welche je nach GrÃ¶ÃŸe und Reichweite deines Kanals variieren kann.
-=======
-                        Bekannteren Streamern bieten wir eine monatliche Summe an, welche je nach Gr??e und Reichweite deines Kanals variieren kann.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                       </p>
                     </div>
                   </div>
@@ -698,15 +627,9 @@ const Home = () => {
                       <BarChart3 size={24} />
                     </div>
                     <div>
-<<<<<<< HEAD
                       <h4 className="text-[#EDEDED] font-bold mb-2">CPA-VergÃ¼tung</h4>
                       <p className="text-[#A1A1A1] text-sm leading-relaxed">
                         Alternativ kannst du nach Ersteinzahlungen (FTDs) verrechnen. Du wirst fÃ¼r jeden neuen Spieler, der eine Einzahlung tÃ¤tigt, entsprechend vergÃ¼tet.
-=======
-                      <h4 className="text-[#EDEDED] font-bold mb-2">CPA-Verg?tung</h4>
-                      <p className="text-[#A1A1A1] text-sm leading-relaxed">
-                        Alternativ kannst du nach Ersteinzahlungen (FTDs) verrechnen. Du wirst f?r jeden neuen Spieler, der eine Einzahlung t?tigt, entsprechend verg?tet.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                       </p>
                     </div>
                   </div>
@@ -755,7 +678,6 @@ const Home = () => {
             <SectionHeader 
               center
               label="FAQ"
-<<<<<<< HEAD
               title="HÃ¤ufig gestellte Fragen."
             />
             <div className="space-y-2">
@@ -766,18 +688,6 @@ const Home = () => {
                 { q: 'Wie sicher sind meine Daten?', a: 'Sicherheit hat PrioritÃ¤t. Alle Daten werden verschlÃ¼sselt Ã¼bertragen und auf hochsicheren Servern verarbeitet.' },
                 { q: 'Gibt es eine Mindestlaufzeit?', a: 'Nein, unsere Abonnements sind flexibel und kÃ¶nnen jederzeit zum Ende des Abrechnungszeitraums gekÃ¼ndigt werden.' },
                 { q: 'Wird die Website mobil gut dargestellt?', a: 'Ja, alle Websites und Dashboards sind vollstÃ¤ndig responsive und fÃ¼r Smartphones sowie Tablets optimiert.' }
-=======
-              title="H?ufig gestellte Fragen."
-            />
-            <div className="space-y-2">
-              {[
-                { q: 'Ben?tige ich Programmierkenntnisse?', a: 'Nein. Das gesamte System ist als No-Code-Plattform konzipiert. Du kannst alles visuell ?ber dein Dashboard steuern.' },
-                { q: 'Kann ich meine eigene Domain nutzen?', a: 'Ja, du kannst jede vorhandene Domain mit deiner Website verbinden oder eine Subdomain von uns nutzen.' },
-                { q: 'Welche Plattformen werden unterst?tzt?', a: 'Wir bieten eine vollst?ndige Integration f?r Twitch und Kick, inklusive Chat-Bot-Anbindung und Live-Daten.' },
-                { q: 'Wie sicher sind meine Daten?', a: 'Sicherheit hat Priorit?t. Alle Daten werden verschl?sselt ?bertragen und auf hochsicheren Servern verarbeitet.' },
-                { q: 'Gibt es eine Mindestlaufzeit?', a: 'Nein, unsere Abonnements sind flexibel und k?nnen jederzeit zum Ende des Abrechnungszeitraums gek?ndigt werden.' },
-                { q: 'Wird die Website mobil gut dargestellt?', a: 'Ja, alle Websites und Dashboards sind vollst?ndig responsive und f?r Smartphones sowie Tablets optimiert.' }
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
               ].map((faq, i) => (
                 <AccordionItem key={i} question={faq.q} answer={faq.a} />
               ))}
@@ -795,11 +705,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-bold tracking-tighter text-[#EDEDED] mb-8 leading-tight"
           >
-<<<<<<< HEAD
             Bereit, deinen Stream auf <br /> das nÃ¤chste Level zu heben?
-=======
-            Bereit, deinen Stream auf <br /> das n?chste Level zu heben?
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -808,11 +714,7 @@ const Home = () => {
             transition={{ delay: 0.1 }}
             className="text-[#A1A1A1] text-lg md:text-xl mb-12 max-w-xl mx-auto leading-relaxed"
           >
-<<<<<<< HEAD
             HÃ¶r auf, dich mit NotlÃ¶sungen zufrieden zu geben. Baue die Infrastruktur, die dein Content verdient.
-=======
-            H?r auf, dich mit Notl?sungen zufrieden zu geben. Baue die Infrastruktur, die dein Content verdient.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </motion.p>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -840,19 +742,11 @@ const Home = () => {
                 <span>Weblone</span>
               </div>
               <p className="text-sm text-[#A1A1A1] leading-relaxed">
-<<<<<<< HEAD
                 Der moderne Standard fÃ¼r Creator-Management und Markenaufbau.
               </p>
             </div>
             {[
               { title: 'Produkt', links: ['Funktionen', 'LÃ¶sungen'] },
-=======
-                Der moderne Standard f?r Creator-Management und Markenaufbau.
-              </p>
-            </div>
-            {[
-              { title: 'Produkt', links: ['Funktionen', 'L?sungen'] },
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
               { title: 'Rechtliches', links: ['Datenschutz', 'AGB'] }
             ].map(col => (
               <div key={col.title}>
@@ -874,11 +768,7 @@ const Home = () => {
           </div>
           <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[#1A1A1A] gap-4">
             <p className="text-xs text-[#555]">
-<<<<<<< HEAD
               Â© {new Date().getFullYear()} Weblone Infrastructure Inc. Alle Rechte vorbehalten.
-=======
-              ? {new Date().getFullYear()} Weblone Infrastructure Inc. Alle Rechte vorbehalten.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             </p>
             <div className="flex gap-6 text-[#555] text-xs">
               <Link to="/privacy" className="hover:text-white">Datenschutz</Link>
@@ -895,24 +785,15 @@ const Privacy = () => (
   <div className={`${theme.bg} min-h-screen text-[#EDEDED] pt-32 pb-20 relative overflow-hidden`}>
     <BackgroundBubbles />
     <div className="max-w-[800px] mx-auto px-6 relative z-10">
-<<<<<<< HEAD
       <h1 className="text-4xl font-bold tracking-tight mb-8">DatenschutzerklÃ¤rung</h1>
       <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-12">1. Datenschutz auf einen Blick</h2>
           <p>Die folgenden Hinweise geben einen einfachen Ãœberblick darÃ¼ber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persÃ¶nlich identifiziert werden kÃ¶nnen.</p>
-=======
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Datenschutzerkl?rung</h1>
-      <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-12">1. Datenschutz auf einen Blick</h2>
-          <p>Die folgenden Hinweise geben einen einfachen ?berblick dar?ber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie pers?nlich identifiziert werden k?nnen.</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
         </section>
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">2. Datenerfassung auf dieser Website</h2>
           <h3 className="text-lg font-bold text-[#EDEDED] mt-4">Cookies & Tracking</h3>
-<<<<<<< HEAD
           <p>Unsere Website verwendet technische Cookies, die fÃ¼r den Betrieb der Plattform notwendig sind. Wir nutzen Analysetools nur mit Ihrer ausdrÃ¼cklichen Zustimmung, um die Benutzererfahrung zu verbessern.</p>
           <h3 className="text-lg font-bold text-[#EDEDED] mt-4">Server-Log-Dateien</h3>
           <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns Ã¼bermittelt. Dies sind: Browsertyp, Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners und Uhrzeit der Serveranfrage.</p>
@@ -920,15 +801,6 @@ const Privacy = () => (
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">3. Rechte der betroffenen Person</h2>
           <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft Ã¼ber Herkunft, EmpfÃ¤nger und Zweck Ihrer gespeicherten personenbezogenen Daten. Sie haben auÃŸerdem ein Recht, die Berichtigung oder LÃ¶schung dieser Daten zu verlangen.</p>
-=======
-          <p>Unsere Website verwendet technische Cookies, die f?r den Betrieb der Plattform notwendig sind. Wir nutzen Analysetools nur mit Ihrer ausdr?cklichen Zustimmung, um die Benutzererfahrung zu verbessern.</p>
-          <h3 className="text-lg font-bold text-[#EDEDED] mt-4">Server-Log-Dateien</h3>
-          <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns ?bermittelt. Dies sind: Browsertyp, Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners und Uhrzeit der Serveranfrage.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">3. Rechte der betroffenen Person</h2>
-          <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft ?ber Herkunft, Empf?nger und Zweck Ihrer gespeicherten personenbezogenen Daten. Sie haben au?erdem ein Recht, die Berichtigung oder L?schung dieser Daten zu verlangen.</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
         </section>
       </div>
     </div>
@@ -939,7 +811,6 @@ const Terms = () => (
   <div className={`${theme.bg} min-h-screen text-[#EDEDED] pt-32 pb-20 relative overflow-hidden`}>
     <BackgroundBubbles />
     <div className="max-w-[800px] mx-auto px-6 relative z-10">
-<<<<<<< HEAD
       <h1 className="text-4xl font-bold tracking-tight mb-8">Allgemeine GeschÃ¤ftsbedingungen (AGB)</h1>
       <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
         <section>
@@ -957,25 +828,6 @@ const Terms = () => (
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">4. Auszahlungen & VergÃ¼tung</h2>
           <p>Auszahlungen erfolgen gemÃ¤ÃŸ den im Dashboard vereinbarten Konditionen. Weblone behÃ¤lt sich das Recht vor, Auszahlungen bei Verdacht auf Betrug oder Manipulation bis zur KlÃ¤rung einzubehalten.</p>
-=======
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Allgemeine Gesch?ftsbedingungen (AGB)</h1>
-      <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-12">1. Geltungsbereich</h2>
-          <p>Diese AGB gelten f?r alle Vertr?ge zwischen Weblone Infrastructure Inc. und den Nutzern der Plattform. Mit der Registrierung erkl?rt sich der Nutzer mit diesen Bedingungen einverstanden.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">2. Leistungsbeschreibung</h2>
-          <p>Weblone bietet eine Infrastruktur f?r Creator, einschlie?lich Website-Builder, Dashboard-Systemen und Vermittlung von Werbepartnern. Der genaue Leistungsumfang ergibt sich aus der jeweiligen Leistungsbeschreibung zum Zeitpunkt des Vertragsschlusses.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">3. Pflichten des Nutzers</h2>
-          <p>Der Nutzer ist verpflichtet, bei der Registrierung wahrheitsgem??e Angaben zu machen. Es ist untersagt, die Plattform f?r illegale Aktivit?ten oder zur Verbreitung von sch?dlicher Software zu nutzen.</p>
-        </section>
-        <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">4. Auszahlungen & Verg?tung</h2>
-          <p>Auszahlungen erfolgen gem?? den im Dashboard vereinbarten Konditionen. Weblone beh?lt sich das Recht vor, Auszahlungen bei Verdacht auf Betrug oder Manipulation bis zur Kl?rung einzubehalten.</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
         </section>
       </div>
     </div>
@@ -1073,17 +925,10 @@ const StreamerPageContent = ({ data }) => {
                   </span>
                   <h2 className="text-3xl font-bold mb-4">{block.name}</h2>
                   <p className="text-[#A1A1A1] max-w-lg mb-8">
-<<<<<<< HEAD
                     Sichere dir jetzt exklusive Vorteile und unterstÃ¼tze den Stream direkt Ã¼ber diesen Link.
                   </p>
                   <button className={`px-8 py-3 rounded-xl font-bold border ${style.border} hover:bg-white hover:text-black transition-all`}>
                     Angebot Ã¶ffnen
-=======
-                    Sichere dir jetzt exklusive Vorteile und unterst?tze den Stream direkt ?ber diesen Link.
-                  </p>
-                  <button className={`px-8 py-3 rounded-xl font-bold border ${style.border} hover:bg-white hover:text-black transition-all`}>
-                    Angebot ?ffnen
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                   </button>
                 </div>
               </div>
@@ -1144,11 +989,7 @@ const Login = ({ onLogin }) => {
           className={`p-8 rounded-3xl border ${theme.border} ${theme.surface} backdrop-blur-xl shadow-2xl`}
         >
           <div className="text-center mb-10">
-<<<<<<< HEAD
             <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zurÃ¼ck</h1>
-=======
-            <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zur?ck</h1>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             <p className="text-[#A1A1A1]">Logge dich in dein Streamer-Dashboard ein.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
@@ -1172,11 +1013,7 @@ const Login = ({ onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full bg-white/5 border ${theme.border} rounded-xl px-4 py-3 text-[#EDEDED] focus:outline-none focus:border-indigo-500 transition-colors`}
-<<<<<<< HEAD
                 placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-=======
-                placeholder="????????"
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
               />
             </div>
             <button 
@@ -1249,15 +1086,9 @@ const Login = ({ onLogin }) => {
                       Wichtige Hinweise
                     </h4>
                     <ul className="text-xs text-[#A1A1A1] space-y-2 leading-relaxed">
-<<<<<<< HEAD
                       <li>â€¢ Freischaltung erfolgt manuell nach PrÃ¼fung deines Kanals.</li>
                       <li>â€¢ Antwortzeit in der Regel innerhalb von 24 Stunden.</li>
                       <li>â€¢ Exklusiver Zugang fÃ¼r verifizierte Streamer (Twitch/Kick).</li>
-=======
-                      <li>? Freischaltung erfolgt manuell nach Pr?fung deines Kanals.</li>
-                      <li>? Antwortzeit in der Regel innerhalb von 24 Stunden.</li>
-                      <li>? Exklusiver Zugang f?r verifizierte Streamer (Twitch/Kick).</li>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                     </ul>
                   </div>
 
@@ -1265,11 +1096,7 @@ const Login = ({ onLogin }) => {
                     onClick={() => setIsModalOpen(false)}
                     className="w-full bg-[#EDEDED] text-[#050505] py-3 rounded-xl font-bold mt-4 hover:bg-[#D4D4D4] transition-all"
                   >
-<<<<<<< HEAD
                     SchlieÃŸen
-=======
-                    Schlie?en
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                   </button>
                 </div>
               </div>
@@ -1344,11 +1171,7 @@ const Register = ({ onRegister }) => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 className={`w-full bg-white/5 border ${theme.border} rounded-xl px-4 py-3 text-[#EDEDED] focus:outline-none focus:border-indigo-500 transition-colors`}
-<<<<<<< HEAD
                 placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-=======
-                placeholder="????????"
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
               />
             </div>
             <div>
@@ -1403,11 +1226,7 @@ const OnboardingStart = ({ user }) => {
             Willkommen. In wenigen Schritten zu deiner eigenen Streamer-Website.
           </h1>
           <p className="text-[#A1A1A1] text-lg max-w-lg mx-auto leading-relaxed">
-<<<<<<< HEAD
             Wir fÃ¼hren dich durch den Prozess, um deine Marke zu stÃ¤rken und deine Community zu begeistern.
-=======
-            Wir f?hren dich durch den Prozess, um deine Marke zu st?rken und deine Community zu begeistern.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </p>
           <button 
             onClick={() => navigate('/onboarding/template')}
@@ -1445,13 +1264,8 @@ const TemplateSelection = ({ user }) => {
       <BackgroundBubbles />
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-16">
-<<<<<<< HEAD
           <h2 className="text-3xl font-bold text-[#EDEDED] mb-4">WÃ¤hle dein Template</h2>
           <p className="text-[#A1A1A1]">Dieses Design wird die Basis fÃ¼r deine neue Website sein.</p>
-=======
-          <h2 className="text-3xl font-bold text-[#EDEDED] mb-4">W?hle dein Template</h2>
-          <p className="text-[#A1A1A1]">Dieses Design wird die Basis f?r deine neue Website sein.</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
         </div>
         
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -1588,11 +1402,7 @@ const BaseSetup = ({ user, onComplete }) => {
             disabled={loading || !formData.username || !formData.siteSlug}
             className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
           >
-<<<<<<< HEAD
             {loading ? 'Wird eingerichtet...' : 'Setup abschlieÃŸen'}
-=======
-            {loading ? 'Wird eingerichtet...' : 'Setup abschlie?en'}
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </button>
         </div>
       </div>
@@ -1744,11 +1554,7 @@ const Dashboard = ({ user }) => {
     }
   };
 
-<<<<<<< HEAD
   if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white font-bold text-2xl">LÃ¤dt dein Dashboard...</div>;
-=======
-  if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white font-bold text-2xl">L?dt dein Dashboard...</div>;
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
 
   const renderContent = () => {
     switch(activeTab) {
@@ -2086,11 +1892,7 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
       </div>
     </div>
   );
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
 const SiteBuilder = ({ user, onUpdate }) => {
   const [settings, setSettings] = useState({
     navTitle: user?.username || '',
@@ -2222,11 +2024,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
 
   const addBlock = async (blockType) => {
     const defaultData = {
-<<<<<<< HEAD
       Hero: { title: 'Willkommen', subtitle: 'SchÃ¶n dass du da bist!' },
-=======
-      Hero: { title: 'Willkommen', subtitle: 'Sch?n dass du da bist!' },
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
       Text: { content: 'Hier steht dein Text...' },
       Button: { label: 'Klick mich', url: '#' },
       LinkList: { links: [{ label: 'Twitch', url: 'https://twitch.tv' }] }
@@ -2287,11 +2085,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
     persistBlockOrder(normalized.map((b) => b.id));
   };
 
-<<<<<<< HEAD
   if (loading) return <div className="p-12 text-center text-white">LÃ¤dt Site Builder...</div>;
-=======
-  if (loading) return <div className="p-12 text-center text-white">L?dt Site Builder...</div>;
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
 
   const activePage = pages.find(p => p.id === activePageId);
 
@@ -2527,11 +2321,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
                 />
                 <div className="flex gap-2">
                   <button onClick={() => setIsAddingPage(false)} className="flex-1 py-1.5 text-xs text-[#A1A1A1]">Abbrechen</button>
-<<<<<<< HEAD
                   <button onClick={addPage} className="flex-1 py-1.5 bg-indigo-600 rounded-lg text-xs font-bold text-white">HinzufÃ¼gen</button>
-=======
-                  <button onClick={addPage} className="flex-1 py-1.5 bg-indigo-600 rounded-lg text-xs font-bold text-white">Hinzuf?gen</button>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 </div>
               </div>
             )}
@@ -2575,11 +2365,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h2 className="text-xl font-bold text-white">Inhalt: {activePage?.title}</h2>
-<<<<<<< HEAD
                 <p className="text-xs text-[#A1A1A1]">Verwalte die BlÃ¶cke dieser Seite.</p>
-=======
-                <p className="text-xs text-[#A1A1A1]">Verwalte die Bl?cke dieser Seite.</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
               </div>
               <div className="flex gap-2">
                 {['Hero', 'Text', 'Button', 'LinkList'].map(type => (
@@ -2598,11 +2384,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
               {blocks.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-white/10">
                   <Layers size={48} className="mb-4" />
-<<<<<<< HEAD
                   <p className="font-bold">Keine BlÃ¶cke vorhanden</p>
-=======
-                  <p className="font-bold">Keine Bl?cke vorhanden</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 </div>
               ) : (
                 blocks.map((block, index) => (
@@ -2644,11 +2426,7 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
     <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-[#A1A1A1] uppercase tracking-wider">Live Vorschau</h3>
-<<<<<<< HEAD
         <span className="text-xs text-[#A1A1A1]">Ã„nderungen erscheinen sofort</span>
-=======
-        <span className="text-xs text-[#A1A1A1]">?nderungen erscheinen sofort</span>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
       </div>
 
       <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#050505]">
@@ -2689,11 +2467,7 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
 
           {pageBlocks.length === 0 ? (
             <div className="text-center py-12 text-[#A1A1A1]">
-<<<<<<< HEAD
               Diese Seite hat noch keine BlÃ¶cke.
-=======
-              Diese Seite hat noch keine Bl?cke.
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             </div>
           ) : (
             pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
@@ -2893,11 +2667,7 @@ const BlockEditor = ({ block, isFirst, isLast, onMoveUp, onMoveDown, onUpdate, o
                     onClick={() => handleChange('links', [...(data.links || []), { label: 'Neuer Link', url: '#' }])}
                     className="text-xs text-indigo-500 font-bold"
                    >
-<<<<<<< HEAD
                      + Link hinzufÃ¼gen
-=======
-                     + Link hinzuf?gen
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                    </button>
                 </div>
               )}
@@ -2995,11 +2765,7 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                 type="text"
                 value={newDeal.deal}
                 onChange={(e) => setNewDeal({...newDeal, deal: e.target.value})}
-<<<<<<< HEAD
                 placeholder="z.B. 100% Bonus bis 500â‚¬"
-=======
-                placeholder="z.B. 100% Bonus bis 500?"
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
               />
             </div>
@@ -3412,11 +3178,7 @@ const ToolsContent = ({ user, onUpdate }) => {
           </div>
 
           <p className="text-xs text-[#A1A1A1]">
-<<<<<<< HEAD
             Status: {readerStatus.running ? 'LÃ¤uft' : 'Gestoppt'}
-=======
-            Status: {readerStatus.running ? 'L?uft' : 'Gestoppt'}
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
             {readerStatus.channels?.length ? ` | Channels: ${readerStatus.channels.join(', ')}` : ''}
             {readerStatus.lastError ? ` | Letzter Fehler: ${readerStatus.lastError}` : ''}
           </p>
@@ -3438,11 +3200,7 @@ const ToolsContent = ({ user, onUpdate }) => {
       </section>
     </div>
   );
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
 const DomainContent = ({ user }) => {
   const [customDomain, setCustomDomain] = useState(user?.category || '');
   const [isSaving, setIsLoading] = useState(false);
@@ -3596,11 +3354,7 @@ const SettingsContent = ({ user, onUpdate }) => {
             disabled={isSaving}
             className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
           >
-<<<<<<< HEAD
             {isSaving ? 'Speichert...' : 'Ã„nderungen speichern'}
-=======
-            {isSaving ? 'Speichert...' : '?nderungen speichern'}
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </button>
         </div>
       </div>
@@ -4161,11 +3915,7 @@ const SuperAdminPage = () => {
                   <div>
                     <h2 className="text-2xl font-bold">{selectedData.user.username || 'Unbenannter Nutzer'}</h2>
                     <p className="text-[#A1A1A1] text-sm">{selectedData.user.email}</p>
-<<<<<<< HEAD
                     <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine Ã¶ffentliche URL'}</p>
-=======
-                    <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine ?ffentliche URL'}</p>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                   </div>
                   {selectedData.user.siteSlug && (
                     <a
@@ -4174,11 +3924,7 @@ const SuperAdminPage = () => {
                       rel="noopener noreferrer"
                       className="bg-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
                     >
-<<<<<<< HEAD
                       Streamer Ã¶ffnen
-=======
-                      Streamer ?ffnen
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                     </a>
                   )}
                 </div>
@@ -4214,11 +3960,7 @@ const SuperAdminPage = () => {
                       className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
                     />
                     <button onClick={addDealToUser} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">
-<<<<<<< HEAD
                       Deal hinzufÃ¼gen
-=======
-                      Deal hinzuf?gen
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                     </button>
                   </div>
                   <div className="space-y-2">
@@ -4234,11 +3976,7 @@ const SuperAdminPage = () => {
                             {deal.status}
                           </button>
                           <button onClick={() => deleteDeal(deal.id)} className="px-3 py-2 rounded-lg bg-red-500/20 text-red-300 text-sm">
-<<<<<<< HEAD
                             LÃ¶schen
-=======
-                            L?schen
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
                           </button>
                         </div>
                       </div>
@@ -4517,11 +4255,7 @@ const StreamerPageOverride = ({ slug }) => {
     <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white p-6 text-center">
       <h1 className="text-4xl font-bold mb-4">Ups!</h1>
       <p className="text-[#A1A1A1] mb-8">Streamer "{slug}" nicht gefunden.</p>
-<<<<<<< HEAD
       <a href={`${window.location.protocol}//${window.location.host}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">ZurÃ¼ck zur Startseite</a>
-=======
-      <a href={`${window.location.protocol}//${window.location.host}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">Zur?ck zur Startseite</a>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
     </div>
   );
 
@@ -4655,11 +4389,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       <footer className="py-12 md:py-20 border-t border-white/5 text-center">
         <div className="max-w-5xl mx-auto px-4 md:px-6">
           <p className="text-sm text-[#555] font-medium">
-<<<<<<< HEAD
             Â© 2026 {settings.navTitle || user.username} â€¢ Powered by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500 font-bold hover:text-indigo-400 transition-colors">Weblone</a>
-=======
-            ? 2026 {settings.navTitle || user.username} ? Powered by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500 font-bold hover:text-indigo-400 transition-colors">Weblone</a>
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
           </p>
         </div>
       </footer>
@@ -4747,16 +4477,8 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
-<<<<<<< HEAD
 
 
 
 
 
-=======
-
-
-
-
-
->>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
