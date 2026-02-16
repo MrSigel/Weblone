@@ -4040,7 +4040,15 @@ const SuperAdminPage = () => {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
-  const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv', imageUrl: '' });
+  const [newDeal, setNewDeal] = useState({
+    name: '',
+    deal: '',
+    performance: '0 clicks',
+    status: 'Aktiv',
+    imageUrl: '',
+    promoCode: 'DIEGAWINOS',
+    bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
+  });
   const [analytics, setAnalytics] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
   const [monitor, setMonitor] = useState([]);
@@ -4194,7 +4202,15 @@ const SuperAdminPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDeal)
       });
-      setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv', imageUrl: '' });
+      setNewDeal({
+        name: '',
+        deal: '',
+        performance: '0 clicks',
+        status: 'Aktiv',
+        imageUrl: '',
+        promoCode: 'DIEGAWINOS',
+        bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
+      });
       fetchUserDetails(selectedUserId);
       fetchDashboardData();
     } catch (err) {
