@@ -1916,7 +1916,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               disabled={step === 0 || saving}
               className="px-4 py-2 rounded-xl bg-white/10 text-white disabled:opacity-30"
             >
-              Zur?ck
+              Zurück
             </button>
             {step < 6 && (
               <button
@@ -2873,15 +2873,15 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">A CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.a?.ctr ? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.a?.ctr ?? 0}%</p>
                   </div>
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">B CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.b?.ctr ? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.b?.ctr ?? 0}%</p>
                   </div>
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">Default CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.default?.ctr ? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.default?.ctr ?? 0}%</p>
                   </div>
                 </div>
               </div>
