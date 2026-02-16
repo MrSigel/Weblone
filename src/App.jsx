@@ -1594,12 +1594,12 @@ const DashboardOverview = ({ data, setActiveTab }) => (
         </div>
         <div>
           <span className="text-sm text-[#A1A1A1] block">Deine Website</span>
-          <a href={`${window.location.protocol}//${data.user?.siteSlug}.${window.location.host}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{data.user?.siteSlug}.{window.location.host}</a>
+          <a href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{window.location.host}/{data.user?.siteSlug}</a>
         </div>
       </div>
       <div className="flex gap-2">
         <a 
-          href={`${window.location.protocol}//${data.user?.siteSlug}.${window.location.host}`}
+          href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition-all"
@@ -1815,7 +1815,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
         </div>
         <div className="flex gap-4">
            <a 
-            href={`${window.location.protocol}//${user?.siteSlug}.${window.location.host}`} 
+            href={`${window.location.protocol}//${window.location.host}/${user?.siteSlug}`} 
             target="_blank" 
             rel="noopener noreferrer"
             className="bg-white/5 border border-white/10 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-white/10 transition-all"
@@ -2414,7 +2414,7 @@ const DomainContent = ({ user }) => {
           <Globe size={24} className="text-indigo-500" />
           <div>
             <span className="text-xs text-[#A1A1A1] block uppercase tracking-wider font-bold">Aktive Domain</span>
-            <span className="text-lg font-bold text-[#EDEDED]">{user?.siteSlug}.{window.location.host}</span>
+            <span className="text-lg font-bold text-[#EDEDED]">{window.location.host}/{user?.siteSlug}</span>
           </div>
         </div>
 
@@ -2668,7 +2668,7 @@ const StreamerPageOverride = ({ slug }) => {
     <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white p-6 text-center">
       <h1 className="text-4xl font-bold mb-4">Ups!</h1>
       <p className="text-[#A1A1A1] mb-8">Streamer "{slug}" nicht gefunden.</p>
-      <a href={`http://${window.location.host.split('.').slice(-2).join('.')}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">Zurück zur Startseite</a>
+      <a href={`${window.location.protocol}//${window.location.host}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">Zurück zur Startseite</a>
     </div>
   );
 
