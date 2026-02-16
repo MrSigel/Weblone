@@ -1544,6 +1544,73 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
   const normalizeSlug = (value) => String(value || '').toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
 
+  useEffect(() => {
+    const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
+    if (!slug || !user?.id) {
+      setSlugState({ checking: false, available: false, message: 'Slug fehlt.' });
+      return;
+    }
+    if (slug.length < 3) {
+      setSlugState({ checking: false, available: false, message: 'Slug muss mindestens 3 Zeichen haben.' });
+      return;
+    }
+
+    const isOwnSlug = user?.siteSlug && slug === user.siteSlug;
+    if (isOwnSlug) {
+      setSlugState({ checking: false, available: true, message: 'Dein aktueller Slug.' });
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setSlugState({ checking: true, available: false, message: 'Prüfe Verfügbarkeit...' });
+      try {
+        const res = await fetch(`${API_BASE}/api/check-slug/${encodeURIComponent(slug)}`);
+        const data = await res.json();
+        if (data.available) {
+          setSlugState({ checking: false, available: true, message: 'Slug ist verfügbar.' });
+        } else {
+          setSlugState({ checking: false, available: false, message: 'Slug ist bereits vergeben.' });
+        }
+      } catch (err) {
+        setSlugState({ checking: false, available: false, message: 'Slug-Check fehlgeschlagen.' });
+      }
+    }, 450);
+
+    return () => clearTimeout(timeoutId);
+  }, [basic.siteSlug, basic.streamerName, user?.id, user?.siteSlug]);
+
+  const getStepError = (currentStep) => {
+    const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
+    if (currentStep === 0) {
+      if (!basic.fullName.trim()) return 'Name ist erforderlich.';
+      if (!basic.streamerName.trim()) return 'Streamername ist erforderlich.';
+      if (!slug) return 'Slug ist erforderlich.';
+      if (slug.length < 3) return 'Slug muss mindestens 3 Zeichen haben.';
+      if (!slugState.available) return slugState.message || 'Slug ist nicht verfügbar.';
+      return '';
+    }
+    if (currentStep === 2) {
+      if ((social.twitchOauthToken && !social.twitchBotUsername) || (!social.twitchOauthToken && social.twitchBotUsername)) {
+        return 'Für Twitch Bot müssen Username und OAuth Token gemeinsam gesetzt werden.';
+      }
+      if (social.kickWebhookUrl && !isValidUrl(social.kickWebhookUrl)) return 'Kick Webhook URL ist ungültig.';
+      return '';
+    }
+    if (currentStep === 4) {
+      if (bot.adIntervalMinutes < 1 || bot.adIntervalMinutes > 240) return 'Werbeintervall muss zwischen 1 und 240 Minuten liegen.';
+      if (!bot.adMessage.trim()) return 'Werbenachricht darf nicht leer sein.';
+      return '';
+    }
+    if (currentStep === 5) {
+      if (landing.primaryCtaUrl && !isValidUrl(landing.primaryCtaUrl)) return 'Primary CTA URL ist ungültig.';
+      if (landing.stickyCtaUrl && !isValidUrl(landing.stickyCtaUrl)) return 'Sticky CTA URL ist ungültig.';
+      return '';
+    }
+    return '';
+  };
+
+  const currentStepError = getStepError(step);
+
   const connectTwitchOauth = () => {
     if (!user?.id) return;
     window.location.href = `${API_BASE}/api/social/twitch/start?userId=${user.id}`;
@@ -1551,6 +1618,11 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
   const finalizeWizard = async () => {
     if (!user?.id) return;
+    const blockers = [0, 2, 4, 5].map((s) => getStepError(s)).filter(Boolean);
+    if (blockers.length > 0) {
+      setError(blockers[0]);
+      return;
+    }
     setSaving(true);
     setError('');
     setStatus('Richte alles ein...');
