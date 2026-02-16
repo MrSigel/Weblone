@@ -1110,6 +1110,76 @@ app.get('/api/check-slug/:slug', (req, res) => {
 app.post('/api/user/:id/setup', (req, res) => {
   const { templateId, username, siteSlug, category } = req.body;
   const userId = req.params.id;
+  const parsedTemplateId = Number(templateId) || 2;
+  const landingPresetsByTemplate = {
+    1: {
+      home: [
+        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights fuer deine Community.' } },
+        { blockType: 'Text', dataJson: { content: 'Hier findest du meine handverlesenen Partner inklusive exklusiver Vorteile. Trage unten nur noch deine finalen Deal-Links ein.' } },
+        { blockType: 'Button', dataJson: { label: 'Hauptdeal Link einfuegen', url: 'https://example.com/deal-main' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Twitch', url: 'https://twitch.tv/' }, { label: 'Kick', url: 'https://kick.com/' }] } }
+      ],
+      shop: [
+        { blockType: 'Hero', dataJson: { title: 'Top Bonus Auswahl', subtitle: 'Fuer schnelle Conversions auf einen Blick.' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Casino Deal 1', url: 'https://example.com/deal-1' }, { label: 'Casino Deal 2', url: 'https://example.com/deal-2' }, { label: 'VIP Deal', url: 'https://example.com/deal-vip' }] } }
+      ],
+      hunt: [
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos fuer den naechsten Hunt-Stream.' } },
+        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise fuer die Community.' } },
+        { blockType: 'Button', dataJson: { label: 'Hunt Teilnahme Link', url: 'https://example.com/hunt' } }
+      ],
+      giveaway: [
+        { blockType: 'Hero', dataJson: { title: 'Giveaway Zone', subtitle: 'Aktionen und Teilnahme in wenigen Klicks.' } },
+        { blockType: 'Text', dataJson: { content: 'Beschreibe Gewinn, Laufzeit und Bedingungen. Der Link unten fuehrt direkt zur Teilnahme.' } },
+        { blockType: 'Button', dataJson: { label: 'Giveaway Link', url: 'https://example.com/giveaway' } }
+      ]
+    },
+    2: {
+      home: [
+        { blockType: 'Hero', dataJson: { title: 'Willkommen auf meiner Landingpage', subtitle: 'Exklusive Deals, klar strukturiert und direkt klickbar.' } },
+        { blockType: 'Text', dataJson: { content: 'Dieses Template ist auf maximale Uebersicht optimiert. Ersetze nur die Platzhalter-Links mit deinen Partner-Links.' } },
+        { blockType: 'Button', dataJson: { label: 'Jetzt zum Hauptangebot', url: 'https://example.com/main-offer' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Discord Community', url: 'https://discord.com/' }, { label: 'Telegram News', url: 'https://t.me/' }] } }
+      ],
+      shop: [
+        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote fuer neue und bestehende Spieler.' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Willkommensbonus', url: 'https://example.com/welcome' }, { label: 'Reload Bonus', url: 'https://example.com/reload' }, { label: 'Highroller Deal', url: 'https://example.com/highroller' }] } }
+      ],
+      hunt: [
+        { blockType: 'Hero', dataJson: { title: 'Hunt Plan', subtitle: 'Zeiten, Punkte und Teilnahmelinks.' } },
+        { blockType: 'Text', dataJson: { content: 'Erklaere hier kurz, wann Punkte gesammelt werden und wann Belohnungen abgeholt werden koennen.' } },
+        { blockType: 'Button', dataJson: { label: 'Zum Hunt-Portal', url: 'https://example.com/hunt-portal' } }
+      ],
+      giveaway: [
+        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen fuer aktive Zuschauer.' } },
+        { blockType: 'Text', dataJson: { content: 'Definiere Teilnahmebedingungen transparent, damit Zuschauer schnell verstehen, wie sie mitmachen.' } },
+        { blockType: 'Button', dataJson: { label: 'Jetzt teilnehmen', url: 'https://example.com/giveaway-entry' } }
+      ]
+    },
+    3: {
+      home: [
+        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs fuer maximale Einzahlungen.' } },
+        { blockType: 'Text', dataJson: { content: 'Dieses Preset ist conversion-orientiert. Trage deine Partner-Links ein und starte direkt mit einer professionellen Struktur.' } },
+        { blockType: 'Button', dataJson: { label: 'VIP Bonus aktivieren', url: 'https://example.com/vip-bonus' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Live Stream', url: 'https://twitch.tv/' }, { label: 'Kick Stream', url: 'https://kick.com/' }, { label: 'Kontakt', url: 'mailto:kontakt@weblone.de' }] } }
+      ],
+      shop: [
+        { blockType: 'Hero', dataJson: { title: 'Casino Deals', subtitle: 'Schneller Zugriff auf die besten Partnerangebote.' } },
+        { blockType: 'LinkList', dataJson: { links: [{ label: 'Top Casino #1', url: 'https://example.com/casino-1' }, { label: 'Top Casino #2', url: 'https://example.com/casino-2' }, { label: 'Exklusiv Deal', url: 'https://example.com/exclusive' }] } }
+      ],
+      hunt: [
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles fuer deinen naechsten Live-Hunt.' } },
+        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite fuer Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
+        { blockType: 'Button', dataJson: { label: 'Hunt Event starten', url: 'https://example.com/hunt-start' } }
+      ],
+      giveaway: [
+        { blockType: 'Hero', dataJson: { title: 'Giveaway & Rewards', subtitle: 'Belohne deine treusten Zuschauer.' } },
+        { blockType: 'Text', dataJson: { content: 'Erklaere die Teilnahme in 2-3 Saetzen und leite ueber den Button direkt zur Aktionsseite weiter.' } },
+        { blockType: 'Button', dataJson: { label: 'Rewards Seite', url: 'https://example.com/rewards' } }
+      ]
+    }
+  };
+  const selectedPreset = landingPresetsByTemplate[parsedTemplateId] || landingPresetsByTemplate[2];
   
   // 1. Check if slug is taken
   const existing = db.prepare('SELECT id FROM users WHERE siteSlug = ? AND id != ?').get(siteSlug, userId);
@@ -1120,37 +1190,44 @@ app.post('/api/user/:id/setup', (req, res) => {
   try {
     // Start transaction to ensure everything is created or nothing
     const transaction = db.transaction(() => {
+      const existingUser = db.prepare('SELECT isSetupComplete FROM users WHERE id = ?').get(userId);
+      const isFirstSetup = !existingUser || Number(existingUser.isSetupComplete || 0) === 0;
+
       // 2. Update user setup data
       db.prepare(`
         UPDATE users 
         SET templateId = ?, username = ?, siteSlug = ?, category = ?, isSetupComplete = 1 
         WHERE id = ?
-      `).run(Number(templateId) || 2, username, siteSlug, category, userId);
+      `).run(parsedTemplateId, username, siteSlug, category, userId);
 
-      // 3. Clear existing blocks to avoid duplicates if setup is run twice
+      // Ensure settings row exists in any case
+      db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
+
+      // Seed defaults only on first setup to avoid overriding existing custom work
+      if (!isFirstSetup) return;
+
+      // 3. Clear existing blocks/pages to avoid duplicates
       db.prepare('DELETE FROM site_blocks WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM page_blocks WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM streamer_pages WHERE userId = ?').run(userId);
 
-      // 4. Create default blocks based on template
+      // 4. Create dashboard blocks
       const defaultBlocks = [
         { name: 'Willkommen', type: 'Hero', orderIndex: 1 },
         { name: 'Meine Top Deals', type: 'Grid', orderIndex: 2 },
         { name: 'Social Media', type: 'List', orderIndex: 3 }
       ];
-
-      const insertBlock = db.prepare('INSERT INTO site_blocks (userId, name, type, status, orderIndex) VALUES (?, ?, ?, ?, ?)');
+      const insertSiteBlock = db.prepare('INSERT INTO site_blocks (userId, name, type, status, orderIndex) VALUES (?, ?, ?, ?, ?)');
       for (const block of defaultBlocks) {
-        insertBlock.run(userId, block.name, block.type, 'Active', block.orderIndex);
+        insertSiteBlock.run(userId, block.name, block.type, 'Active', block.orderIndex);
       }
-      
+
       // 5. Create a default deal only when no deal exists yet
       const existingDealCount = db.prepare('SELECT COUNT(*) as c FROM deals WHERE userId = ?').get(userId)?.c || 0;
       if (existingDealCount === 0) {
         db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
           .run(userId, 'Weblone Partner', '100% Bonus bis 500?', 'Top Deal', 'Aktiv');
       }
-
-      // 6. Create default site settings
-      db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
 
       // 7. Create default pages
       const defaultPages = [
@@ -1160,9 +1237,37 @@ app.post('/api/user/:id/setup', (req, res) => {
         { title: 'Giveaway', slug: 'giveaway', type: 'system', sortOrder: 4 }
       ];
       const insertPage = db.prepare('INSERT INTO streamer_pages (userId, title, slug, type, sortOrder) VALUES (?, ?, ?, ?, ?)');
+      const pageIdBySlug = {};
       for (const page of defaultPages) {
-        insertPage.run(userId, page.title, page.slug, page.type, page.sortOrder);
+        const info = insertPage.run(userId, page.title, page.slug, page.type, page.sortOrder);
+        pageIdBySlug[page.slug] = Number(info.lastInsertRowid);
       }
+
+      // 8. Create predefined landing page content from selected template
+      const pageBlocksBySlug = {
+        '': selectedPreset.home || [],
+        shop: selectedPreset.shop || [],
+        hunt: selectedPreset.hunt || [],
+        giveaway: selectedPreset.giveaway || []
+      };
+      const insertPageBlock = db.prepare(`
+        INSERT INTO page_blocks (userId, pageId, blockType, dataJson, visible, sortOrder)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `);
+      Object.entries(pageBlocksBySlug).forEach(([slug, blocks]) => {
+        const pageId = pageIdBySlug[slug];
+        if (!pageId) return;
+        blocks.forEach((block, index) => {
+          insertPageBlock.run(
+            userId,
+            pageId,
+            block.blockType,
+            JSON.stringify(block.dataJson || {}),
+            1,
+            index + 1
+          );
+        });
+      });
     });
 
     transaction();

@@ -1798,10 +1798,15 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
           {step === 1 && (
             <div className="grid md:grid-cols-3 gap-4">
-              {[{ id: 1, name: 'Neon Night' }, { id: 2, name: 'Minimal Pro' }, { id: 3, name: 'Casino Master' }].map((tpl) => (
+              {[
+                { id: 1, name: 'Neon Night', preset: 'Dynamische Promo-Struktur mit schnellen CTA-Flaechen' },
+                { id: 2, name: 'Minimal Pro', preset: 'Klarer Baukasten fuer einfache Link-Pflege' },
+                { id: 3, name: 'Casino Master', preset: 'Conversion-fokussiertes Setup fuer Casino Traffic' }
+              ].map((tpl) => (
                 <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
                   <p className="font-bold text-white">{tpl.name}</p>
                   <p className="text-xs text-[#A1A1A1] mt-1">Template #{tpl.id}</p>
+                  <p className="text-xs text-[#A1A1A1] mt-2">{tpl.preset}</p>
                 </button>
               ))}
             </div>
