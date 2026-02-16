@@ -3350,26 +3350,35 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
     deal: '',
     status: 'Aktiv',
     imageUrl: '',
+    ctaUrl: '',
     promoCode: 'DIEGAWINOS',
     bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
   });
   const [dealImages, setDealImages] = useState({});
   const [dealNames, setDealNames] = useState({});
+  const [dealTexts, setDealTexts] = useState({});
+  const [dealLinks, setDealLinks] = useState({});
   const [dealCodes, setDealCodes] = useState({});
   const [dealTerms, setDealTerms] = useState({});
   useEffect(() => {
     const nextImages = {};
     const nextNames = {};
+    const nextTexts = {};
+    const nextLinks = {};
     const nextCodes = {};
     const nextTerms = {};
     (deals || []).forEach((d) => {
       nextImages[d.id] = d.imageUrl || '';
       nextNames[d.id] = d.name || '';
+      nextTexts[d.id] = d.deal || '';
+      nextLinks[d.id] = d.ctaUrl || '';
       nextCodes[d.id] = d.promoCode || 'DIEGAWINOS';
       nextTerms[d.id] = d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager';
     });
     setDealImages(nextImages);
     setDealNames(nextNames);
+    setDealTexts(nextTexts);
+    setDealLinks(nextLinks);
     setDealCodes(nextCodes);
     setDealTerms(nextTerms);
   }, [deals]);
@@ -3406,6 +3415,7 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
           deal: '',
           status: 'Aktiv',
           imageUrl: '',
+          ctaUrl: '',
           promoCode: 'DIEGAWINOS',
           bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
         });
@@ -3427,16 +3437,18 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
   const saveDealConfig = async (deal) => {
     try {
       const name = (dealNames[deal.id] || deal.name || '').trim();
+      const dealText = (dealTexts[deal.id] || deal.deal || '').trim();
       const imageUrl = (dealImages[deal.id] || '').trim();
+      const ctaUrl = (dealLinks[deal.id] || '').trim();
       const promoCode = (dealCodes[deal.id] || 'DIEGAWINOS').trim();
       const bonusTerms = (dealTerms[deal.id] || '100% Sticky - 300EUR Max Bonus - 40x Wager').trim();
       const response = await fetch(`${API_BASE}/api/user/${userId}/deal/${deal.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...deal, name, imageUrl, promoCode, bonusTerms })
+        body: JSON.stringify({ ...deal, name, deal: dealText, imageUrl, ctaUrl, promoCode, bonusTerms })
       });
       if (response.ok) {
-        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, name, imageUrl, promoCode, bonusTerms } : d));
+        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, name, deal: dealText, imageUrl, ctaUrl, promoCode, bonusTerms } : d));
       }
     } catch (err) { console.error(err); }
   };
