@@ -1916,7 +1916,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               disabled={step === 0 || saving}
               className="px-4 py-2 rounded-xl bg-white/10 text-white disabled:opacity-30"
             >
-              Zurueck
+              Zur?ck
             </button>
             {step < 6 && (
               <button
@@ -3642,7 +3642,7 @@ const ToolsContent = ({ user, onUpdate }) => {
       }
       const attempted = result.result?.attempted ? 0;
       const errorCount = result.result?.errors?.length ? 0;
-      setStatus(`Gesendet an ${attempted} Kanal/Kanaele${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
+      setStatus(`Gesendet an ${attempted} Kanal/Kan?le${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
     } catch (err) {
       setStatus('Aktion fehlgeschlagen.');
     }
@@ -3704,7 +3704,7 @@ const ToolsContent = ({ user, onUpdate }) => {
   const tools = [
     { name: 'Bonushunt List', id: 'bonushunt', desc: 'Verwalte deine Boni und teile die Liste live mit deinem Stream.', icon: List },
     { name: 'Wagerbar', id: 'wagerbar', desc: 'Visualisiere deinen Fortschritt beim Umsetzen von Boni.', icon: Activity },
-    { name: 'Slottracker', id: 'slottracker', desc: 'Behalte den Ueberblick ueber deine gespielten Slots und Ergebnisse.', icon: BarChart3 },
+    { name: 'Slottracker', id: 'slottracker', desc: 'Behalte den ?berblick ?ber deine gespielten Slots und Ergebnisse.', icon: BarChart3 },
     { name: 'Tournament System', id: 'tournament', desc: 'Erstelle Giveaways und Turniere für deine Community.', icon: Trophy }
   ];
 
@@ -3718,8 +3718,8 @@ const ToolsContent = ({ user, onUpdate }) => {
       <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
         <h3 className="text-lg font-bold text-[#EDEDED]">Bot Auth & Kick Bridge</h3>
         <p className="text-xs text-[#A1A1A1]">
-          Fuer Twitch muss dein Bot-Account Moderator im Channel sein. Token als OAuth (oauth:...) hinterlegen.
-          Fuer Kick wird aktuell eine Bridge-Webhook-URL benoetigt.
+          F?r Twitch muss dein Bot-Account Moderator im Channel sein. Token als OAuth (oauth:...) hinterlegen.
+          F?r Kick wird aktuell eine Bridge-Webhook-URL ben?tigt.
         </p>
         <div className="grid md:grid-cols-2 gap-4">
           <input
@@ -4321,7 +4321,7 @@ const SuperAdminPage = () => {
       fetchUserDetails(selectedUserId);
       fetchDashboardData();
     } catch (err) {
-      setError(err.message || 'Deal konnte nicht hinzugefuegt werden.');
+      setError(err.message || 'Deal konnte nicht hinzugef?gt werden.');
     }
   };
 
@@ -4336,7 +4336,7 @@ const SuperAdminPage = () => {
       fetchUserDetails(selectedUserId);
       fetchDashboardData();
     } catch (err) {
-      setError(err.message || 'Deal-Status konnte nicht geaendert werden.');
+      setError(err.message || 'Deal-Status konnte nicht ge?ndert werden.');
     }
   };
 
@@ -4349,7 +4349,7 @@ const SuperAdminPage = () => {
       fetchUserDetails(selectedUserId);
       fetchDashboardData();
     } catch (err) {
-      setError(err.message || 'Deal konnte nicht geloescht werden.');
+      setError(err.message || 'Deal konnte nicht gel?scht werden.');
     }
   };
 
@@ -4718,7 +4718,7 @@ const SuperAdminPage = () => {
             </div>
 
             {loadingDetails && <p className="text-sm text-[#A1A1A1]">Lade Nutzerdetails...</p>}
-            {!loadingDetails && activeSection === 'overview' && !selectedData && <p className="text-sm text-[#A1A1A1]">Waehle links einen Nutzer aus.</p>}
+            {!loadingDetails && activeSection === 'overview' && !selectedData && <p className="text-sm text-[#A1A1A1]">W?hle links einen Nutzer aus.</p>}
 
             {!loadingDetails && activeSection === 'overview' && selectedData && (
               <>
@@ -5194,7 +5194,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         <div>
           <p className="font-bold mb-2">Features:</p>
           <ul className="space-y-1 text-sm text-[#d8def1]">
-            <li><span className="text-emerald-400">+</span> Reloadboni ueber den VIP-Support anfragbar</li>
+            <li><span className="text-emerald-400">+</span> Reloadboni ?ber den VIP-Support anfragbar</li>
             <li><span className="text-emerald-400">+</span> Alle Auszahlungen binnen Minuten auf dem Konto</li>
             <li><span className="text-emerald-400">+</span> Keine verbotenen Spiele im Bonus</li>
             <li><span className="text-emerald-400">+</span> VPN - Freundlich</li>
@@ -5203,7 +5203,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
           </ul>
         </div>
         <div className="md:border-l md:border-[#2a385c] md:pl-4">
-          <p className="font-bold mb-2">Verfuegbarkeit:</p>
+          <p className="font-bold mb-2">Verf?gbarkeit:</p>
           <div className="grid grid-cols-3 gap-1.5">
             {countries.map((country) => (
               <div key={country.code} className="rounded bg-white/10 border border-white/10 p-1 flex items-center justify-center">
@@ -5321,7 +5321,7 @@ const CasinoDealsSection = ({ deals = [], compact = false, ctaHref = '#' }) => {
   if (!deals.length) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-[#A1A1A1]">
-        Auf dieser Seite erscheinen Bonus-Angebote automatisch, sobald ein Deal hinzugefuegt wurde.
+        Auf dieser Seite erscheinen Bonus-Angebote automatisch, sobald ein Deal hinzugef?gt wurde.
       </div>
     );
   }
