@@ -4650,7 +4650,7 @@ const SuperAdminPage = () => {
 
                 <section className="space-y-3">
                   <h3 className="text-lg font-bold">Deals Verwalten</h3>
-                  <div className="grid md:grid-cols-5 gap-3">
+                  <div className="grid md:grid-cols-7 gap-3">
                     <input
                       type="text"
                       placeholder="Deal Name"
@@ -4677,6 +4677,20 @@ const SuperAdminPage = () => {
                       placeholder="Bild URL (optional)"
                       value={newDeal.imageUrl || ''}
                       onChange={(e) => setNewDeal({ ...newDeal, imageUrl: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Code"
+                      value={newDeal.promoCode || ''}
+                      onChange={(e) => setNewDeal({ ...newDeal, promoCode: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Bonus Zeile"
+                      value={newDeal.bonusTerms || ''}
+                      onChange={(e) => setNewDeal({ ...newDeal, bonusTerms: e.target.value })}
                       className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
                     />
                     <button onClick={addDealToUser} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">
