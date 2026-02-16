@@ -12,11 +12,12 @@ import {
   Layers,
   Zap,
   Check,
+  ArrowUp,
+  ArrowDown,
   ChevronDown,
   User,
   Settings,
   Link as LinkIcon,
-  HelpCircle,
   Eye,
   Plus,
   Briefcase,
@@ -354,12 +355,9 @@ const Home = () => {
                   Etabliere deine eigene Marke, verwalte deine Partnerschaften effizient und biete deiner Community ein interaktives Zuhause – Website + Dashboard.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-16">
-                  <button className="bg-[#EDEDED] text-[#050505] px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-[#D4D4D4] transition-all group">
-                    Jetzt kostenlos starten <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button className={`bg-[#0A0A0A] text-[#EDEDED] px-8 py-4 rounded-full font-bold text-lg border ${theme.border} ${theme.borderHover} transition-all`}>
-                    Live-Demo
-                  </button>
+                  <Link to="/register" className="bg-[#EDEDED] text-[#050505] px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-[#D4D4D4] transition-all group">
+                    Jetzt Starten <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                  </Link>
                 </div>
                 
                 <motion.div 
@@ -945,39 +943,7 @@ const StreamerPageContent = ({ data }) => {
 // --- STREAMER LANDING PAGE ---
 const StreamerPage = () => {
   const { slug } = useParams();
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchStreamerData = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/streamer/${slug}`);
-        const result = await response.json();
-        if (result.success) {
-          setData(result.data);
-        } else {
-          setError(result.error || 'Streamer nicht gefunden.');
-        }
-      } catch (err) {
-        setError('Verbindung zum Server fehlgeschlagen.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchStreamerData();
-  }, [slug]);
-
-  if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white">Lade Streamer Seite...</div>;
-  if (error) return (
-    <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white p-6 text-center">
-      <h1 className="text-4xl font-bold mb-4">Ups!</h1>
-      <p className="text-[#A1A1A1] mb-8">{error}</p>
-      <Link to="/" className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">Zurück zur Startseite</Link>
-    </div>
-  );
-
-  return <StreamerPageContent data={data} />;
+  return <StreamerPageOverride slug={slug} />;
 };
 
 // --- AUTH & ONBOARDING COMPONENTS ---
@@ -1443,7 +1409,6 @@ const BaseSetup = ({ user, onComplete }) => {
 // --- DASHBOARD COMPONENTS ---
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
-  const navigate = useNavigate();
   const menuItems = [
     { id: 'overview', name: 'Overview', icon: Layout },
     { id: 'builder', name: 'Site Builder', icon: Monitor },
@@ -1478,10 +1443,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         ))}
       </nav>
       <div className="p-4 border-t border-white/5 space-y-2">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[#A1A1A1] hover:bg-white/5 hover:text-[#EDEDED] transition-all">
-          <HelpCircle size={20} />
-          <span className="font-medium">Support</span>
-        </button>
         <button 
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-500/70 hover:bg-red-500/5 hover:text-red-500 transition-all"
@@ -1802,6 +1763,31 @@ const SiteBuilder = ({ user, onUpdate }) => {
     } catch (err) { console.error(err); }
   };
 
+  const persistBlockOrder = async (orderedIds) => {
+    try {
+      await fetch(`${API_BASE}/api/site/${user.id}/pages/${activePageId}/blocks/reorder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blockIds: orderedIds })
+      });
+    } catch (err) { console.error(err); }
+  };
+
+  const moveBlock = (blockId, direction) => {
+    const currentIndex = blocks.findIndex((b) => b.id === blockId);
+    if (currentIndex < 0) return;
+
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= blocks.length) return;
+
+    const reordered = [...blocks];
+    const [moved] = reordered.splice(currentIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+    const normalized = reordered.map((block, index) => ({ ...block, sortOrder: index + 1 }));
+    setBlocks(normalized);
+    persistBlockOrder(normalized.map((b) => b.id));
+  };
+
   if (loading) return <div className="p-12 text-center text-white">Lädt Site Builder...</div>;
 
   const activePage = pages.find(p => p.id === activePageId);
@@ -1948,10 +1934,14 @@ const SiteBuilder = ({ user, onUpdate }) => {
                   <p className="font-bold">Keine Blöcke vorhanden</p>
                 </div>
               ) : (
-                blocks.map((block) => (
+                blocks.map((block, index) => (
                   <BlockEditor 
                     key={block.id} 
                     block={block} 
+                    isFirst={index === 0}
+                    isLast={index === blocks.length - 1}
+                    onMoveUp={() => moveBlock(block.id, 'up')}
+                    onMoveDown={() => moveBlock(block.id, 'down')}
                     onUpdate={(data, visible) => updateBlock(block.id, data, visible)}
                     onDelete={() => deleteBlock(block.id)}
                   />
@@ -1959,19 +1949,80 @@ const SiteBuilder = ({ user, onUpdate }) => {
               )}
             </div>
           </div>
+
+          <BuilderPreview
+            user={user}
+            settings={settings}
+            pages={pages}
+            blocks={blocks}
+            activePageId={activePageId}
+            setActivePageId={setActivePageId}
+          />
         </div>
       </div>
     </div>
   );
 };
 
-const BlockEditor = ({ block, onUpdate, onDelete }) => {
+const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActivePageId }) => {
+  const activePage = pages.find((p) => p.id === activePageId) || pages[0];
+  const visiblePages = pages.filter((p) => p.visible || p.id === activePageId);
+  const pageBlocks = [...blocks].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+
+  return (
+    <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-bold text-[#A1A1A1] uppercase tracking-wider">Live Vorschau</h3>
+        <span className="text-xs text-[#A1A1A1]">Änderungen erscheinen sofort</span>
+      </div>
+
+      <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#050505]">
+        <div className="px-4 py-3 border-b border-white/10 bg-[#0A0A0A] flex items-center justify-between">
+          <span className="font-bold text-white">{settings.navTitle || user?.username || 'Streamer'}</span>
+          <span className="text-xs text-[#A1A1A1]">{activePage?.title || 'Seite'}</span>
+        </div>
+
+        <div className="px-4 py-3 border-b border-white/10 flex flex-wrap gap-2">
+          {(visiblePages.length ? visiblePages : pages).map((page) => (
+            <button
+              key={page.id}
+              onClick={() => setActivePageId(page.id)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${page.id === activePageId ? 'bg-indigo-600 text-white' : 'bg-white/5 text-[#A1A1A1] hover:text-white'}`}
+            >
+              {page.title}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-6 space-y-6">
+          {pageBlocks.length === 0 ? (
+            <div className="text-center py-12 text-[#A1A1A1]">
+              Diese Seite hat noch keine Blöcke.
+            </div>
+          ) : (
+            pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const BlockEditor = ({ block, isFirst, isLast, onMoveUp, onMoveDown, onUpdate, onDelete }) => {
   const [data, setData] = useState(() => {
     try {
       return typeof block.dataJson === 'string' ? JSON.parse(block.dataJson) : block.dataJson;
     } catch (e) { return {}; }
   });
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    try {
+      setData(typeof block.dataJson === 'string' ? JSON.parse(block.dataJson) : block.dataJson);
+    } catch (e) {
+      setData({});
+    }
+  }, [block.dataJson]);
 
   const handleChange = (key, value) => {
     const newData = { ...data, [key]: value };
@@ -1992,6 +2043,20 @@ const BlockEditor = ({ block, onUpdate, onDelete }) => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+           <button 
+            onClick={onMoveUp}
+            disabled={isFirst}
+            className="p-2 text-[#A1A1A1] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ArrowUp size={16} />
+          </button>
+          <button 
+            onClick={onMoveDown}
+            disabled={isLast}
+            className="p-2 text-[#A1A1A1] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ArrowDown size={16} />
+          </button>
            <button 
             onClick={() => onUpdate(data, !block.visible)}
             className="p-2 text-[#A1A1A1] hover:text-white transition-colors"
@@ -2747,7 +2812,12 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
 };
 
 const RenderBlock = ({ block, deals }) => {
-  const data = JSON.parse(block.dataJson);
+  let data = {};
+  try {
+    data = typeof block.dataJson === 'string' ? JSON.parse(block.dataJson) : (block.dataJson || {});
+  } catch (e) {
+    data = {};
+  }
 
   switch (block.blockType) {
     case 'Hero':
@@ -2805,3 +2875,5 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
+
