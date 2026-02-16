@@ -1410,6 +1410,420 @@ const BaseSetup = ({ user, onComplete }) => {
   );
 };
 
+const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
+  const navigate = useNavigate();
+  const [step, setStep] = useState(initialStep);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState('');
+  const [error, setError] = useState('');
+
+  const [basic, setBasic] = useState({
+    fullName: '',
+    streamerName: user?.username || '',
+    siteSlug: user?.siteSlug || '',
+    category: user?.category || 'Casino'
+  });
+  const [templateId, setTemplateId] = useState(user?.templateId || 2);
+  const [social, setSocial] = useState({
+    twitchBotUsername: '',
+    twitchOauthToken: '',
+    kickChannel: '',
+    kickWebhookUrl: '',
+    kickWebhookSecret: ''
+  });
+  const [bot, setBot] = useState({
+    twitchChannel: '',
+    kickChannel: '',
+    adIntervalMinutes: 15,
+    adMessage: 'Werbung: Checkt meine Deals auf der Landingpage.',
+    autoStartReader: false
+  });
+  const [dealSelections, setDealSelections] = useState({});
+  const [deals, setDeals] = useState([]);
+  const [landing, setLanding] = useState({
+    navTitle: user?.username || '',
+    slogan: '',
+    primaryCtaText: 'Jetzt Bonus sichern',
+    primaryCtaUrl: '',
+    stickyCtaEnabled: 1,
+    stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
+    stickyCtaUrl: '',
+    trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
+    urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler'
+  });
+  const [pageVisibility, setPageVisibility] = useState({
+    '': true,
+    shop: true,
+    hunt: true,
+    giveaway: true
+  });
+
+  const stepLabels = [
+    'Basisdaten',
+    'Template',
+    'Social Tokens',
+    'Deals',
+    'Bot Setup',
+    'Landingpage',
+    'Verbindung starten'
+  ];
+
+  useEffect(() => {
+    if (!user) navigate('/login');
+  }, [user, navigate]);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!user?.id) return;
+      try {
+        const [dashRes, settingsRes, pagesRes] = await Promise.all([
+          fetch(`${API_BASE}/api/user/${user.id}/dashboard`),
+          fetch(`${API_BASE}/api/site/${user.id}/settings`),
+          fetch(`${API_BASE}/api/site/${user.id}/pages`)
+        ]);
+
+        const dash = await dashRes.json();
+        const settings = await settingsRes.json();
+        const pages = await pagesRes.json();
+
+        if (dash.success) {
+          setDeals(dash.data?.deals || []);
+          const next = {};
+          (dash.data?.deals || []).forEach((d) => { next[d.id] = d.status !== 'Deaktiviert'; });
+          setDealSelections(next);
+
+          let parsedTools = {};
+          try {
+            parsedTools = typeof dash.data?.user?.toolsConfig === 'string'
+              ? JSON.parse(dash.data.user.toolsConfig || '{}')
+              : (dash.data?.user?.toolsConfig || {});
+          } catch (e) {}
+
+          setSocial((prev) => ({
+            ...prev,
+            twitchBotUsername: parsedTools?.chatAuth?.twitchBotUsername || '',
+            twitchOauthToken: parsedTools?.chatAuth?.twitchOauthToken || '',
+            kickChannel: parsedTools?.socialAuth?.kick?.channel || '',
+            kickWebhookUrl: parsedTools?.kickBridge?.webhookUrl || '',
+            kickWebhookSecret: parsedTools?.kickBridge?.webhookSecret || ''
+          }));
+          setBot((prev) => ({
+            ...prev,
+            twitchChannel: parsedTools?.bonushunt?.twitch || '',
+            kickChannel: parsedTools?.bonushunt?.kick || ''
+          }));
+        }
+
+        if (settings.success) {
+          setLanding((prev) => ({ ...prev, ...(settings.settings || {}) }));
+        }
+        if (pages.success) {
+          const vis = { ...pageVisibility };
+          (pages.pages || []).forEach((p) => {
+            vis[p.slug || ''] = !!p.visible;
+          });
+          setPageVisibility(vis);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    load();
+  }, [user?.id]);
+
+  const normalizeSlug = (value) => String(value || '').toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
+
+  const connectTwitchOauth = () => {
+    if (!user?.id) return;
+    window.location.href = `${API_BASE}/api/social/twitch/start?userId=${user.id}`;
+  };
+
+  const finalizeWizard = async () => {
+    if (!user?.id) return;
+    setSaving(true);
+    setError('');
+    setStatus('Richte alles ein...');
+
+    const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
+    try {
+      // Step A: setup account/site basics
+      if (!user.isSetupComplete) {
+        const setupRes = await fetch(`${API_BASE}/api/user/${user.id}/setup`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            templateId,
+            username: basic.streamerName,
+            siteSlug: slug,
+            category: basic.category
+          })
+        });
+        const setupData = await setupRes.json();
+        if (!setupRes.ok || !setupData.success) throw new Error(setupData.error || 'Setup fehlgeschlagen.');
+      }
+
+      setStatus('Speichere Tools und Social...');
+      const dashboardRes = await fetch(`${API_BASE}/api/user/${user.id}/dashboard`);
+      const dashboardData = await dashboardRes.json();
+      const currentUser = dashboardData?.data?.user || user;
+      const currentDeals = dashboardData?.data?.deals || [];
+
+      let toolsConfig = {};
+      try {
+        toolsConfig = typeof currentUser?.toolsConfig === 'string'
+          ? JSON.parse(currentUser.toolsConfig || '{}')
+          : (currentUser?.toolsConfig || {});
+      } catch (e) {}
+
+      toolsConfig.chatAuth = {
+        ...(toolsConfig.chatAuth || {}),
+        twitchBotUsername: social.twitchBotUsername,
+        twitchOauthToken: social.twitchOauthToken
+      };
+      toolsConfig.kickBridge = {
+        ...(toolsConfig.kickBridge || {}),
+        webhookUrl: social.kickWebhookUrl,
+        webhookSecret: social.kickWebhookSecret
+      };
+
+      ['bonushunt', 'wagerbar', 'slottracker', 'tournament'].forEach((toolId) => {
+        toolsConfig[toolId] = {
+          ...(toolsConfig[toolId] || {}),
+          twitch: bot.twitchChannel,
+          kick: bot.kickChannel
+        };
+      });
+
+      await fetch(`${API_BASE}/api/user/${user.id}/tools`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toolsConfig })
+      });
+
+      if (social.kickChannel?.trim()) {
+        await fetch(`${API_BASE}/api/user/${user.id}/social/kick/connect`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel: social.kickChannel.trim() })
+        });
+      }
+
+      setStatus('Speichere Deals...');
+      for (const deal of currentDeals) {
+        const accepted = dealSelections[deal.id];
+        if (accepted === undefined) continue;
+        const nextStatus = accepted ? 'Aktiv' : 'Deaktiviert';
+        await fetch(`${API_BASE}/api/user/${user.id}/deal/${deal.id}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...deal, status: nextStatus })
+        });
+      }
+
+      setStatus('Speichere Landingpage...');
+      await fetch(`${API_BASE}/api/site/${user.id}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...landing,
+          navTitle: landing.navTitle || basic.streamerName
+        })
+      });
+
+      const pagesRes = await fetch(`${API_BASE}/api/site/${user.id}/pages`);
+      const pagesData = await pagesRes.json();
+      for (const p of (pagesData.pages || [])) {
+        const key = p.slug || '';
+        if (typeof pageVisibility[key] === 'boolean') {
+          await fetch(`${API_BASE}/api/site/${user.id}/pages/${p.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: p.title, slug: p.slug, visible: pageVisibility[key] ? 1 : 0 })
+          });
+        }
+      }
+
+      if (bot.autoStartReader && social.twitchBotUsername && social.twitchOauthToken) {
+        await fetch(`${API_BASE}/api/user/${user.id}/tools/chat-reader/start`, { method: 'POST' });
+      }
+
+      onComplete?.({
+        ...user,
+        username: basic.streamerName,
+        siteSlug: slug,
+        category: basic.category,
+        isSetupComplete: 1
+      });
+      navigate(`/dashboard/${slug}`);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || 'Einrichtung fehlgeschlagen.');
+    } finally {
+      setSaving(false);
+      setStatus('');
+    }
+  };
+
+  return (
+    <div className={`${theme.bg} min-h-screen pt-28 pb-20 px-6 relative overflow-hidden`}>
+      <BackgroundBubbles />
+      <div className="max-w-4xl mx-auto relative z-10 space-y-6">
+        <div className="text-center space-y-3">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#EDEDED]">Setup Wizard</h1>
+          <p className="text-[#A1A1A1]">Schritt {step + 1} von {stepLabels.length}: {stepLabels[step]}</p>
+          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-full bg-indigo-600 transition-all" style={{ width: `${((step + 1) / stepLabels.length) * 100}%` }} />
+          </div>
+        </div>
+
+        <div className={`p-6 md:p-8 rounded-2xl border ${theme.border} ${theme.surface} space-y-6`}>
+          {error && <p className="text-sm text-red-300">{error}</p>}
+          {status && <p className="text-sm text-indigo-300">{status}</p>}
+
+          {step === 0 && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <input value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} placeholder="Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={basic.streamerName} onChange={(e) => setBasic({ ...basic, streamerName: e.target.value })} placeholder="Streamername" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={basic.siteSlug} onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })} placeholder="URL-Name (slug)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <select value={basic.category} onChange={(e) => setBasic({ ...basic, category: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3">
+                <option>Casino</option>
+                <option>Gaming</option>
+                <option>Just Chatting</option>
+                <option>Sports</option>
+              </select>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div className="grid md:grid-cols-3 gap-4">
+              {[{ id: 1, name: 'Neon Night' }, { id: 2, name: 'Minimal Pro' }, { id: 3, name: 'Casino Master' }].map((tpl) => (
+                <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <p className="font-bold text-white">{tpl.name}</p>
+                  <p className="text-xs text-[#A1A1A1] mt-1">Template #{tpl.id}</p>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <input value={social.twitchBotUsername} onChange={(e) => setSocial({ ...social, twitchBotUsername: e.target.value })} placeholder="Twitch Bot Username" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={social.twitchOauthToken} onChange={(e) => setSocial({ ...social, twitchOauthToken: e.target.value })} placeholder="Twitch OAuth Token" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={social.kickChannel} onChange={(e) => setSocial({ ...social, kickChannel: e.target.value })} placeholder="Kick Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={social.kickWebhookUrl} onChange={(e) => setSocial({ ...social, kickWebhookUrl: e.target.value })} placeholder="Kick Webhook URL (optional)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={social.kickWebhookSecret} onChange={(e) => setSocial({ ...social, kickWebhookSecret: e.target.value })} placeholder="Kick Webhook Secret (optional)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
+              <button onClick={connectTwitchOauth} className="md:col-span-2 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-indigo-500 transition-all">
+                Optional: Twitch Account via OAuth verbinden
+              </button>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-3">
+              {deals.length === 0 && <p className="text-sm text-[#A1A1A1]">Noch keine Deals vorhanden. Du kannst später im Dashboard entscheiden.</p>}
+              {deals.map((deal) => (
+                <label key={deal.id} className="flex items-center justify-between gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
+                  <div>
+                    <p className="font-bold text-white">{deal.name}</p>
+                    <p className="text-sm text-[#A1A1A1]">{deal.deal}</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={dealSelections[deal.id] !== false}
+                    onChange={(e) => setDealSelections({ ...dealSelections, [deal.id]: e.target.checked })}
+                  />
+                </label>
+              ))}
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <input value={bot.twitchChannel} onChange={(e) => setBot({ ...bot, twitchChannel: e.target.value })} placeholder="Bot Twitch Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={bot.kickChannel} onChange={(e) => setBot({ ...bot, kickChannel: e.target.value })} placeholder="Bot Kick Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input type="number" min="1" value={bot.adIntervalMinutes} onChange={(e) => setBot({ ...bot, adIntervalMinutes: Number(e.target.value || 15) })} placeholder="Werbeintervall (Min)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={bot.adMessage} onChange={(e) => setBot({ ...bot, adMessage: e.target.value })} placeholder="Werbenachricht" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <label className="md:col-span-2 flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5">
+                <span className="text-sm text-white">Chat Reader nach Setup direkt starten</span>
+                <input type="checkbox" checked={bot.autoStartReader} onChange={(e) => setBot({ ...bot, autoStartReader: e.target.checked })} />
+              </label>
+            </div>
+          )}
+
+          {step === 5 && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <input value={landing.navTitle || ''} onChange={(e) => setLanding({ ...landing, navTitle: e.target.value })} placeholder="Navigationstitel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.slogan || ''} onChange={(e) => setLanding({ ...landing, slogan: e.target.value })} placeholder="Slogan" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.primaryCtaText || ''} onChange={(e) => setLanding({ ...landing, primaryCtaText: e.target.value })} placeholder="CTA Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.primaryCtaUrl || ''} onChange={(e) => setLanding({ ...landing, primaryCtaUrl: e.target.value })} placeholder="CTA URL" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.stickyCtaText || ''} onChange={(e) => setLanding({ ...landing, stickyCtaText: e.target.value })} placeholder="Sticky CTA Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.stickyCtaUrl || ''} onChange={(e) => setLanding({ ...landing, stickyCtaUrl: e.target.value })} placeholder="Sticky CTA URL" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={landing.trustBadgeText || ''} onChange={(e) => setLanding({ ...landing, trustBadgeText: e.target.value })} placeholder="Trust Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
+              <input value={landing.urgencyText || ''} onChange={(e) => setLanding({ ...landing, urgencyText: e.target.value })} placeholder="FOMO Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
+              <div className="md:col-span-2 p-4 rounded-xl border border-white/10 bg-white/5 space-y-2">
+                <p className="text-sm font-bold text-white">Seiten Sichtbarkeit</p>
+                {[
+                  { key: '', label: 'Home' },
+                  { key: 'shop', label: 'Shop' },
+                  { key: 'hunt', label: 'Hunt' },
+                  { key: 'giveaway', label: 'Giveaway' }
+                ].map((page) => (
+                  <label key={page.key || 'home'} className="flex items-center justify-between">
+                    <span className="text-sm text-[#EDEDED]">{page.label}</span>
+                    <input
+                      type="checkbox"
+                      checked={!!pageVisibility[page.key]}
+                      onChange={(e) => setPageVisibility({ ...pageVisibility, [page.key]: e.target.checked })}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {step === 6 && (
+            <div className="space-y-4">
+              <p className="text-[#A1A1A1]">Wenn du auf "Verbindung starten" klickst, wird alles automatisch eingerichtet:</p>
+              <ul className="text-sm text-[#EDEDED] space-y-2">
+                <li>- Basisdaten und Template</li>
+                <li>- Deals (akzeptieren/ablehnen)</li>
+                <li>- Bot und Social Konfiguration</li>
+                <li>- Landingpage Buttons und Seiten</li>
+              </ul>
+              <button
+                onClick={finalizeWizard}
+                disabled={saving || !basic.streamerName || !normalizeSlug(basic.siteSlug || basic.streamerName)}
+                className="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-black hover:bg-indigo-500 transition-all disabled:opacity-50"
+              >
+                {saving ? 'Richte ein...' : 'Verbindung starten'}
+              </button>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-4 border-t border-white/10">
+            <button
+              onClick={() => setStep((s) => Math.max(0, s - 1))}
+              disabled={step === 0 || saving}
+              className="px-4 py-2 rounded-xl bg-white/10 text-white disabled:opacity-30"
+            >
+              Zurueck
+            </button>
+            {step < 6 && (
+              <button
+                onClick={() => setStep((s) => Math.min(6, s + 1))}
+                disabled={saving}
+                className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 disabled:opacity-50"
+              >
+                Weiter
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // --- DASHBOARD COMPONENTS ---
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
@@ -4247,9 +4661,9 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login onLogin={handleSetUser} />} />
             <Route path="/register" element={<Register onRegister={handleSetUser} />} />
-            <Route path="/onboarding" element={<OnboardingStart user={user} />} />
-            <Route path="/onboarding/template" element={<TemplateSelection user={user} />} />
-            <Route path="/onboarding/setup" element={<BaseSetup user={user} onComplete={(updatedUser) => handleSetUser({...user, ...updatedUser})} />} />
+            <Route path="/onboarding" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={0} />} />
+            <Route path="/onboarding/template" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={1} />} />
+            <Route path="/onboarding/setup" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={2} />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/dashboard/:slug" element={<Dashboard user={user} />} />
             <Route path="/superadmin" element={<SuperAdminPage />} />
@@ -4515,5 +4929,3 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
-
-
