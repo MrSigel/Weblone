@@ -18,7 +18,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const IS_PROD = process.env.NODE_ENV === 'production';
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'dev-token-123';
-const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'leads.db');
+const DB_PATH = process.env.DATABASE_PATH || (IS_PROD ? '/var/data/leads.db' : path.join(__dirname, 'leads.db'));
 const SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL || 'admin@weblone2026.com';
 const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'graecodesigns.de2026!';
 const SUPERADMIN_SESSION_TOKEN = process.env.SUPERADMIN_SESSION_TOKEN || 'superadmin-session-token-2026';
@@ -2139,4 +2139,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Database path: ${DB_PATH}`);
 });
