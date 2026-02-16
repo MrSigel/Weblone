@@ -2097,6 +2097,7 @@ const Dashboard = ({ user }) => {
       case 'builder': return (
         <SiteBuilder 
           user={user} 
+          deals={data.deals || []}
           onUpdate={(newUser) => setData({...data, user: newUser})} 
         />
       );
@@ -2428,7 +2429,7 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
     </div>
   );
 };
-const SiteBuilder = ({ user, onUpdate }) => {
+const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   const [settings, setSettings] = useState({
     navTitle: user?.username || '',
     slogan: '',
@@ -2623,6 +2624,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
   if (loading) return <div className="p-12 text-center text-white">Lädt Site Builder...</div>;
 
   const activePage = pages.find(p => p.id === activePageId);
+  const isCasinoPage = activePage?.slug === 'shop';
 
   return (
     <div className="space-y-8 pb-20">
