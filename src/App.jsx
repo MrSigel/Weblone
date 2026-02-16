@@ -3695,6 +3695,34 @@ const SuperAdminPage = () => {
     }
   };
 
+  const deleteSelectedUser = async () => {
+    if (!selectedData?.user?.id) return;
+    const label = selectedData.user.siteSlug || selectedData.user.username || String(selectedData.user.id);
+    const confirmation = window.prompt(`Zum vollständigen Löschen bitte exakt "${label}" eingeben:`);
+    if (confirmation !== label) {
+      setError('Löschung abgebrochen: Bestätigung stimmt nicht.');
+      return;
+    }
+
+    setIsDeletingUser(true);
+    setError('');
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/user/${selectedData.user.id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      setSelectedData(null);
+      setSelectedUserId(null);
+      setSelectedUserIds((prev) => prev.filter((id) => id !== selectedData.user.id));
+      await fetchUsers();
+      await fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Streamer konnte nicht gelöscht werden.');
+    } finally {
+      setIsDeletingUser(false);
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     const query = search.toLowerCase();
     return (
@@ -3918,16 +3946,25 @@ const SuperAdminPage = () => {
                     <p className="text-[#A1A1A1] text-sm">{selectedData.user.email}</p>
                     <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine ?ffentliche URL'}</p>
                   </div>
-                  {selectedData.user.siteSlug && (
-                    <a
-                      href={`${window.location.protocol}//${window.location.host}/${selectedData.user.siteSlug}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
+                  <div className="flex items-center gap-2">
+                    {selectedData.user.siteSlug && (
+                      <a
+                        href={`${window.location.protocol}//${window.location.host}/${selectedData.user.siteSlug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
+                      >
+                        Streamer öffnen
+                      </a>
+                    )}
+                    <button
+                      onClick={deleteSelectedUser}
+                      disabled={isDeletingUser}
+                      className="bg-red-500/15 text-red-300 border border-red-500/30 px-4 py-2 rounded-xl font-bold hover:bg-red-500/25 transition-all disabled:opacity-50"
                     >
-                      Streamer ?ffnen
-                    </a>
-                  )}
+                      {isDeletingUser ? 'Löscht...' : 'Streamer löschen'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="p-4 rounded-xl border border-white/10 bg-white/5">
@@ -4478,7 +4515,5 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
-
-
 
 
