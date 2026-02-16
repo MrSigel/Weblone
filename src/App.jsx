@@ -1465,6 +1465,10 @@ const Dashboard = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [data, setData] = useState({ user: null, blocks: [], deals: [] });
   const [loading, setLoading] = useState(true);
+  const [showSupportModal, setShowSupportModal] = useState(false);
+  const [supportForm, setSupportForm] = useState({ subject: '', message: '', priority: 'normal' });
+  const [supportStatus, setSupportStatus] = useState('');
+  const [supportTickets, setSupportTickets] = useState([]);
 
   const loadDashboardData = async () => {
     try {
@@ -1501,6 +1505,55 @@ const Dashboard = ({ user }) => {
     loadDashboardData();
   }, [user, navigate, slug]);
 
+  useEffect(() => {
+    if (showSupportModal) {
+      loadSupportTickets();
+      setSupportStatus('');
+    }
+  }, [showSupportModal]);
+
+  const loadSupportTickets = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/support-tickets`);
+      const result = await response.json();
+      if (result.success) {
+        setSupportTickets(result.tickets || []);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const submitSupportTicket = async () => {
+    if (!user?.id || !supportForm.subject.trim() || !supportForm.message.trim()) {
+      setSupportStatus('Bitte Betreff und Nachricht ausfüllen.');
+      return;
+    }
+    setSupportStatus('Ticket wird erstellt...');
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/support-ticket`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subject: supportForm.subject.trim(),
+          message: supportForm.message.trim(),
+          priority: supportForm.priority
+        })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setSupportStatus(result.error || 'Ticket konnte nicht erstellt werden.');
+        return;
+      }
+      setSupportStatus(`Ticket #${result.ticketId} erfolgreich erstellt.`);
+      setSupportForm({ subject: '', message: '', priority: 'normal' });
+      await loadSupportTickets();
+    } catch (err) {
+      setSupportStatus('Ticket konnte nicht erstellt werden.');
+    }
+  };
+
   if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white font-bold text-2xl">LÃ¤dt dein Dashboard...</div>;
 
   const renderContent = () => {
@@ -1529,6 +1582,68 @@ const Dashboard = ({ user }) => {
           {renderContent()}
         </div>
       </main>
+
+      <button
+        onClick={() => setShowSupportModal(true)}
+        className="fixed bottom-6 right-6 z-40 bg-red-600 text-white px-6 py-4 rounded-2xl font-black shadow-2xl shadow-red-900/40 hover:bg-red-500 transition-all border border-red-300/30"
+      >
+        Support
+      </button>
+
+      {showSupportModal && (
+        <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className={`w-full max-w-2xl p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-[#EDEDED]">Support Ticket</h2>
+              <button onClick={() => setShowSupportModal(false)} className="px-3 py-2 rounded-lg bg-white/10 text-sm">Schließen</button>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Betreff"
+                value={supportForm.subject}
+                onChange={(e) => setSupportForm({ ...supportForm, subject: e.target.value })}
+                className="md:col-span-2 bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+              />
+              <select
+                value={supportForm.priority}
+                onChange={(e) => setSupportForm({ ...supportForm, priority: e.target.value })}
+                className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+              >
+                <option value="low">low</option>
+                <option value="normal">normal</option>
+                <option value="high">high</option>
+              </select>
+            </div>
+
+            <textarea
+              placeholder="Nachricht"
+              value={supportForm.message}
+              onChange={(e) => setSupportForm({ ...supportForm, message: e.target.value })}
+              className="w-full min-h-32 bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+            />
+
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm text-[#A1A1A1]">{supportStatus}</p>
+              <button onClick={submitSupportTicket} className="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all">
+                Ticket senden
+              </button>
+            </div>
+
+            <div className="pt-3 border-t border-white/10 space-y-2 max-h-52 overflow-y-auto">
+              <p className="text-sm font-bold text-[#EDEDED]">Deine letzten Tickets</p>
+              {supportTickets.length === 0 && <p className="text-xs text-[#A1A1A1]">Noch keine Tickets vorhanden.</p>}
+              {supportTickets.map((ticket) => (
+                <div key={ticket.id} className="p-3 rounded-lg border border-white/10 bg-white/5">
+                  <p className="font-bold text-sm">#{ticket.id} {ticket.subject}</p>
+                  <p className="text-xs text-[#A1A1A1]">{ticket.status} | {ticket.priority} | {new Date(ticket.createdAt).toLocaleString()}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1537,6 +1652,12 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
   const [kickChannel, setKickChannel] = useState(data.social?.kickAccount?.channel || '');
   const [socialStatus, setSocialStatus] = useState('');
   const userId = data?.user?.id;
+  let parsedToolsConfig = {};
+  try {
+    parsedToolsConfig = typeof data?.user?.toolsConfig === 'string'
+      ? JSON.parse(data.user.toolsConfig || '{}')
+      : (data?.user?.toolsConfig || {});
+  } catch (e) {}
 
   useEffect(() => {
     setKickChannel(data.social?.kickAccount?.channel || '');
@@ -1610,6 +1731,12 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
     { title: 'Twitch Follower', value: data.social?.twitch?.followers ?? '-', change: data.social?.twitchConnected ? 'Connected' : 'Nicht verbunden', icon: Activity },
     { title: 'Twitch Subs', value: data.social?.twitch?.subs ?? '-', change: data.social?.twitch?.subsError ? 'Scope fehlt' : 'Live', icon: Trophy },
     { title: 'Neue Follower 24h', value: data.social?.twitch?.newFollowers24h ?? '-', change: data.social?.twitch?.lastSync ? new Date(data.social.twitch.lastSync).toLocaleTimeString() : 'Kein Sync', icon: BarChart3 }
+  ];
+  const checklist = [
+    { label: 'Site Builder eingerichtet', done: !!data.user?.siteSlug, action: () => setActiveTab('builder') },
+    { label: 'Mind. 1 Deal aktiv', done: (data.deals || []).some((d) => d.status === 'Aktiv'), action: () => setActiveTab('deals') },
+    { label: 'Twitch oder Kick verbunden', done: !!(data.social?.twitchConnected || data.social?.kickConnected), action: () => setActiveTab('overview') },
+    { label: 'Bot-Channels hinterlegt', done: !!(parsedToolsConfig?.twitchChannel || parsedToolsConfig?.kickChannel), action: () => setActiveTab('tools') }
   ];
 
   return (
@@ -1727,6 +1854,22 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
         ))}
       </div>
 
+      <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+        <h3 className="text-xl font-bold text-[#EDEDED]">Setup-Checkliste</h3>
+        <div className="grid md:grid-cols-2 gap-3">
+          {checklist.map((item, idx) => (
+            <button
+              key={idx}
+              onClick={item.action}
+              className={`text-left p-4 rounded-xl border transition-all ${item.done ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-white/10 bg-white/5 hover:border-indigo-500/40'}`}
+            >
+              <p className="font-bold text-white">{item.label}</p>
+              <p className={`text-xs mt-1 ${item.done ? 'text-emerald-300' : 'text-[#A1A1A1]'}`}>{item.done ? 'Erledigt' : 'Jetzt einrichten'}</p>
+            </button>
+          ))}
+        </div>
+      </section>
+
       <div>
         <h3 className="text-xl font-bold text-[#EDEDED] mb-6">Quick-Links</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -1751,7 +1894,23 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
   );
 };
 const SiteBuilder = ({ user, onUpdate }) => {
-  const [settings, setSettings] = useState({ navTitle: user?.username || '', slogan: '' });
+  const [settings, setSettings] = useState({
+    navTitle: user?.username || '',
+    slogan: '',
+    primaryCtaText: 'Jetzt Bonus sichern',
+    primaryCtaUrl: '',
+    stickyCtaEnabled: 1,
+    stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
+    stickyCtaUrl: '',
+    trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
+    urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+    abTestEnabled: 0,
+    ctaAText: 'Jetzt Bonus sichern',
+    ctaAUrl: '',
+    ctaBText: 'Bonus fuer neue Spieler holen',
+    ctaBUrl: ''
+  });
+  const [ctaStats, setCtaStats] = useState({ default: { impressions: 0, clicks: 0, ctr: 0 }, a: { impressions: 0, clicks: 0, ctr: 0 }, b: { impressions: 0, clicks: 0, ctr: 0 } });
   const [pages, setPages] = useState([]);
   const [activePageId, setActivePageId] = useState(null);
   const [blocks, setBlocks] = useState([]);
@@ -1769,7 +1928,9 @@ const SiteBuilder = ({ user, onUpdate }) => {
         const settData = await settRes.json();
         const pagesData = await pagesRes.json();
         
-        if (settData.success) setSettings(settData.settings);
+        if (settData.success) {
+          setSettings((prev) => ({ ...prev, ...(settData.settings || {}) }));
+        }
         if (pagesData.success) {
           setPages(pagesData.pages);
           if (pagesData.pages.length > 0) {
@@ -1780,6 +1941,17 @@ const SiteBuilder = ({ user, onUpdate }) => {
       finally { setLoading(false); }
     };
     fetchSiteData();
+  }, [user.id]);
+
+  useEffect(() => {
+    const fetchCtaStats = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/user/${user.id}/cta-stats`);
+        const result = await response.json();
+        if (result.success && result.stats) setCtaStats(result.stats);
+      } catch (err) { console.error(err); }
+    };
+    fetchCtaStats();
   }, [user.id]);
 
   useEffect(() => {
@@ -1795,12 +1967,13 @@ const SiteBuilder = ({ user, onUpdate }) => {
     }
   }, [activePageId, user.id]);
 
-  const saveSettings = async () => {
+  const saveSettings = async (overrideSettings) => {
     try {
+      const payload = (overrideSettings && !overrideSettings?.target) ? overrideSettings : settings;
       await fetch(`${API_BASE}/api/site/${user.id}/settings`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
+        body: JSON.stringify(payload)
       });
     } catch (err) { console.error(err); }
   };
@@ -1969,6 +2142,162 @@ const SiteBuilder = ({ user, onUpdate }) => {
             </div>
           </section>
 
+          <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+            <h3 className="text-sm font-bold text-[#A1A1A1] uppercase tracking-wider flex items-center gap-2">
+              <MousePointer2 size={16} className="text-indigo-500" /> Conversion Booster
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Primärer CTA Text</label>
+                <input
+                  type="text"
+                  value={settings.primaryCtaText || ''}
+                  onChange={(e) => setSettings({ ...settings, primaryCtaText: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="Jetzt Bonus sichern"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Primärer CTA Link</label>
+                <input
+                  type="text"
+                  value={settings.primaryCtaUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, primaryCtaUrl: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="https://dein-casino-partner.de/offer"
+                />
+              </div>
+              <div className="flex items-center justify-between rounded-xl border border-white/10 p-3 bg-white/5">
+                <div>
+                  <p className="text-sm font-bold text-white">Sticky CTA Leiste</p>
+                  <p className="text-xs text-[#A1A1A1]">Bleibt unten sichtbar auf der Landingpage.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!settings.stickyCtaEnabled}
+                  onChange={(e) => {
+                    const next = { ...settings, stickyCtaEnabled: e.target.checked ? 1 : 0 };
+                    setSettings(next);
+                    saveSettings(next);
+                  }}
+                  onBlur={saveSettings}
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Sticky CTA Text</label>
+                <input
+                  type="text"
+                  value={settings.stickyCtaText || ''}
+                  onChange={(e) => setSettings({ ...settings, stickyCtaText: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="Jetzt registrieren & Bonus aktivieren"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Sticky CTA Link</label>
+                <input
+                  type="text"
+                  value={settings.stickyCtaUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, stickyCtaUrl: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="https://dein-casino-partner.de/offer"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Trust Text</label>
+                <input
+                  type="text"
+                  value={settings.trustBadgeText || ''}
+                  onChange={(e) => setSettings({ ...settings, trustBadgeText: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="Verifiziert | 18+ | Verantwortungsvoll spielen"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">FOMO Text</label>
+                <input
+                  type="text"
+                  value={settings.urgencyText || ''}
+                  onChange={(e) => setSettings({ ...settings, urgencyText: e.target.value })}
+                  onBlur={saveSettings}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                  placeholder="Nur heute: exklusive Freispiele fuer neue Spieler"
+                />
+              </div>
+
+              <div className="rounded-xl border border-white/10 p-3 bg-white/5 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-bold text-white">A/B Test CTA</p>
+                    <p className="text-xs text-[#A1A1A1]">Teste 2 Varianten fuer bessere Klickrate.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={!!settings.abTestEnabled}
+                    onChange={(e) => {
+                      const next = { ...settings, abTestEnabled: e.target.checked ? 1 : 0 };
+                      setSettings(next);
+                      saveSettings(next);
+                    }}
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                  <input
+                    type="text"
+                    value={settings.ctaAText || ''}
+                    onChange={(e) => setSettings({ ...settings, ctaAText: e.target.value })}
+                    onBlur={saveSettings}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                    placeholder="Variante A Text"
+                  />
+                  <input
+                    type="text"
+                    value={settings.ctaAUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, ctaAUrl: e.target.value })}
+                    onBlur={saveSettings}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                    placeholder="Variante A Link"
+                  />
+                  <input
+                    type="text"
+                    value={settings.ctaBText || ''}
+                    onChange={(e) => setSettings({ ...settings, ctaBText: e.target.value })}
+                    onBlur={saveSettings}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                    placeholder="Variante B Text"
+                  />
+                  <input
+                    type="text"
+                    value={settings.ctaBUrl || ''}
+                    onChange={(e) => setSettings({ ...settings, ctaBUrl: e.target.value })}
+                    onBlur={saveSettings}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                    placeholder="Variante B Link"
+                  />
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10">
+                    <p className="text-[#A1A1A1]">A CTR</p>
+                    <p className="font-bold text-white">{ctaStats?.a?.ctr ?? 0}%</p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10">
+                    <p className="text-[#A1A1A1]">B CTR</p>
+                    <p className="font-bold text-white">{ctaStats?.b?.ctr ?? 0}%</p>
+                  </div>
+                  <div className="p-2 rounded-lg bg-white/5 border border-white/10">
+                    <p className="text-[#A1A1A1]">Default CTR</p>
+                    <p className="font-bold text-white">{ctaStats?.default?.ctr ?? 0}%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Navigation / Pages Section */}
           <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
             <div className="flex justify-between items-center">
@@ -2119,6 +2448,23 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
         </div>
 
         <div className="p-6 space-y-6">
+          {!!settings.urgencyText && (
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+              {settings.urgencyText}
+            </div>
+          )}
+
+          {!!settings.primaryCtaUrl && (
+            <a
+              href={settings.primaryCtaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition-all"
+            >
+              {settings.primaryCtaText || 'Jetzt Bonus sichern'}
+            </a>
+          )}
+
           {pageBlocks.length === 0 ? (
             <div className="text-center py-12 text-[#A1A1A1]">
               Diese Seite hat noch keine BlÃ¶cke.
@@ -2126,7 +2472,27 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
           ) : (
             pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
           )}
+
+          {!!settings.trustBadgeText && (
+            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+              {settings.trustBadgeText}
+            </div>
+          )}
         </div>
+
+        {!!settings.stickyCtaEnabled && (
+          <div className="sticky bottom-0 border-t border-white/10 bg-[#0A0A0A] px-4 py-3 flex items-center justify-between gap-3">
+            <p className="text-xs text-[#A1A1A1] truncate">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
+            <a
+              href={settings.stickyCtaUrl || settings.primaryCtaUrl || '#'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all"
+            >
+              Zum Angebot
+            </a>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -2997,6 +3363,10 @@ const SettingsContent = ({ user, onUpdate }) => {
 };
 
 const SuperAdminPage = () => {
+  const navigate = useNavigate();
+  const { section } = useParams();
+  const superadminSections = ['overview', 'support', 'payouts', 'bots', 'security', 'audit'];
+  const activeSection = superadminSections.includes(section || '') ? section : 'overview';
   const TOKEN_KEY = 'superadmin_token';
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || '');
   const [email, setEmail] = useState('');
@@ -3008,7 +3378,6 @@ const SuperAdminPage = () => {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedData, setSelectedData] = useState(null);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const [activeTab, setActiveTab] = useState('overview');
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
@@ -3022,6 +3391,16 @@ const SuperAdminPage = () => {
   const [payoutForm, setPayoutForm] = useState({ userId: '', amount: '', currency: 'EUR', note: '', period: '', dueDate: '' });
   const [dealTemplate, setDealTemplate] = useState('starter');
   const [bulkStatus, setBulkStatus] = useState('Aktiv');
+
+  useEffect(() => {
+    if (!section) {
+      navigate('/superadmin/overview', { replace: true });
+      return;
+    }
+    if (!superadminSections.includes(section)) {
+      navigate('/superadmin/overview', { replace: true });
+    }
+  }, [section, navigate]);
 
   const authHeaders = () => ({
     'Content-Type': 'application/json',
@@ -3335,6 +3714,25 @@ const SuperAdminPage = () => {
     }
   });
 
+  const sectionMeta = {
+    overview: { title: 'Overview', text: 'User-Ansicht, Deals, Seiten und Links eines Streamers.' },
+    support: { title: 'Support', text: 'Alle Support-Tickets zentral verwalten.' },
+    payouts: { title: 'Payouts', text: 'Auszahlungen planen und auf bezahlt setzen.' },
+    bots: { title: 'Bots', text: 'Chat Reader und AdTimer Status aller Streamer.' },
+    security: { title: 'Security', text: 'Aktive Superadmin Sessions verwalten.' },
+    audit: { title: 'Audit', text: 'Alle relevanten Admin-Aktionen nachvollziehen.' }
+  };
+  const openTicketCount = (tickets || []).filter((t) => ['open', 'in_progress'].includes(t.status)).length;
+  const pendingPayoutCount = (payouts || []).filter((p) => p.status === 'pending').length;
+  const tabItems = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'support', label: 'Support', badge: openTicketCount },
+    { id: 'payouts', label: 'Payouts', badge: pendingPayoutCount },
+    { id: 'bots', label: 'Bots' },
+    { id: 'security', label: 'Security' },
+    { id: 'audit', label: 'Audit' }
+  ];
+
   if (!token) {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6">
@@ -3374,8 +3772,9 @@ const SuperAdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-20">
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+    <div className="min-h-screen bg-[#050505] text-white pt-20 relative overflow-hidden">
+      <BackgroundBubbles />
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 relative z-10">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Superadmin Dashboard</h1>
@@ -3388,7 +3787,7 @@ const SuperAdminPage = () => {
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
-        <section className={`p-5 rounded-2xl border ${theme.border} ${theme.surface}`}>
+        <section className={`p-5 rounded-2xl border ${theme.border} ${theme.surface} shadow-2xl`}>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">User</p>
@@ -3418,7 +3817,8 @@ const SuperAdminPage = () => {
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <aside className={`lg:col-span-4 p-4 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+          {activeSection === 'overview' && (
+          <aside className={`lg:col-span-4 p-4 rounded-2xl border ${theme.border} ${theme.surface} space-y-4 shadow-2xl`}>
             <div className="grid grid-cols-2 gap-2">
               <button onClick={() => setSelectedUserIds(users.map((u) => u.id))} className="text-xs px-3 py-2 rounded-lg bg-white/10">
                 Alle
@@ -3482,11 +3882,34 @@ const SuperAdminPage = () => {
               </div>
             </div>
           </aside>
+          )}
 
-          <main className={`lg:col-span-8 p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-6`}>
+          <main className={`${activeSection === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'} p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-6 shadow-2xl`}>
+            <div>
+              <h2 className="text-2xl font-bold">{sectionMeta[activeSection]?.title || 'Overview'}</h2>
+              <p className="text-sm text-[#A1A1A1]">{sectionMeta[activeSection]?.text || ''}</p>
+            </div>
+            <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4">
+              {tabItems.map(({ id, label, badge }) => (
+                <button
+                  key={id}
+                  onClick={() => navigate(`/superadmin/${id}`)}
+                  className={`px-3 py-2 rounded-xl text-sm border flex items-center gap-2 ${activeSection === id ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' : 'bg-white/5 border-white/10 hover:bg-white/10 text-[#EDEDED]'}`}
+                >
+                  {label}
+                  {typeof badge === 'number' && badge > 0 && (
+                    <span className={`min-w-6 h-6 px-1 rounded-full text-[11px] font-bold inline-flex items-center justify-center ${id === 'support' ? 'bg-red-500/20 text-red-300' : 'bg-amber-500/20 text-amber-300'}`}>
+                      {badge}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+
             {loadingDetails && <p className="text-sm text-[#A1A1A1]">Lade Nutzerdetails...</p>}
-            {!loadingDetails && !selectedData && <p className="text-sm text-[#A1A1A1]">WÃ¤hle links einen Nutzer aus.</p>}
-            {!loadingDetails && selectedData && (
+            {!loadingDetails && activeSection === 'overview' && !selectedData && <p className="text-sm text-[#A1A1A1]">Waehle links einen Nutzer aus.</p>}
+
+            {!loadingDetails && activeSection === 'overview' && selectedData && (
               <>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
@@ -3584,7 +4007,10 @@ const SuperAdminPage = () => {
                     </div>
                   </div>
                 </section>
+              </>
+            )}
 
+            {activeSection === 'support' && (
                 <section className="space-y-4">
                   <h3 className="text-lg font-bold">Support Inbox</h3>
                   <div className="grid md:grid-cols-5 gap-3">
@@ -3614,7 +4040,9 @@ const SuperAdminPage = () => {
                     ))}
                   </div>
                 </section>
+            )}
 
+            {activeSection === 'payouts' && (
                 <section className="space-y-4">
                   <h3 className="text-lg font-bold">Payout Management</h3>
                   <div className="grid md:grid-cols-6 gap-3">
@@ -3640,7 +4068,9 @@ const SuperAdminPage = () => {
                     ))}
                   </div>
                 </section>
+            )}
 
+            {activeSection === 'security' && (
                 <section className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-lg font-bold">Security Sessions</h3>
@@ -3662,7 +4092,9 @@ const SuperAdminPage = () => {
                     ))}
                   </div>
                 </section>
+            )}
 
+            {activeSection === 'bots' && (
                 <section className="space-y-3">
                   <h3 className="text-lg font-bold">Bot Monitoring</h3>
                   <div className="space-y-2">
@@ -3677,7 +4109,9 @@ const SuperAdminPage = () => {
                     ))}
                   </div>
                 </section>
+            )}
 
+            {activeSection === 'audit' && (
                 <section className="space-y-3">
                   <h3 className="text-lg font-bold">Audit Log</h3>
                   <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
@@ -3690,7 +4124,6 @@ const SuperAdminPage = () => {
                     ))}
                   </div>
                 </section>
-              </>
             )}
           </main>
         </div>
@@ -3782,6 +4215,7 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/dashboard/:slug" element={<Dashboard user={user} />} />
             <Route path="/superadmin" element={<SuperAdminPage />} />
+            <Route path="/superadmin/:section" element={<SuperAdminPage />} />
             <Route path="/:slug" element={<StreamerPage />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
@@ -3830,9 +4264,46 @@ const StreamerPageOverride = ({ slug }) => {
 
 const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const { user, settings, pages, blocks, deals } = data;
+  const [ctaVariant, setCtaVariant] = useState('default');
   
   const currentPage = pages.find(p => p.slug === activePageSlug) || pages[0];
   const pageBlocks = blocks.filter(b => b.pageId === currentPage?.id);
+  const slug = user?.siteSlug;
+
+  useEffect(() => {
+    if (!settings?.abTestEnabled) {
+      setCtaVariant('default');
+      return;
+    }
+    const hasA = !!settings?.ctaAUrl;
+    const hasB = !!settings?.ctaBUrl;
+    if (hasA && hasB) {
+      setCtaVariant(Math.random() < 0.5 ? 'a' : 'b');
+    } else if (hasA) {
+      setCtaVariant('a');
+    } else if (hasB) {
+      setCtaVariant('b');
+    } else {
+      setCtaVariant('default');
+    }
+  }, [settings?.abTestEnabled, settings?.ctaAUrl, settings?.ctaBUrl, slug]);
+
+  useEffect(() => {
+    if (!slug) return;
+    fetch(`${API_BASE}/api/public/site/${slug}/cta-impression`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ variant: ctaVariant })
+    }).catch(() => {});
+  }, [slug, ctaVariant]);
+
+  const resolvedCtaText = ctaVariant === 'a'
+    ? (settings.ctaAText || settings.primaryCtaText || 'Jetzt Bonus sichern')
+    : ctaVariant === 'b'
+      ? (settings.ctaBText || settings.primaryCtaText || 'Jetzt Bonus sichern')
+      : (settings.primaryCtaText || 'Jetzt Bonus sichern');
+  const trackedCtaHref = `${API_BASE}/api/public/site/${slug}/cta/${ctaVariant}`;
+  const hasAnyCtaTarget = !!(settings.primaryCtaUrl || settings.stickyCtaUrl || settings.ctaAUrl || settings.ctaBUrl);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
@@ -3866,6 +4337,25 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       {/* Hero / Header Area (Dynamic) */}
       <main className="pt-32 md:pt-40 pb-16 md:pb-20 flex-1">
         <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-20">
+          {!!settings.urgencyText && (
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-center text-amber-200 font-medium">
+              {settings.urgencyText}
+            </div>
+          )}
+
+          {!!hasAnyCtaTarget && (
+            <div className="text-center">
+              <a
+                href={trackedCtaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-900/40"
+              >
+                {resolvedCtaText}
+              </a>
+            </div>
+          )}
+
           {pageBlocks.length === 0 ? (
             <div className="text-center py-20">
                {currentPage?.slug === '' ? (
@@ -3886,6 +4376,12 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
               <RenderBlock key={block.id} block={block} deals={deals} />
             ))
           )}
+
+          {!!settings.trustBadgeText && (
+            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-emerald-200 text-sm">
+              {settings.trustBadgeText}
+            </div>
+          )}
         </div>
       </main>
 
@@ -3897,6 +4393,22 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
           </p>
         </div>
       </footer>
+
+      {!!settings.stickyCtaEnabled && !!hasAnyCtaTarget && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl">
+          <div className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-[#EDEDED]">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
+            <a
+              href={trackedCtaHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
+            >
+              Zum Angebot
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

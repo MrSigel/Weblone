@@ -144,7 +144,39 @@ db.exec(`
     paidAt TEXT,
     createdAt TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS cta_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER,
+    slug TEXT,
+    variant TEXT,
+    eventType TEXT,
+    createdAt TEXT,
+    ip TEXT,
+    userAgent TEXT
+  );
 `);
+
+const ensureColumn = (tableName, columnName, definitionSql) => {
+  const columns = db.prepare(`PRAGMA table_info(${tableName})`).all();
+  const hasColumn = columns.some((col) => col.name === columnName);
+  if (!hasColumn) {
+    db.prepare(`ALTER TABLE ${tableName} ADD COLUMN ${columnName} ${definitionSql}`).run();
+  }
+};
+
+ensureColumn('streamer_site_settings', 'primaryCtaText', "TEXT DEFAULT 'Jetzt Bonus sichern'");
+ensureColumn('streamer_site_settings', 'primaryCtaUrl', "TEXT DEFAULT ''");
+ensureColumn('streamer_site_settings', 'stickyCtaEnabled', 'INTEGER DEFAULT 1');
+ensureColumn('streamer_site_settings', 'stickyCtaText', "TEXT DEFAULT 'Jetzt registrieren & Bonus aktivieren'");
+ensureColumn('streamer_site_settings', 'stickyCtaUrl', "TEXT DEFAULT ''");
+ensureColumn('streamer_site_settings', 'trustBadgeText', "TEXT DEFAULT 'Verifiziert | 18+ | Verantwortungsvoll spielen'");
+ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele fuer neue Spieler'");
+ensureColumn('streamer_site_settings', 'abTestEnabled', 'INTEGER DEFAULT 0');
+ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus sichern'");
+ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
+ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus fuer neue Spieler holen'");
+ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 
 // Insert default superadmin if not exists
 const adminEmail = 'admin@weblone.de';
@@ -979,6 +1011,40 @@ app.get('/api/user/:id', (req, res) => {
   }
 });
 
+app.get('/api/user/:id/support-tickets', (req, res) => {
+  try {
+    const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    const tickets = db.prepare('SELECT * FROM support_tickets WHERE userId = ? ORDER BY id DESC LIMIT 50').all(req.params.id);
+    res.json({ success: true, tickets });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/user/:id/support-ticket', (req, res) => {
+  try {
+    const user = db.prepare('SELECT id, username, email FROM users WHERE id = ?').get(req.params.id);
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+
+    const { subject, message, priority } = req.body;
+    if (!subject || !message) {
+      return res.status(400).json({ success: false, error: 'subject und message sind erforderlich.' });
+    }
+
+    const now = new Date().toISOString();
+    const info = db.prepare(`
+      INSERT INTO support_tickets (userId, subject, status, priority, message, assignee, createdAt, updatedAt)
+      VALUES (?, ?, 'open', ?, ?, NULL, ?, ?)
+    `).run(user.id, subject, priority || 'normal', message, now, now);
+
+    logAudit(`user:${user.id}`, 'support_ticket_create_by_streamer', user.id, { ticketId: info.lastInsertRowid, subject });
+    res.json({ success: true, ticketId: info.lastInsertRowid });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.get('/api/check-slug/:slug', (req, res) => {
   const existing = db.prepare('SELECT id FROM users WHERE siteSlug = ?').get(req.params.slug);
   res.json({ available: !existing });
@@ -1483,13 +1549,82 @@ app.get('/api/user/:id/dashboard', (req, res) => {
 
 app.get('/api/site/:id/settings', (req, res) => {
   const settings = db.prepare('SELECT * FROM streamer_site_settings WHERE userId = ?').get(req.params.id);
-  res.json({ success: true, settings: settings || { navTitle: '' } });
+  res.json({
+    success: true,
+    settings: {
+      navTitle: '',
+      slogan: '',
+      primaryCtaText: 'Jetzt Bonus sichern',
+      primaryCtaUrl: '',
+      stickyCtaEnabled: 1,
+      stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
+      stickyCtaUrl: '',
+      trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
+      urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+      abTestEnabled: 0,
+      ctaAText: 'Jetzt Bonus sichern',
+      ctaAUrl: '',
+      ctaBText: 'Bonus fuer neue Spieler holen',
+      ctaBUrl: '',
+      ...(settings || {})
+    }
+  });
 });
 
 app.put('/api/site/:id/settings', (req, res) => {
-  const { navTitle, slogan } = req.body;
-  db.prepare('INSERT OR REPLACE INTO streamer_site_settings (userId, navTitle, slogan) VALUES (?, ?, ?)')
-    .run(req.params.id, navTitle, slogan);
+  const {
+    navTitle,
+    slogan,
+    primaryCtaText,
+    primaryCtaUrl,
+    stickyCtaEnabled,
+    stickyCtaText,
+    stickyCtaUrl,
+    trustBadgeText,
+    urgencyText,
+    abTestEnabled,
+    ctaAText,
+    ctaAUrl,
+    ctaBText,
+    ctaBUrl
+  } = req.body || {};
+  db.prepare(`
+    INSERT INTO streamer_site_settings (
+      userId, navTitle, slogan, primaryCtaText, primaryCtaUrl, stickyCtaEnabled, stickyCtaText, stickyCtaUrl, trustBadgeText, urgencyText, abTestEnabled, ctaAText, ctaAUrl, ctaBText, ctaBUrl
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(userId) DO UPDATE SET
+      navTitle = excluded.navTitle,
+      slogan = excluded.slogan,
+      primaryCtaText = excluded.primaryCtaText,
+      primaryCtaUrl = excluded.primaryCtaUrl,
+      stickyCtaEnabled = excluded.stickyCtaEnabled,
+      stickyCtaText = excluded.stickyCtaText,
+      stickyCtaUrl = excluded.stickyCtaUrl,
+      trustBadgeText = excluded.trustBadgeText,
+      urgencyText = excluded.urgencyText,
+      abTestEnabled = excluded.abTestEnabled,
+      ctaAText = excluded.ctaAText,
+      ctaAUrl = excluded.ctaAUrl,
+      ctaBText = excluded.ctaBText,
+      ctaBUrl = excluded.ctaBUrl
+  `).run(
+    req.params.id,
+    navTitle || '',
+    slogan || '',
+    primaryCtaText || 'Jetzt Bonus sichern',
+    primaryCtaUrl || '',
+    stickyCtaEnabled ? 1 : 0,
+    stickyCtaText || 'Jetzt registrieren & Bonus aktivieren',
+    stickyCtaUrl || '',
+    trustBadgeText || 'Verifiziert | 18+ | Verantwortungsvoll spielen',
+    urgencyText || 'Nur heute: exklusive Freispiele fuer neue Spieler',
+    abTestEnabled ? 1 : 0,
+    ctaAText || 'Jetzt Bonus sichern',
+    ctaAUrl || '',
+    ctaBText || 'Bonus fuer neue Spieler holen',
+    ctaBUrl || ''
+  );
   res.json({ success: true });
 });
 
@@ -1611,18 +1746,125 @@ app.get('/api/public/site/:slug', (req, res) => {
     const blocks = db.prepare('SELECT * FROM page_blocks WHERE userId = ? AND visible = 1 ORDER BY sortOrder ASC').all(user.id);
     const deals = db.prepare("SELECT * FROM deals WHERE userId = ? AND status = 'Aktiv'").all(user.id);
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       data: { 
         user, 
-        settings: settings || { navTitle: user.username }, 
+        settings: {
+          navTitle: user.username,
+          slogan: '',
+          primaryCtaText: 'Jetzt Bonus sichern',
+          primaryCtaUrl: '',
+          stickyCtaEnabled: 1,
+          stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
+          stickyCtaUrl: '',
+          trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
+          urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+          abTestEnabled: 0,
+          ctaAText: 'Jetzt Bonus sichern',
+          ctaAUrl: '',
+          ctaBText: 'Bonus fuer neue Spieler holen',
+          ctaBUrl: '',
+          ...(settings || {})
+        }, 
         pages, 
         blocks,
         deals
-      } 
+      }
     });
   } catch (err) {
     console.error('PUBLIC SITE API ERROR:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/public/site/:slug/cta-impression', (req, res) => {
+  try {
+    const user = db.prepare('SELECT id FROM users WHERE siteSlug = ?').get(req.params.slug);
+    if (!user) return res.status(404).json({ success: false, error: 'Streamer not found' });
+    const variant = String(req.body?.variant || 'default').toLowerCase();
+    db.prepare(`
+      INSERT INTO cta_events (userId, slug, variant, eventType, createdAt, ip, userAgent)
+      VALUES (?, ?, ?, 'impression', ?, ?, ?)
+    `).run(
+      user.id,
+      req.params.slug,
+      ['a', 'b'].includes(variant) ? variant : 'default',
+      new Date().toISOString(),
+      req.ip,
+      req.headers['user-agent'] || ''
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/public/site/:slug/cta/:variant', (req, res) => {
+  try {
+    const user = db.prepare('SELECT id FROM users WHERE siteSlug = ?').get(req.params.slug);
+    if (!user) return res.status(404).send('Streamer not found');
+
+    const settings = db.prepare('SELECT * FROM streamer_site_settings WHERE userId = ?').get(user.id) || {};
+    const variant = String(req.params.variant || 'default').toLowerCase();
+    const isAb = !!settings.abTestEnabled;
+    let targetUrl = settings.stickyCtaUrl || settings.primaryCtaUrl || '';
+    let normalizedVariant = 'default';
+
+    if (isAb && variant === 'a') {
+      targetUrl = settings.ctaAUrl || targetUrl;
+      normalizedVariant = 'a';
+    } else if (isAb && variant === 'b') {
+      targetUrl = settings.ctaBUrl || targetUrl;
+      normalizedVariant = 'b';
+    }
+
+    db.prepare(`
+      INSERT INTO cta_events (userId, slug, variant, eventType, createdAt, ip, userAgent)
+      VALUES (?, ?, ?, 'click', ?, ?, ?)
+    `).run(
+      user.id,
+      req.params.slug,
+      normalizedVariant,
+      new Date().toISOString(),
+      req.ip,
+      req.headers['user-agent'] || ''
+    );
+
+    if (!targetUrl) return res.status(400).send('CTA target is not configured');
+    res.redirect(targetUrl);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+app.get('/api/user/:id/cta-stats', (req, res) => {
+  try {
+    const rows = db.prepare(`
+      SELECT
+        variant,
+        SUM(CASE WHEN eventType = 'impression' THEN 1 ELSE 0 END) AS impressions,
+        SUM(CASE WHEN eventType = 'click' THEN 1 ELSE 0 END) AS clicks
+      FROM cta_events
+      WHERE userId = ?
+      GROUP BY variant
+    `).all(req.params.id);
+
+    const variants = { default: { impressions: 0, clicks: 0 }, a: { impressions: 0, clicks: 0 }, b: { impressions: 0, clicks: 0 } };
+    rows.forEach((row) => {
+      variants[row.variant] = {
+        impressions: Number(row.impressions || 0),
+        clicks: Number(row.clicks || 0)
+      };
+    });
+
+    const withCtr = Object.fromEntries(Object.entries(variants).map(([key, value]) => {
+      const ctr = value.impressions > 0 ? Number(((value.clicks / value.impressions) * 100).toFixed(2)) : 0;
+      return [key, { ...value, ctr }];
+    }));
+
+    res.json({ success: true, stats: withCtr });
+  } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
