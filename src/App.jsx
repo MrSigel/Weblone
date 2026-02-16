@@ -4849,13 +4849,67 @@ const StreamerPageOverride = ({ slug }) => {
   return <PublicStreamerSite data={data} activePageSlug={activePageSlug} setActivePageSlug={setActivePageSlug} />;
 };
 
+const CasinoDealsSection = ({ deals = [], compact = false, ctaHref = '#' }) => {
+  if (!deals.length) {
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-[#A1A1A1]">
+        Auf dieser Seite erscheinen Bonus-Angebote automatisch, sobald ein Deal hinzugefügt wurde.
+      </div>
+    );
+  }
+
+  return (
+    <div className={`space-y-4 ${compact ? 'max-h-[480px] overflow-y-auto pr-1' : ''}`}>
+      {deals.map((deal) => (
+        <article key={deal.id} className="rounded-2xl border border-white/10 bg-gradient-to-r from-[#131a2d] to-[#111827] overflow-hidden">
+          <div className="grid md:grid-cols-[170px_1fr_auto] items-center gap-3 border-b border-white/10">
+            <div className="h-full min-h-[88px] bg-[#0f172a] border-r border-white/10 flex items-center justify-center p-3">
+              {deal.imageUrl ? (
+                <img
+                  src={deal.imageUrl}
+                  alt={deal.name}
+                  className="max-h-14 md:max-h-16 max-w-full object-contain"
+                />
+              ) : (
+                <div className="text-center">
+                  <p className="text-lg font-black tracking-tight text-white">{deal.name}</p>
+                </div>
+              )}
+            </div>
+            <div className="px-2 py-3 md:py-0">
+              <p className="text-2xl md:text-4xl font-black text-amber-300 leading-tight">{deal.deal}</p>
+              <p className="text-xs md:text-sm text-[#A1A1A1] mt-1">Casino Bonus</p>
+            </div>
+            <div className="px-4 pb-4 md:pb-0">
+              <a
+                href={ctaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-black px-6 py-3 rounded-md shadow-lg"
+              >
+                SPIELEN
+              </a>
+            </div>
+          </div>
+          <div className="px-4 py-3 grid md:grid-cols-2 gap-2 text-xs">
+            <p className="text-[#D1D5DB]"><span className="text-white font-bold">Casino:</span> {deal.name}</p>
+            <p className="text-[#D1D5DB]"><span className="text-white font-bold">Status:</span> {deal.status}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  );
+};
+
 const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const { user, settings, pages, blocks, deals } = data;
   const [ctaVariant, setCtaVariant] = useState('default');
   
   const currentPage = pages.find(p => p.slug === activePageSlug) || pages[0];
   const pageBlocks = blocks.filter(b => b.pageId === currentPage?.id);
+  const isCasinoPage = currentPage?.slug === 'shop';
   const slug = user?.siteSlug;
+  const activeDeals = (deals || []).filter((d) => d.status !== 'Deaktiviert');
 
   useEffect(() => {
     if (!settings?.abTestEnabled) {
@@ -4943,7 +4997,9 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
             </div>
           )}
 
-          {pageBlocks.length === 0 ? (
+          {isCasinoPage ? (
+            <CasinoDealsSection deals={activeDeals} ctaHref={trackedCtaHref} />
+          ) : pageBlocks.length === 0 ? (
             <div className="text-center py-20">
                {currentPage?.slug === '' ? (
                  <div className="space-y-6">
