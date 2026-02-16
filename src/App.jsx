@@ -4930,7 +4930,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         </div>
         <div className="px-4 py-4">
           <p className="text-3xl md:text-5xl font-black text-amber-300 leading-none">{deal.deal}</p>
-          <p className="text-sm text-white/80 mt-1"><span className="text-amber-300">?</span> 5.0/5</p>
+          <p className="text-sm text-white/80 mt-1"><span className="text-amber-300">&#9733;</span> 5.0/5</p>
         </div>
         <div className="px-4 pb-4 md:pb-0">
           <a
@@ -4948,10 +4948,10 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         100% Sticky - 300EUR Max Bonus - 40x Wager
       </div>
       <div className="px-4 py-3 border-b border-[#2a385c] text-sm text-[#d8def1]">
-        <span className="text-amber-300">?</span> Book of Ra
-        <span className="mx-3 text-amber-300">?</span> Lucky Lady
-        <span className="mx-3 text-amber-300">?</span> Keine 5 Sekunden Pause
-        <span className="mx-3 text-amber-300">?</span> Keine Maxbet-Sperre
+        <span className="text-amber-300">&#10003;</span> Book of Ra
+        <span className="mx-3 text-amber-300">&#10003;</span> Lucky Lady
+        <span className="mx-3 text-amber-300">&#10003;</span> Keine 5 Sekunden Pause
+        <span className="mx-3 text-amber-300">&#10003;</span> Keine Maxbet-Sperre
       </div>
       <div className="px-4 py-3 border-b border-[#2a385c] text-center text-lg font-black text-amber-300">
         Einfacher / Schneller VIP Transfer <span className="text-white font-semibold">Code:</span> DIEGAWINOS
