@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -1226,7 +1226,7 @@ const OnboardingStart = ({ user }) => {
             Willkommen. In wenigen Schritten zu deiner eigenen Streamer-Website.
           </h1>
           <p className="text-[#A1A1A1] text-lg max-w-lg mx-auto leading-relaxed">
-            Wir f?hren dich durch den Prozess, um deine Marke zu st?rken und deine Community zu begeistern.
+            Wir führen dich durch den Prozess, um deine Marke zu st?rken und deine Community zu begeistern.
           </p>
           <button 
             onClick={() => navigate('/onboarding/template')}
