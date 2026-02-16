@@ -791,6 +791,63 @@ app.get('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
   }
 });
 
+app.delete('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
+  try {
+    const userId = Number(req.params.id);
+    if (!Number.isFinite(userId)) {
+      return res.status(400).json({ success: false, error: 'Ungültige User-ID.' });
+    }
+
+    const user = db.prepare('SELECT id, email, username, siteSlug FROM users WHERE id = ?').get(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
+
+    const protectedEmails = new Set([SUPERADMIN_EMAIL, 'admin@weblone.de']);
+    if (protectedEmails.has(String(user.email || '').toLowerCase())) {
+      return res.status(403).json({ success: false, error: 'Dieser Account kann nicht gelöscht werden.' });
+    }
+
+    // Stop and cleanup runtime jobs/sessions before deleting persisted data
+    stopTwitchChatReader(userId);
+    const userKey = String(userId);
+    if (adTimerJobs.has(userKey)) {
+      clearInterval(adTimerJobs.get(userKey).intervalId);
+      adTimerJobs.delete(userKey);
+    }
+    if (pickupReminderJobs.has(userKey)) {
+      clearTimeout(pickupReminderJobs.get(userKey));
+      pickupReminderJobs.delete(userKey);
+    }
+    for (const [state, data] of pendingTwitchAuthStates.entries()) {
+      if (String(data?.userId) === userKey) pendingTwitchAuthStates.delete(state);
+    }
+
+    const tx = db.transaction(() => {
+      db.prepare('DELETE FROM cta_events WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM payouts WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM support_tickets WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM page_blocks WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM streamer_pages WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM streamer_site_settings WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM site_blocks WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM deals WHERE userId = ?').run(userId);
+      db.prepare('DELETE FROM audit_logs WHERE targetUserId = ?').run(userId);
+      db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+    });
+    tx();
+
+    logAudit(req.superadmin.email, 'user_delete_full', userId, {
+      email: user.email,
+      username: user.username,
+      siteSlug: user.siteSlug
+    });
+    res.json({ success: true, deletedUserId: userId });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
   const { name, deal, performance, status } = req.body;
   if (!name || !deal) {
@@ -1920,4 +1977,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
