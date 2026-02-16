@@ -2451,6 +2451,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   const [activePageId, setActivePageId] = useState(null);
   const [blocks, setBlocks] = useState([]);
   const [previewDeals, setPreviewDeals] = useState(deals || []);
+  const [casinoDealDrafts, setCasinoDealDrafts] = useState({});
   const [loading, setLoading] = useState(true);
   const [isAddingPage, setIsAddingPage] = useState(false);
   const [newPage, setNewPage] = useState({ title: '', slug: '' });
@@ -2458,6 +2459,22 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   useEffect(() => {
     setPreviewDeals(deals || []);
   }, [deals]);
+
+  useEffect(() => {
+    const next = {};
+    (previewDeals || []).forEach((d) => {
+      next[d.id] = {
+        name: d.name || '',
+        deal: d.deal || '',
+        imageUrl: d.imageUrl || '',
+        promoCode: d.promoCode || 'DIEGAWINOS',
+        bonusTerms: d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        status: d.status || 'Aktiv',
+        performance: d.performance || '0 clicks'
+      };
+    });
+    setCasinoDealDrafts(next);
+  }, [previewDeals]);
 
   useEffect(() => {
     const fetchSiteData = async () => {
@@ -2629,6 +2646,32 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
     const normalized = reordered.map((block, index) => ({ ...block, sortOrder: index + 1 }));
     setBlocks(normalized);
     persistBlockOrder(normalized.map((b) => b.id));
+  };
+
+  const updateCasinoDealDraft = (dealId, key, value) => {
+    setCasinoDealDrafts((prev) => ({
+      ...prev,
+      [dealId]: { ...(prev[dealId] || {}), [key]: value }
+    }));
+  };
+
+  const saveCasinoDeal = async (dealId) => {
+    const draft = casinoDealDrafts[dealId];
+    if (!draft) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/deal/${dealId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...draft,
+          id: dealId
+        })
+      });
+      if (!response.ok) return;
+      setPreviewDeals((prev) => prev.map((d) => d.id === dealId ? { ...d, ...draft } : d));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (loading) return <div className="p-12 text-center text-white">Lädt Site Builder...</div>;
