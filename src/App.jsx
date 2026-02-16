@@ -1416,6 +1416,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
+  const [slugState, setSlugState] = useState({ checking: false, available: true, message: '' });
 
   const [basic, setBasic] = useState({
     fullName: '',
@@ -1457,6 +1458,16 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     hunt: true,
     giveaway: true
   });
+
+  const isValidUrl = (value) => {
+    if (!value) return true;
+    try {
+      const u = new URL(value);
+      return ['http:', 'https:'].includes(u.protocol);
+    } catch (e) {
+      return false;
+    }
+  };
 
   const stepLabels = [
     'Basisdaten',
