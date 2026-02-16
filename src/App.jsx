@@ -2759,6 +2759,23 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
                   placeholder="Dein Slogan"
                 />
               </div>
+              <div>
+                <label className="text-xs text-[#A1A1A1] mb-1 block">Hintergrund-Theme</label>
+                <select
+                  value={settings.backgroundTheme || 'dark'}
+                  onChange={(e) => {
+                    const next = { ...settings, backgroundTheme: e.target.value };
+                    setSettings(next);
+                    saveSettings(next);
+                  }}
+                  className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
+                >
+                  {Object.entries(landingBackgroundThemes).map(([key, item]) => (
+                    <option key={key} value={key}>{item.label}</option>
+                  ))}
+                </select>
+                <div className={`mt-2 h-10 rounded-lg border border-white/10 ${activeBackgroundTheme.previewClass}`} />
+              </div>
             </div>
           </section>
 
