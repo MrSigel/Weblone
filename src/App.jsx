@@ -4703,6 +4703,8 @@ const SuperAdminPage = () => {
                         <div>
                           <p className="font-bold">{deal.name}</p>
                           <p className="text-sm text-[#A1A1A1]">{deal.deal}</p>
+                          <p className="text-xs text-amber-300">{deal.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'}</p>
+                          <p className="text-xs text-[#EDEDED]">Code: {deal.promoCode || 'DIEGAWINOS'}</p>
                           <p className="text-xs text-indigo-400">{deal.performance}</p>
                           {!!deal.imageUrl && <p className="text-xs text-[#A1A1A1] truncate">{deal.imageUrl}</p>}
                         </div>
