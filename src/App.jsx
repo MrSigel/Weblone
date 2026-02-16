@@ -3640,9 +3640,9 @@ const ToolsContent = ({ user, onUpdate }) => {
         setStatus(result.error || 'Aktion fehlgeschlagen.');
         return;
       }
-      const attempted = result.result?.attempted ? 0;
-      const errorCount = result.result?.errors?.length ? 0;
-      setStatus(`Gesendet an ${attempted} Kanal/Kanäle${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
+      const attempted = result.result?.attempted ?? 0;
+      const errorCount = result.result?.errors?.length ?? 0;
+      setStatus(`Gesendet an ${attempted} Kanal/Kan?le${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
     } catch (err) {
       setStatus('Aktion fehlgeschlagen.');
     }
