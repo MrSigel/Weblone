@@ -2450,19 +2450,26 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   const [pages, setPages] = useState([]);
   const [activePageId, setActivePageId] = useState(null);
   const [blocks, setBlocks] = useState([]);
+  const [previewDeals, setPreviewDeals] = useState(deals || []);
   const [loading, setLoading] = useState(true);
   const [isAddingPage, setIsAddingPage] = useState(false);
   const [newPage, setNewPage] = useState({ title: '', slug: '' });
 
   useEffect(() => {
+    setPreviewDeals(deals || []);
+  }, [deals]);
+
+  useEffect(() => {
     const fetchSiteData = async () => {
       try {
-        const [settRes, pagesRes] = await Promise.all([
+        const [settRes, pagesRes, dashRes] = await Promise.all([
           fetch(`${API_BASE}/api/site/${user.id}/settings`),
-          fetch(`${API_BASE}/api/site/${user.id}/pages`)
+          fetch(`${API_BASE}/api/site/${user.id}/pages`),
+          fetch(`${API_BASE}/api/user/${user.id}/dashboard`)
         ]);
         const settData = await settRes.json();
         const pagesData = await pagesRes.json();
+        const dashData = await dashRes.json();
         
         if (settData.success) {
           setSettings((prev) => ({ ...prev, ...(settData.settings || {}) }));
@@ -2472,6 +2479,9 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
           if (pagesData.pages.length > 0) {
             setActivePageId(pagesData.pages[0].id);
           }
+        }
+        if (dashData.success) {
+          setPreviewDeals(dashData?.data?.deals || []);
         }
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
@@ -2950,7 +2960,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
 
           <BuilderPreview
             user={user}
-            deals={deals}
+            deals={previewDeals}
             settings={settings}
             pages={pages}
             blocks={blocks}
@@ -2965,7 +2975,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
 
 const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageId, setActivePageId }) => {
   const activePage = pages.find((p) => p.id === activePageId) || pages[0];
-  const visiblePages = pages.filter((p) => p.visible || p.id === activePageId);
+  const visiblePages = pages;
   const pageBlocks = [...blocks].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
   const isCasinoPage = activePage?.slug === 'shop';
 
