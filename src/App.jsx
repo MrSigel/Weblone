@@ -214,10 +214,10 @@ const Header = () => {
   }, []);
 
   // Define auth/dashboard paths
-  const isAuthOrDashboard = ['/login', '/register', '/onboarding', '/dashboard'].some(path => location.pathname.startsWith(path));
+  const isAuthOrDashboard = ['/login', '/register', '/onboarding', '/dashboard', '/superadmin'].some(path => location.pathname.startsWith(path));
   
   // Check if we are on a streamer page (any path that isn't root, privacy, terms, imprint, login, etc.)
-  const reservedPaths = ['/', '/login', '/register', '/onboarding', '/dashboard', '/privacy', '/terms', '/imprint'];
+  const reservedPaths = ['/', '/login', '/register', '/onboarding', '/dashboard', '/superadmin', '/privacy', '/terms', '/imprint'];
   const isStreamerPage = !reservedPaths.includes(location.pathname) && !isAuthOrDashboard;
 
   // We don't want the main Weblone Header on Streamer pages or Auth/Dashboard
@@ -884,9 +884,9 @@ const StreamerPageContent = ({ data }) => {
       <BackgroundBubbles />
       
       {/* Streamer Custom Nav */}
-      <nav className={`fixed top-6 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl z-50 px-8 py-4 rounded-2xl border ${style.nav} flex justify-between items-center`}>
-        <span className="text-xl font-black tracking-tighter">{data.user.username}</span>
-        <div className="flex gap-6 items-center">
+      <nav className={`fixed top-4 md:top-6 left-1/2 -translate-x-1/2 w-[94%] max-w-4xl z-50 px-4 md:px-8 py-3 md:py-4 rounded-2xl border ${style.nav} flex justify-between items-center`}>
+        <span className="text-lg md:text-xl font-black tracking-tighter">{data.user.username}</span>
+        <div className="hidden sm:flex gap-4 md:gap-6 items-center">
           <a href="#about" className="text-sm font-medium hover:opacity-70 transition-opacity">About</a>
           <a href="#deals" className="text-sm font-medium hover:opacity-70 transition-opacity">Deals</a>
           <button className={`bg-white text-black px-4 py-2 rounded-lg text-sm font-bold hover:bg-white/90 transition-all`}>
@@ -895,16 +895,16 @@ const StreamerPageContent = ({ data }) => {
         </div>
       </nav>
 
-      <div className="max-w-4xl mx-auto pt-40 px-6 relative z-10 pb-32">
+      <div className="max-w-4xl mx-auto pt-32 md:pt-40 px-4 md:px-6 relative z-10 pb-20 md:pb-32">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-24"
         >
-          <h1 className="text-6xl md:text-8xl font-black tracking-tighter mb-6 uppercase italic">
+          <h1 className="text-4xl sm:text-6xl md:text-8xl font-black tracking-tighter mb-6 uppercase italic">
             {data.user.username}<span className={style.accent}>.</span>
           </h1>
-          <p className="text-xl text-[#A1A1A1] max-w-xl mx-auto">
+          <p className="text-base md:text-xl text-[#A1A1A1] max-w-xl mx-auto">
             Willkommen in meiner Community. Checke unten meine exklusiven Deals und Tools ab!
           </p>
         </motion.div>
@@ -916,7 +916,7 @@ const StreamerPageContent = ({ data }) => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`p-10 rounded-3xl border ${style.border} ${style.card} group hover:scale-[1.01] transition-all`}
+              className={`p-6 md:p-10 rounded-3xl border ${style.border} ${style.card} group hover:scale-[1.01] transition-all`}
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -2343,44 +2343,171 @@ const ToolsContent = ({ user, onUpdate }) => {
     } catch (e) { return {}; }
   });
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTool, setActiveTool] = useState(null);
+  const [status, setStatus] = useState('');
+  const [adTimer, setAdTimer] = useState({ running: false, intervalMinutes: 15, message: 'Werbung: Checkt meine Deals auf der Landingpage.' });
+  const [tournamentTitle, setTournamentTitle] = useState('Stream Turnier');
+  const [pickupAfterMinutes, setPickupAfterMinutes] = useState(30);
+  const [manualMessage, setManualMessage] = useState('Testnachricht aus dem Streamer Dashboard');
+  const [readerStatus, setReaderStatus] = useState({ running: false, channels: [], startedAt: null, lastError: null });
+  const [readerLogs, setReaderLogs] = useState([]);
 
-  const handleSave = async (toolName, toolData) => {
+  const saveToolsConfig = async (nextConfig) => {
     setIsSaving(true);
-    const newConfigs = { ...configs, [toolName]: toolData };
+    setStatus('');
     try {
       const response = await fetch(`${API_BASE}/api/user/${user.id}/tools`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ toolsConfig: newConfigs })
+        body: JSON.stringify({ toolsConfig: nextConfig })
       });
-      if (response.ok) {
-        setConfigs(newConfigs);
-        onUpdate({ ...user, toolsConfig: JSON.stringify(newConfigs) });
-        setActiveTool(null);
+      if (!response.ok) throw new Error('Speichern fehlgeschlagen');
+      setConfigs(nextConfig);
+      onUpdate({ ...user, toolsConfig: JSON.stringify(nextConfig) });
+      setStatus('Konfiguration gespeichert.');
+    } catch (err) {
+      setStatus('Konfiguration konnte nicht gespeichert werden.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const runToolAction = async (path, body = {}) => {
+    setStatus('');
+    try {
+      const response = await fetch(`${API_BASE}${path}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setStatus(result.error || 'Aktion fehlgeschlagen.');
+        return;
+      }
+      const attempted = result.result?.attempted ?? 0;
+      const errorCount = result.result?.errors?.length ?? 0;
+      setStatus(`Gesendet an ${attempted} Kanal/Kanaele${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
+    } catch (err) {
+      setStatus('Aktion fehlgeschlagen.');
+    }
+  };
+
+  const fetchTimerStatus = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/tools/ad-timer/status`);
+      const result = await response.json();
+      if (result.success) {
+        setAdTimer((prev) => ({
+          ...prev,
+          running: !!result.running,
+          intervalMinutes: result.intervalMinutes || prev.intervalMinutes,
+          message: result.message || prev.message
+        }));
       }
     } catch (err) { console.error(err); }
-    finally { setIsSaving(false); }
   };
+
+  const fetchReaderStatus = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/tools/chat-reader/status`);
+      const result = await response.json();
+      if (result.success) {
+        setReaderStatus({
+          running: !!result.running,
+          channels: result.channels || [],
+          startedAt: result.startedAt || null,
+          lastError: result.lastError || null
+        });
+      }
+    } catch (err) { console.error(err); }
+  };
+
+  const fetchReaderLogs = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/tools/chat-reader/logs?limit=120`);
+      const result = await response.json();
+      if (result.success) setReaderLogs(result.logs || []);
+    } catch (err) { console.error(err); }
+  };
+
+  useEffect(() => {
+    fetchTimerStatus();
+    fetchReaderStatus();
+    fetchReaderLogs();
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!readerStatus.running) return;
+    const interval = setInterval(() => {
+      fetchReaderStatus();
+      fetchReaderLogs();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [readerStatus.running, user?.id]);
 
   const tools = [
     { name: 'Bonushunt List', id: 'bonushunt', desc: 'Verwalte deine Boni und teile die Liste live mit deinem Stream.', icon: List },
     { name: 'Wagerbar', id: 'wagerbar', desc: 'Visualisiere deinen Fortschritt beim Umsetzen von Boni.', icon: Activity },
-    { name: 'Slottracker', id: 'slottracker', desc: 'Behalte den Überblick über deine gespielten Slots und Ergebnisse.', icon: BarChart3 },
-    { name: 'Tournament System', id: 'tournament', desc: 'Erstelle Giveaways und Turniere für deine Community.', icon: Trophy }
+    { name: 'Slottracker', id: 'slottracker', desc: 'Behalte den Ueberblick ueber deine gespielten Slots und Ergebnisse.', icon: BarChart3 },
+    { name: 'Tournament System', id: 'tournament', desc: 'Erstelle Giveaways und Turniere fuer deine Community.', icon: Trophy }
   ];
 
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Streaming Tools</h1>
-        <p className="text-[#A1A1A1]">Konfiguriere deine Tools für Twitch & Kick.</p>
+        <p className="text-[#A1A1A1]">Bots fuer Twitch/Kick konfigurieren: Channels joinen, schreiben, Turnier-/Timer-Aktionen.</p>
       </motion.div>
+
+      <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+        <h3 className="text-lg font-bold text-[#EDEDED]">Bot Auth & Kick Bridge</h3>
+        <p className="text-xs text-[#A1A1A1]">
+          Fuer Twitch muss dein Bot-Account Moderator im Channel sein. Token als OAuth (oauth:...) hinterlegen.
+          Fuer Kick wird aktuell eine Bridge-Webhook-URL benoetigt.
+        </p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder="Twitch Bot Username"
+            value={configs.chatAuth?.twitchBotUsername || ''}
+            onChange={(e) => setConfigs({ ...configs, chatAuth: { ...(configs.chatAuth || {}), twitchBotUsername: e.target.value } })}
+            className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+          />
+          <input
+            type="password"
+            placeholder="Twitch OAuth Token (oauth:...)"
+            value={configs.chatAuth?.twitchOauthToken || ''}
+            onChange={(e) => setConfigs({ ...configs, chatAuth: { ...(configs.chatAuth || {}), twitchOauthToken: e.target.value } })}
+            className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+          />
+          <input
+            type="text"
+            placeholder="Kick Bridge Webhook URL"
+            value={configs.kickBridge?.webhookUrl || ''}
+            onChange={(e) => setConfigs({ ...configs, kickBridge: { ...(configs.kickBridge || {}), webhookUrl: e.target.value } })}
+            className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+          />
+          <input
+            type="password"
+            placeholder="Kick Bridge Secret (optional)"
+            value={configs.kickBridge?.webhookSecret || ''}
+            onChange={(e) => setConfigs({ ...configs, kickBridge: { ...(configs.kickBridge || {}), webhookSecret: e.target.value } })}
+            className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+          />
+        </div>
+        <button
+          onClick={() => saveToolsConfig(configs)}
+          disabled={isSaving}
+          className="bg-indigo-600 text-white px-6 py-2 rounded-xl font-bold hover:bg-indigo-500 disabled:opacity-50"
+        >
+          {isSaving ? 'Speichert...' : 'Bot-Konfiguration speichern'}
+        </button>
+      </section>
 
       <div className="grid md:grid-cols-2 gap-6">
         {tools.map((tool, i) => (
-          <motion.div 
-            key={i} 
+          <motion.div
+            key={i}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.1 }}
@@ -2391,66 +2518,199 @@ const ToolsContent = ({ user, onUpdate }) => {
             </div>
             <h3 className="text-xl font-bold text-[#EDEDED] mb-3">{tool.name}</h3>
             <p className="text-[#A1A1A1] text-sm leading-relaxed mb-6">{tool.desc}</p>
-            
-            {activeTool === tool.id ? (
-              <div className="space-y-4 pt-4 border-t border-white/5">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] font-bold text-[#A1A1A1] uppercase mb-1 block">Twitch Name</label>
-                    <input 
-                      type="text"
-                      placeholder="username"
-                      defaultValue={configs[tool.id]?.twitch || ''}
-                      id={`twitch-${tool.id}`}
-                      className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-bold text-[#A1A1A1] uppercase mb-1 block">Kick Name</label>
-                    <input 
-                      type="text"
-                      placeholder="username"
-                      defaultValue={configs[tool.id]?.kick || ''}
-                      id={`kick-${tool.id}`}
-                      className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500 outline-none"
-                    />
-                  </div>
+
+            <div className="space-y-3 pt-4 border-t border-white/5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-bold text-[#A1A1A1] uppercase mb-1 block">Twitch Channel</label>
+                  <input
+                    type="text"
+                    placeholder="channelname"
+                    value={configs[tool.id]?.twitch || ''}
+                    onChange={(e) => setConfigs({ ...configs, [tool.id]: { ...(configs[tool.id] || {}), twitch: e.target.value } })}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                  />
                 </div>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => setActiveTool(null)}
-                    className="flex-1 py-2 rounded-lg bg-white/5 text-[#A1A1A1] text-xs font-bold hover:text-white transition-all"
-                  >
-                    Abbrechen
-                  </button>
-                  <button 
-                    onClick={() => {
-                      const twitch = document.getElementById(`twitch-${tool.id}`).value;
-                      const kick = document.getElementById(`kick-${tool.id}`).value;
-                      handleSave(tool.id, { twitch, kick });
-                    }}
-                    disabled={isSaving}
-                    className="flex-1 py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-all disabled:opacity-50"
-                  >
-                    {isSaving ? 'Speichert...' : 'Speichern'}
-                  </button>
+                <div>
+                  <label className="text-[10px] font-bold text-[#A1A1A1] uppercase mb-1 block">Kick Channel</label>
+                  <input
+                    type="text"
+                    placeholder="channelname"
+                    value={configs[tool.id]?.kick || ''}
+                    onChange={(e) => setConfigs({ ...configs, [tool.id]: { ...(configs[tool.id] || {}), kick: e.target.value } })}
+                    className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+                  />
                 </div>
               </div>
-            ) : (
-              <button 
-                onClick={() => setActiveTool(tool.id)}
-                className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-[#EDEDED] font-bold hover:bg-indigo-600 hover:border-indigo-600 transition-all"
+              <button
+                onClick={() => saveToolsConfig(configs)}
+                disabled={isSaving}
+                className="w-full py-2 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 disabled:opacity-50"
               >
-                Konfigurieren
+                Kanal speichern
               </button>
-            )}
+            </div>
           </motion.div>
         ))}
       </div>
+
+      <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
+        <h3 className="text-lg font-bold text-[#EDEDED]">Bot Aktionen</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-xs text-[#A1A1A1] uppercase font-bold">Test Nachricht</label>
+            <input
+              type="text"
+              value={manualMessage}
+              onChange={(e) => setManualMessage(e.target.value)}
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+              placeholder="Nachricht fuer Twitch/Kick"
+            />
+            <button
+              onClick={() => runToolAction(`/api/user/${user.id}/tools/chat/test`, { message: manualMessage })}
+              className="w-full py-2 rounded-xl bg-white/10 border border-white/10 text-white font-bold text-sm"
+            >
+              Test senden
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs text-[#A1A1A1] uppercase font-bold">Turnier Start</label>
+            <input
+              type="text"
+              value={tournamentTitle}
+              onChange={(e) => setTournamentTitle(e.target.value)}
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+              placeholder="Turniertitel"
+            />
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="0"
+                value={pickupAfterMinutes}
+                onChange={(e) => setPickupAfterMinutes(Number(e.target.value))}
+                className="w-32 bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+              />
+              <button
+                onClick={() => runToolAction(`/api/user/${user.id}/tools/tournament/start`, { title: tournamentTitle, pickupAfterMinutes })}
+                className="flex-1 py-2 rounded-xl bg-indigo-600 text-white font-bold text-sm hover:bg-indigo-500"
+              >
+                Turnier starten
+              </button>
+            </div>
+            <button
+              onClick={() => runToolAction(`/api/user/${user.id}/tools/tournament/pickup`, { message: 'Punkte zum Abholen sind jetzt verfuegbar.' })}
+              className="w-full py-2 rounded-xl bg-white/10 border border-white/10 text-white font-bold text-sm"
+            >
+              Pickup Hinweis jetzt senden
+            </button>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-white/10 space-y-2">
+          <label className="text-xs text-[#A1A1A1] uppercase font-bold">Werbe Timer</label>
+          <div className="grid md:grid-cols-[140px_1fr_auto] gap-2">
+            <input
+              type="number"
+              min="1"
+              max="240"
+              value={adTimer.intervalMinutes}
+              onChange={(e) => setAdTimer({ ...adTimer, intervalMinutes: Number(e.target.value) })}
+              className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+            />
+            <input
+              type="text"
+              value={adTimer.message}
+              onChange={(e) => setAdTimer({ ...adTimer, message: e.target.value })}
+              className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
+              placeholder="Werbenachricht"
+            />
+            {!adTimer.running ? (
+              <button
+                onClick={async () => {
+                  await runToolAction(`/api/user/${user.id}/tools/ad-timer/start`, { intervalMinutes: adTimer.intervalMinutes, message: adTimer.message });
+                  fetchTimerStatus();
+                }}
+                className="px-4 py-2 rounded-xl bg-green-600 text-white font-bold text-sm"
+              >
+                Start
+              </button>
+            ) : (
+              <button
+                onClick={async () => {
+                  await runToolAction(`/api/user/${user.id}/tools/ad-timer/stop`, {});
+                  fetchTimerStatus();
+                }}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-sm"
+              >
+                Stop
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs text-[#A1A1A1] uppercase font-bold">Dauerhafter Chat Reader (Twitch)</label>
+            <div className="flex gap-2">
+              {!readerStatus.running ? (
+                <button
+                  onClick={async () => {
+                    await runToolAction(`/api/user/${user.id}/tools/chat-reader/start`, {});
+                    fetchReaderStatus();
+                    fetchReaderLogs();
+                  }}
+                  className="px-4 py-2 rounded-xl bg-green-600 text-white font-bold text-sm"
+                >
+                  Reader Start
+                </button>
+              ) : (
+                <button
+                  onClick={async () => {
+                    await runToolAction(`/api/user/${user.id}/tools/chat-reader/stop`, {});
+                    fetchReaderStatus();
+                  }}
+                  className="px-4 py-2 rounded-xl bg-red-600 text-white font-bold text-sm"
+                >
+                  Reader Stop
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  fetchReaderStatus();
+                  fetchReaderLogs();
+                }}
+                className="px-4 py-2 rounded-xl bg-white/10 border border-white/10 text-white font-bold text-sm"
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+
+          <p className="text-xs text-[#A1A1A1]">
+            Status: {readerStatus.running ? 'Läuft' : 'Gestoppt'}
+            {readerStatus.channels?.length ? ` | Channels: ${readerStatus.channels.join(', ')}` : ''}
+            {readerStatus.lastError ? ` | Letzter Fehler: ${readerStatus.lastError}` : ''}
+          </p>
+
+          <div className="bg-[#0A0A0A] border border-white/10 rounded-xl p-3 h-56 overflow-y-auto font-mono text-xs space-y-1">
+            {readerLogs.length === 0 ? (
+              <p className="text-[#777]">Noch keine Chat-Logs vorhanden.</p>
+            ) : (
+              readerLogs.map((log, idx) => (
+                <p key={idx} className="text-[#CFCFCF]">
+                  [{new Date(log.at).toLocaleTimeString()}] {log.channel ? `#${log.channel}` : ''} {log.username ? `${log.username}:` : ''} {log.message}
+                </p>
+              ))
+            )}
+          </div>
+        </div>
+
+        {status && <p className="text-sm text-[#A1A1A1]">{status}</p>}
+      </section>
     </div>
   );
 };
-
 const DomainContent = ({ user }) => {
   const [customDomain, setCustomDomain] = useState(user?.category || '');
   const [isSaving, setIsLoading] = useState(false);
@@ -2612,6 +2872,343 @@ const SettingsContent = ({ user, onUpdate }) => {
   );
 };
 
+const SuperAdminPage = () => {
+  const TOKEN_KEY = 'superadmin_token';
+  const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState('');
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedData, setSelectedData] = useState(null);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+
+  const authHeaders = () => ({
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`
+  });
+
+  const fetchUsers = async () => {
+    if (!token) return;
+    setLoadingUsers(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/superadmin/users`, { headers: authHeaders() });
+      const result = await response.json();
+      if (result.success) {
+        setUsers(result.users);
+        if (!selectedUserId && result.users.length > 0) {
+          setSelectedUserId(result.users[0].id);
+        }
+      } else {
+        setError(result.error || 'Fehler beim Laden der Nutzer.');
+      }
+    } catch (err) {
+      setError('Superadmin-API nicht erreichbar.');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const fetchUserDetails = async (userId) => {
+    if (!token || !userId) return;
+    setLoadingDetails(true);
+    try {
+      const response = await fetch(`${API_BASE}/api/superadmin/user/${userId}`, { headers: authHeaders() });
+      const result = await response.json();
+      if (result.success) {
+        setSelectedData(result.data);
+      } else {
+        setSelectedData(null);
+        setError(result.error || 'Nutzerdetails konnten nicht geladen werden.');
+      }
+    } catch (err) {
+      setError('Nutzerdetails konnten nicht geladen werden.');
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [token]);
+
+  useEffect(() => {
+    fetchUserDetails(selectedUserId);
+  }, [selectedUserId, token]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    try {
+      const response = await fetch(`${API_BASE}/api/superadmin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const result = await response.json();
+      if (result.success) {
+        localStorage.setItem(TOKEN_KEY, result.token);
+        setToken(result.token);
+      } else {
+        setError(result.error || 'Login fehlgeschlagen.');
+      }
+    } catch (err) {
+      setError('Login fehlgeschlagen.');
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    setToken('');
+    setSelectedData(null);
+    setUsers([]);
+    setSelectedUserId(null);
+  };
+
+  const addDealToUser = async () => {
+    if (!selectedUserId || !newDeal.name || !newDeal.deal) return;
+    try {
+      const response = await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(newDeal)
+      });
+      const result = await response.json();
+      if (result.success) {
+        setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+        fetchUserDetails(selectedUserId);
+      } else {
+        setError(result.error || 'Deal konnte nicht hinzugefügt werden.');
+      }
+    } catch (err) {
+      setError('Deal konnte nicht hinzugefügt werden.');
+    }
+  };
+
+  const updateDealStatus = async (deal) => {
+    const nextStatus = deal.status === 'Aktiv' ? 'Deaktiviert' : 'Aktiv';
+    try {
+      await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${deal.id}`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify({ ...deal, status: nextStatus })
+      });
+      fetchUserDetails(selectedUserId);
+    } catch (err) {
+      setError('Deal-Status konnte nicht geändert werden.');
+    }
+  };
+
+  const deleteDeal = async (dealId) => {
+    try {
+      await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${dealId}`, {
+        method: 'DELETE',
+        headers: authHeaders()
+      });
+      fetchUserDetails(selectedUserId);
+    } catch (err) {
+      setError('Deal konnte nicht gelöscht werden.');
+    }
+  };
+
+  const filteredUsers = users.filter((u) => {
+    const query = search.toLowerCase();
+    return (
+      (u.email || '').toLowerCase().includes(query) ||
+      (u.username || '').toLowerCase().includes(query) ||
+      (u.siteSlug || '').toLowerCase().includes(query)
+    );
+  });
+
+  const linksFromBlocks = (selectedData?.pageBlocks || []).flatMap((block) => {
+    try {
+      const data = typeof block.dataJson === 'string' ? JSON.parse(block.dataJson) : (block.dataJson || {});
+      if (block.blockType === 'Button' && data.url) return [{ label: data.label || 'Button', url: data.url }];
+      if (block.blockType === 'LinkList' && Array.isArray(data.links)) return data.links.filter((x) => x?.url);
+      return [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6">
+        <div className={`w-full max-w-md p-8 rounded-2xl border ${theme.border} ${theme.surface}`}>
+          <h1 className="text-2xl font-bold mb-2">Superadmin Login</h1>
+          <p className="text-[#A1A1A1] text-sm mb-6">Nur feste Zugangsdaten sind erlaubt.</p>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@weblone2026.com"
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Passwort"
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
+            />
+            {error && <p className="text-red-400 text-sm">{error}</p>}
+            <button type="submit" className="w-full bg-indigo-600 rounded-xl py-3 font-bold hover:bg-indigo-500 transition-all">
+              Einloggen
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-white pt-20">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Superadmin Dashboard</h1>
+            <p className="text-[#A1A1A1] text-sm">Nutzer, Registrierungen, Streamer-Seiten und Deals zentral verwalten.</p>
+          </div>
+          <button onClick={handleLogout} className="bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-xl">
+            Logout
+          </button>
+        </div>
+
+        {error && <p className="text-red-400 text-sm">{error}</p>}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <aside className={`lg:col-span-4 p-4 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Nutzer suchen (Email, Name, Slug)..."
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm"
+            />
+            <div className="max-h-[70vh] overflow-y-auto space-y-2">
+              {loadingUsers && <p className="text-sm text-[#A1A1A1]">Lade Nutzer...</p>}
+              {!loadingUsers && filteredUsers.map((u) => (
+                <button
+                  key={u.id}
+                  onClick={() => setSelectedUserId(u.id)}
+                  className={`w-full text-left p-3 rounded-xl border transition-all ${selectedUserId === u.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}
+                >
+                  <p className="font-bold">{u.username || 'Ohne Name'} <span className="text-[#A1A1A1]">#{u.id}</span></p>
+                  <p className="text-xs text-[#A1A1A1]">{u.email}</p>
+                  <p className="text-xs text-indigo-400">{u.siteSlug ? `/${u.siteSlug}` : 'Kein Slug'}</p>
+                </button>
+              ))}
+            </div>
+          </aside>
+
+          <main className={`lg:col-span-8 p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-6`}>
+            {loadingDetails && <p className="text-sm text-[#A1A1A1]">Lade Nutzerdetails...</p>}
+            {!loadingDetails && !selectedData && <p className="text-sm text-[#A1A1A1]">Wähle links einen Nutzer aus.</p>}
+            {!loadingDetails && selectedData && (
+              <>
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold">{selectedData.user.username || 'Unbenannter Nutzer'}</h2>
+                    <p className="text-[#A1A1A1] text-sm">{selectedData.user.email}</p>
+                    <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine öffentliche URL'}</p>
+                  </div>
+                  {selectedData.user.siteSlug && (
+                    <a
+                      href={`${window.location.protocol}//${window.location.host}/${selectedData.user.siteSlug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
+                    >
+                      Streamer öffnen
+                    </a>
+                  )}
+                </div>
+
+                <section className="space-y-3">
+                  <h3 className="text-lg font-bold">Deals Verwalten</h3>
+                  <div className="grid md:grid-cols-4 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Deal Name"
+                      value={newDeal.name}
+                      onChange={(e) => setNewDeal({ ...newDeal, name: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Deal Text"
+                      value={newDeal.deal}
+                      onChange={(e) => setNewDeal({ ...newDeal, deal: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Performance"
+                      value={newDeal.performance}
+                      onChange={(e) => setNewDeal({ ...newDeal, performance: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
+                    <button onClick={addDealToUser} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">
+                      Deal hinzufügen
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {(selectedData.deals || []).map((deal) => (
+                      <div key={deal.id} className="p-3 rounded-xl border border-white/10 bg-white/5 flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-bold">{deal.name}</p>
+                          <p className="text-sm text-[#A1A1A1]">{deal.deal}</p>
+                          <p className="text-xs text-indigo-400">{deal.performance}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => updateDealStatus(deal)} className="px-3 py-2 rounded-lg bg-white/10 text-sm">
+                            {deal.status}
+                          </button>
+                          <button onClick={() => deleteDeal(deal.id)} className="px-3 py-2 rounded-lg bg-red-500/20 text-red-300 text-sm">
+                            Löschen
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-3">
+                  <h3 className="text-lg font-bold">Seiten & Links</h3>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+                      <p className="font-bold mb-2">Seiten ({selectedData.pages?.length || 0})</p>
+                      <div className="space-y-1 text-sm text-[#A1A1A1]">
+                        {(selectedData.pages || []).map((p) => (
+                          <p key={p.id}>{p.title} ({p.slug || 'home'})</p>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+                      <p className="font-bold mb-2">Links ({linksFromBlocks.length})</p>
+                      <div className="space-y-1 text-sm">
+                        {linksFromBlocks.map((l, idx) => (
+                          <a key={idx} href={l.url} target="_blank" rel="noopener noreferrer" className="block text-indigo-400 truncate">
+                            {(l.label || 'Link')}: {l.url}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </>
+            )}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const List = (props) => (
   <svg {...props} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <line x1="8" y1="6" x2="21" y2="6"></line>
@@ -2694,6 +3291,7 @@ const App = () => {
             <Route path="/onboarding/setup" element={<BaseSetup user={user} onComplete={(updatedUser) => handleSetUser({...user, ...updatedUser})} />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/dashboard/:slug" element={<Dashboard user={user} />} />
+            <Route path="/superadmin" element={<SuperAdminPage />} />
             <Route path="/:slug" element={<StreamerPage />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
@@ -2751,14 +3349,15 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       <BackgroundBubbles />
       
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 py-6">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-[#0A0A0A]/40 backdrop-blur-xl border border-white/5 rounded-full px-8 py-3 flex justify-between items-center shadow-2xl">
+      <nav className="fixed top-0 w-full z-50 py-3 md:py-6">
+        <div className="max-w-5xl mx-auto px-4 md:px-6">
+          <div className="bg-[#0A0A0A]/40 backdrop-blur-xl border border-white/5 rounded-2xl md:rounded-full px-4 md:px-8 py-3 flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 shadow-2xl">
             <button onClick={() => setActivePageSlug('')} className="text-xl font-bold tracking-tighter hover:text-indigo-500 transition-colors">
               {settings.navTitle || user.username}
             </button>
             
-            <div className="flex gap-8">
+            <div className="w-full sm:w-auto overflow-x-auto">
+              <div className="flex gap-4 md:gap-8 min-w-max">
               {pages.map(page => (
                 <button 
                   key={page.id}
@@ -2768,22 +3367,23 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
                   {page.title}
                 </button>
               ))}
+              </div>
             </div>
           </div>
         </div>
       </nav>
 
       {/* Hero / Header Area (Dynamic) */}
-      <main className="pt-40 pb-20">
-        <div className="max-w-5xl mx-auto px-6 space-y-20">
+      <main className="pt-32 md:pt-40 pb-16 md:pb-20">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-20">
           {pageBlocks.length === 0 ? (
             <div className="text-center py-20">
                {currentPage?.slug === '' ? (
                  <div className="space-y-6">
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tighter">
+                    <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter">
                       Willkommen bei <span className="text-indigo-500">{user.username}</span>
                     </h1>
-                    <p className="text-xl text-[#A1A1A1] max-w-2xl mx-auto">
+                    <p className="text-base md:text-xl text-[#A1A1A1] max-w-2xl mx-auto">
                       {settings.slogan || 'Entdecke meine exklusiven Deals und Tools.'}
                     </p>
                  </div>
@@ -2800,8 +3400,8 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       </main>
 
       {/* Footer */}
-      <footer className="py-20 border-t border-white/5 text-center">
-        <div className="max-w-5xl mx-auto px-6">
+      <footer className="py-12 md:py-20 border-t border-white/5 text-center">
+        <div className="max-w-5xl mx-auto px-4 md:px-6">
           <p className="text-sm text-[#555] font-medium">
             © 2026 {settings.navTitle || user.username} • Powered by <span className="text-indigo-500 font-bold">Weblone</span>
           </p>
@@ -2822,11 +3422,11 @@ const RenderBlock = ({ block, deals }) => {
   switch (block.blockType) {
     case 'Hero':
       return (
-        <section className="text-center space-y-6">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <section className="text-center space-y-4 md:space-y-6">
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {data.title}
           </h1>
-          <p className="text-xl text-[#A1A1A1] max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-[#A1A1A1] max-w-2xl mx-auto">
             {data.subtitle}
           </p>
         </section>
@@ -2846,7 +3446,7 @@ const RenderBlock = ({ block, deals }) => {
             href={data.url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-500/20"
+            className="w-full sm:w-auto text-center bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-500/20"
           >
             {data.label}
           </a>
@@ -2875,5 +3475,6 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
 
 
