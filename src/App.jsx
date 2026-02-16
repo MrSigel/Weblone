@@ -3266,7 +3266,7 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
         const result = await response.json();
         onUpdate([...deals, { id: result.dealId, ...newDeal, performance: '0 clicks' }]);
         setIsAdding(false);
-        setNewDeal({ name: '', deal: '', status: 'Aktiv' });
+        setNewDeal({ name: '', deal: '', status: 'Aktiv', imageUrl: '' });
       }
     } catch (err) { console.error(err); }
   };
@@ -3391,6 +3391,24 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
             </div>
             <h3 className="text-lg font-bold text-[#EDEDED] mb-1">{deal.name}</h3>
             <p className="text-sm text-indigo-500 font-medium mb-4">{deal.deal}</p>
+            <div className="space-y-2 mb-4">
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Casino Bild URL</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={dealImages[deal.id] || ''}
+                  onChange={(e) => setDealImages({ ...dealImages, [deal.id]: e.target.value })}
+                  placeholder="https://.../logo.png"
+                  className="flex-1 bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+                />
+                <button
+                  onClick={() => saveDealImage(deal)}
+                  className="px-3 py-2 rounded-lg bg-white/10 text-xs font-bold hover:bg-white/20"
+                >
+                  Bild speichern
+                </button>
+              </div>
+            </div>
             <div className="flex justify-between items-center pt-4 border-t border-white/5">
               <div className="flex items-center gap-2 text-[#A1A1A1]">
                 <PieChart size={16} />
@@ -3960,7 +3978,7 @@ const SuperAdminPage = () => {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [isDeletingUser, setIsDeletingUser] = useState(false);
-  const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+  const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv', imageUrl: '' });
   const [analytics, setAnalytics] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
   const [monitor, setMonitor] = useState([]);
@@ -4114,7 +4132,7 @@ const SuperAdminPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDeal)
       });
-      setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+      setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv', imageUrl: '' });
       fetchUserDetails(selectedUserId);
       fetchDashboardData();
     } catch (err) {
@@ -4554,7 +4572,7 @@ const SuperAdminPage = () => {
 
                 <section className="space-y-3">
                   <h3 className="text-lg font-bold">Deals Verwalten</h3>
-                  <div className="grid md:grid-cols-4 gap-3">
+                  <div className="grid md:grid-cols-5 gap-3">
                     <input
                       type="text"
                       placeholder="Deal Name"
@@ -4576,6 +4594,13 @@ const SuperAdminPage = () => {
                       onChange={(e) => setNewDeal({ ...newDeal, performance: e.target.value })}
                       className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
                     />
+                    <input
+                      type="text"
+                      placeholder="Bild URL (optional)"
+                      value={newDeal.imageUrl || ''}
+                      onChange={(e) => setNewDeal({ ...newDeal, imageUrl: e.target.value })}
+                      className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
+                    />
                     <button onClick={addDealToUser} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">
                       Deal hinzufügen
                     </button>
@@ -4587,6 +4612,7 @@ const SuperAdminPage = () => {
                           <p className="font-bold">{deal.name}</p>
                           <p className="text-sm text-[#A1A1A1]">{deal.deal}</p>
                           <p className="text-xs text-indigo-400">{deal.performance}</p>
+                          {!!deal.imageUrl && <p className="text-xs text-[#A1A1A1] truncate">{deal.imageUrl}</p>}
                         </div>
                         <div className="flex gap-2">
                           <button onClick={() => updateDealStatus(deal)} className="px-3 py-2 rounded-lg bg-white/10 text-sm">
