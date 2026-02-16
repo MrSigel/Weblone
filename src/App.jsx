@@ -1874,7 +1874,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                 <p className="text-sm font-bold text-white">Seiten Sichtbarkeit</p>
                 {[
                   { key: '', label: 'Home' },
-                  { key: 'shop', label: 'Shop' },
+                  { key: 'shop', label: 'Casinos' },
                   { key: 'hunt', label: 'Hunt' },
                   { key: 'giveaway', label: 'Giveaway' }
                 ].map((page) => (
@@ -2950,6 +2950,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
 
           <BuilderPreview
             user={user}
+            deals={deals}
             settings={settings}
             pages={pages}
             blocks={blocks}
@@ -2962,10 +2963,11 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   );
 };
 
-const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActivePageId }) => {
+const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageId, setActivePageId }) => {
   const activePage = pages.find((p) => p.id === activePageId) || pages[0];
   const visiblePages = pages.filter((p) => p.visible || p.id === activePageId);
   const pageBlocks = [...blocks].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const isCasinoPage = activePage?.slug === 'shop';
 
   return (
     <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
@@ -3010,7 +3012,9 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
             </a>
           )}
 
-          {pageBlocks.length === 0 ? (
+          {isCasinoPage ? (
+            <CasinoDealsSection deals={deals} compact />
+          ) : pageBlocks.length === 0 ? (
             <div className="text-center py-12 text-[#A1A1A1]">
               Diese Seite hat noch keine Blöcke.
             </div>
