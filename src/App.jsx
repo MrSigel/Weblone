@@ -2956,7 +2956,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               <div>
                 <h2 className="text-xl font-bold text-white">Inhalt: {activePage?.title}</h2>
                 <p className="text-xs text-[#A1A1A1]">
-                  {isCasinoPage ? 'Diese feste Seite wird automatisch aus aktiven Deals erzeugt.' : 'Verwalte die Bloecke dieser Seite.'}
+                  {isCasinoPage ? 'Diese feste Seite wird automatisch aus aktiven Deals erzeugt.' : 'Verwalte die Blöcke dieser Seite.'}
                 </p>
               </div>
               {!isCasinoPage && (
