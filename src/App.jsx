@@ -2990,7 +2990,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
                       return (
                         <div key={deal.id} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
                           <div className="flex items-center justify-between gap-3">
-                            <p className="font-bold text-white">{deal.name}</p>
+                            <p className="font-bold text-white">{draft.name || deal.name}</p>
                             <button
                               onClick={() => saveCasinoDeal(deal.id)}
                               className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-all"
@@ -2999,6 +2999,13 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
                             </button>
                           </div>
                           <div className="grid md:grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              value={draft.name || ''}
+                              onChange={(e) => updateCasinoDealDraft(deal.id, 'name', e.target.value)}
+                              placeholder="Casino Name"
+                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
+                            />
                             <input
                               type="text"
                               value={draft.deal || ''}
@@ -3347,18 +3354,22 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
     bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
   });
   const [dealImages, setDealImages] = useState({});
+  const [dealNames, setDealNames] = useState({});
   const [dealCodes, setDealCodes] = useState({});
   const [dealTerms, setDealTerms] = useState({});
   useEffect(() => {
     const nextImages = {};
+    const nextNames = {};
     const nextCodes = {};
     const nextTerms = {};
     (deals || []).forEach((d) => {
       nextImages[d.id] = d.imageUrl || '';
+      nextNames[d.id] = d.name || '';
       nextCodes[d.id] = d.promoCode || 'DIEGAWINOS';
       nextTerms[d.id] = d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager';
     });
     setDealImages(nextImages);
+    setDealNames(nextNames);
     setDealCodes(nextCodes);
     setDealTerms(nextTerms);
   }, [deals]);
@@ -3415,16 +3426,17 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
 
   const saveDealConfig = async (deal) => {
     try {
+      const name = (dealNames[deal.id] || deal.name || '').trim();
       const imageUrl = (dealImages[deal.id] || '').trim();
       const promoCode = (dealCodes[deal.id] || 'DIEGAWINOS').trim();
       const bonusTerms = (dealTerms[deal.id] || '100% Sticky - 300EUR Max Bonus - 40x Wager').trim();
       const response = await fetch(`${API_BASE}/api/user/${userId}/deal/${deal.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...deal, imageUrl, promoCode, bonusTerms })
+        body: JSON.stringify({ ...deal, name, imageUrl, promoCode, bonusTerms })
       });
       if (response.ok) {
-        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, imageUrl, promoCode, bonusTerms } : d));
+        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, name, imageUrl, promoCode, bonusTerms } : d));
       }
     } catch (err) { console.error(err); }
   };
@@ -3545,6 +3557,14 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
             <h3 className="text-lg font-bold text-[#EDEDED] mb-1">{deal.name}</h3>
             <p className="text-sm text-indigo-500 font-medium mb-4">{deal.deal}</p>
             <div className="space-y-2 mb-4">
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Name</label>
+              <input
+                type="text"
+                value={dealNames[deal.id] || ''}
+                onChange={(e) => setDealNames({ ...dealNames, [deal.id]: e.target.value })}
+                placeholder="z.B. Razed"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+              />
               <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Code</label>
               <input
                 type="text"
