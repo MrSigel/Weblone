@@ -2737,6 +2737,21 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               <Zap size={16} className="text-indigo-500" /> Branding
             </h3>
             <div className="space-y-4">
+              <div className="flex items-center justify-between rounded-xl border border-white/10 p-3 bg-white/5">
+                <div>
+                  <p className="text-sm font-bold text-white">Conversion Booster aktiv</p>
+                  <p className="text-xs text-[#A1A1A1]">Steuert FOMO-Banner, CTA-Button, Trust-Leiste und Sticky-Leiste.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={!!settings.conversionBoosterEnabled}
+                  onChange={(e) => {
+                    const next = { ...settings, conversionBoosterEnabled: e.target.checked ? 1 : 0 };
+                    setSettings(next);
+                    saveSettings(next);
+                  }}
+                />
+              </div>
               <div>
                 <label className="text-xs text-[#A1A1A1] mb-1 block">Navigationstitel</label>
                 <input 
@@ -3089,6 +3104,8 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
   const visiblePages = pages;
   const pageBlocks = [...blocks].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
   const isCasinoPage = activePage?.slug === 'shop';
+  const conversionBoosterEnabled = Number(settings?.conversionBoosterEnabled ?? 1) === 1;
+  const previewTheme = landingBackgroundThemes[settings?.backgroundTheme] || landingBackgroundThemes.dark;
 
   return (
     <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
@@ -3097,7 +3114,7 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
         <span className="text-xs text-[#A1A1A1]">Änderungen erscheinen sofort</span>
       </div>
 
-      <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#050505]">
+      <div className={`rounded-2xl border border-white/10 overflow-hidden ${previewTheme.previewClass}`}>
         <div className="px-4 py-3 border-b border-white/10 bg-[#0A0A0A] flex items-center justify-between">
           <span className="font-bold text-white">{settings.navTitle || user?.username || 'Streamer'}</span>
           <span className="text-xs text-[#A1A1A1]">{activePage?.title || 'Seite'}</span>
@@ -3116,13 +3133,13 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
         </div>
 
         <div className="p-6 space-y-6">
-          {!!settings.urgencyText && (
+          {!!conversionBoosterEnabled && !!settings.urgencyText && (
             <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
               {settings.urgencyText}
             </div>
           )}
 
-          {!!settings.primaryCtaUrl && (
+          {!!conversionBoosterEnabled && !!settings.primaryCtaUrl && (
             <a
               href={settings.primaryCtaUrl}
               target="_blank"
@@ -3143,14 +3160,14 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
             pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
           )}
 
-          {!!settings.trustBadgeText && (
+          {!!conversionBoosterEnabled && !!settings.trustBadgeText && (
             <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
               {settings.trustBadgeText}
             </div>
           )}
         </div>
 
-        {!!settings.stickyCtaEnabled && (
+        {!!conversionBoosterEnabled && !!settings.stickyCtaEnabled && (
           <div className="sticky bottom-0 border-t border-white/10 bg-[#0A0A0A] px-4 py-3 flex items-center justify-between gap-3">
             <p className="text-xs text-[#A1A1A1] truncate">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
             <a
