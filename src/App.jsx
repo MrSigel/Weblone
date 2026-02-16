@@ -3496,6 +3496,16 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
               />
             </div>
             <div>
+              <label className="text-xs font-bold text-[#A1A1A1] uppercase mb-2 block">Spielen Link URL</label>
+              <input
+                type="text"
+                value={newDeal.ctaUrl || ''}
+                onChange={(e) => setNewDeal({ ...newDeal, ctaUrl: e.target.value })}
+                placeholder="https://dein-casino-link.tld"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <div>
               <label className="text-xs font-bold text-[#A1A1A1] uppercase mb-2 block">Code</label>
               <input
                 type="text"
