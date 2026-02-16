@@ -1142,10 +1142,12 @@ app.post('/api/user/:id/setup', (req, res) => {
         insertBlock.run(userId, block.name, block.type, 'Active', block.orderIndex);
       }
       
-      // 5. Create a default deal
-      db.prepare('DELETE FROM deals WHERE userId = ?').run(userId);
-      db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-        .run(userId, 'Weblone Partner', '100% Bonus bis 500?', 'Top Deal', 'Aktiv');
+      // 5. Create a default deal only when no deal exists yet
+      const existingDealCount = db.prepare('SELECT COUNT(*) as c FROM deals WHERE userId = ?').get(userId)?.c || 0;
+      if (existingDealCount === 0) {
+        db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
+          .run(userId, 'Weblone Partner', '100% Bonus bis 500?', 'Top Deal', 'Aktiv');
+      }
 
       // 6. Create default site settings
       db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
