@@ -3231,7 +3231,13 @@ const BlockEditor = ({ block, isFirst, isLast, onMoveUp, onMoveDown, onUpdate, o
 const DealsContent = ({ deals, userId, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingDeal, setEditingDeal] = useState(null);
-  const [newDeal, setNewDeal] = useState({ name: '', deal: '', status: 'Aktiv' });
+  const [newDeal, setNewDeal] = useState({ name: '', deal: '', status: 'Aktiv', imageUrl: '' });
+  const [dealImages, setDealImages] = useState({});
+  useEffect(() => {
+    const next = {};
+    (deals || []).forEach((d) => { next[d.id] = d.imageUrl || ''; });
+    setDealImages(next);
+  }, [deals]);
 
   const toggleDeal = async (id, currentStatus) => {
     const newStatus = currentStatus === 'Aktiv' ? 'Deaktiviert' : 'Aktiv';
@@ -3276,6 +3282,20 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
     } catch (err) { console.error(err); }
   };
 
+  const saveDealImage = async (deal) => {
+    try {
+      const imageUrl = (dealImages[deal.id] || '').trim();
+      const response = await fetch(`${API_BASE}/api/user/${userId}/deal/${deal.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...deal, imageUrl })
+      });
+      if (response.ok) {
+        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, imageUrl } : d));
+      }
+    } catch (err) { console.error(err); }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex justify-between items-end">
@@ -3315,6 +3335,16 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                 value={newDeal.deal}
                 onChange={(e) => setNewDeal({...newDeal, deal: e.target.value})}
                 placeholder="z.B. 100% Bonus bis 500€"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-xs font-bold text-[#A1A1A1] uppercase mb-2 block">Casino Bild URL (optional)</label>
+              <input
+                type="text"
+                value={newDeal.imageUrl || ''}
+                onChange={(e) => setNewDeal({ ...newDeal, imageUrl: e.target.value })}
+                placeholder="https://.../casino-logo.png"
                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
               />
             </div>
