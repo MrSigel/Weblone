@@ -171,11 +171,11 @@ ensureColumn('streamer_site_settings', 'stickyCtaEnabled', 'INTEGER DEFAULT 1');
 ensureColumn('streamer_site_settings', 'stickyCtaText', "TEXT DEFAULT 'Jetzt registrieren & Bonus aktivieren'");
 ensureColumn('streamer_site_settings', 'stickyCtaUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'trustBadgeText', "TEXT DEFAULT 'Verifiziert | 18+ | Verantwortungsvoll spielen'");
-ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele f?r neue Spieler'");
+ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele für neue Spieler'");
 ensureColumn('streamer_site_settings', 'abTestEnabled', 'INTEGER DEFAULT 0');
 ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus sichern'");
 ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
-ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus f?r neue Spieler holen'");
+ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus für neue Spieler holen'");
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 
 // Insert default superadmin if not exists
@@ -281,7 +281,7 @@ const refreshTwitchAccessToken = async (refreshToken) => {
 
 const fetchTwitchMetrics = async (auth) => {
   if (!auth?.accessToken || !auth?.twitchUserId) {
-    throw new Error('Twitch Auth nicht vollst?ndig.');
+    throw new Error('Twitch Auth nicht vollständig.');
   }
 
   const headers = {
@@ -303,7 +303,7 @@ const fetchTwitchMetrics = async (auth) => {
     if (subsRes.ok) {
       subs = subsData.total ?? 0;
     } else {
-      subsError = subsData.message || 'Subs nicht verf?gbar.';
+      subsError = subsData.message || 'Subs nicht verfügbar.';
     }
   } catch (err) {
     subsError = err.message;
@@ -359,7 +359,7 @@ const collectToolChannels = (toolsConfig) => {
 const sendTwitchChatMessage = ({ botUsername, oauthToken, channel, message }) => {
   return new Promise((resolve, reject) => {
     if (!botUsername || !oauthToken || !channel || !message) {
-      return reject(new Error('Twitch-Konfiguration unvollst?ndig.'));
+      return reject(new Error('Twitch-Konfiguration unvollständig.'));
     }
 
     const token = oauthToken.startsWith('oauth:') ? oauthToken : `oauth:${oauthToken}`;
@@ -577,7 +577,7 @@ app.post('/api/auth/login', (req, res) => {
   if (user && user.password === password) {
     res.json({ success: true, user: { id: user.id, email: user.email, username: user.username, isSetupComplete: user.isSetupComplete, isSuperadmin: false } });
   } else {
-    res.status(401).json({ success: false, error: 'Ung?ltige Anmeldedaten.' });
+    res.status(401).json({ success: false, error: 'Ungültige Anmeldedaten.' });
   }
 });
 
@@ -585,7 +585,7 @@ app.post('/api/auth/register', (req, res) => {
   const { email, password, inviteCode } = req.body;
   
   if (inviteCode !== 'weblone2026!') {
-    return res.status(400).json({ success: false, error: 'Ung?ltiger Einladungscode.' });
+    return res.status(400).json({ success: false, error: 'Ungültiger Einladungscode.' });
   }
 
   try {
@@ -1114,7 +1114,7 @@ app.post('/api/user/:id/setup', (req, res) => {
   const landingPresetsByTemplate = {
     1: {
       home: [
-        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights f?r deine Community.' } },
+        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights für deine Community.' } },
         { blockType: 'Text', dataJson: { content: 'Hier findest du meine handverlesenen Partner inklusive exklusiver Vorteile. Trage unten nur noch deine finalen Deal-Links ein.' } },
         { blockType: 'Button', dataJson: { label: 'Hauptdeal Link einfuegen', url: 'https://example.com/deal-main' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Twitch', url: 'https://twitch.tv/' }, { label: 'Kick', url: 'https://kick.com/' }] } }
@@ -1124,8 +1124,8 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Casino Deal 1', url: 'https://example.com/deal-1' }, { label: 'Casino Deal 2', url: 'https://example.com/deal-2' }, { label: 'VIP Deal', url: 'https://example.com/deal-vip' }] } }
       ],
       hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos f?r den naechsten Hunt-Stream.' } },
-        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise f?r die Community.' } },
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos für den naechsten Hunt-Stream.' } },
+        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise für die Community.' } },
         { blockType: 'Button', dataJson: { label: 'Hunt Teilnahme Link', url: 'https://example.com/hunt' } }
       ],
       giveaway: [
@@ -1142,7 +1142,7 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Discord Community', url: 'https://discord.com/' }, { label: 'Telegram News', url: 'https://t.me/' }] } }
       ],
       shop: [
-        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote f?r neue und bestehende Spieler.' } },
+        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote für neue und bestehende Spieler.' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Willkommensbonus', url: 'https://example.com/welcome' }, { label: 'Reload Bonus', url: 'https://example.com/reload' }, { label: 'Highroller Deal', url: 'https://example.com/highroller' }] } }
       ],
       hunt: [
@@ -1151,14 +1151,14 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'Button', dataJson: { label: 'Zum Hunt-Portal', url: 'https://example.com/hunt-portal' } }
       ],
       giveaway: [
-        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen f?r aktive Zuschauer.' } },
+        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen für aktive Zuschauer.' } },
         { blockType: 'Text', dataJson: { content: 'Definiere Teilnahmebedingungen transparent, damit Zuschauer schnell verstehen, wie sie mitmachen.' } },
         { blockType: 'Button', dataJson: { label: 'Jetzt teilnehmen', url: 'https://example.com/giveaway-entry' } }
       ]
     },
     3: {
       home: [
-        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs f?r maximale Einzahlungen.' } },
+        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs für maximale Einzahlungen.' } },
         { blockType: 'Text', dataJson: { content: 'Dieses Preset ist conversion-orientiert. Trage deine Partner-Links ein und starte direkt mit einer professionellen Struktur.' } },
         { blockType: 'Button', dataJson: { label: 'VIP Bonus aktivieren', url: 'https://example.com/vip-bonus' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Live Stream', url: 'https://twitch.tv/' }, { label: 'Kick Stream', url: 'https://kick.com/' }, { label: 'Kontakt', url: 'mailto:kontakt@weblone.de' }] } }
@@ -1168,8 +1168,8 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Top Casino #1', url: 'https://example.com/casino-1' }, { label: 'Top Casino #2', url: 'https://example.com/casino-2' }, { label: 'Exklusiv Deal', url: 'https://example.com/exclusive' }] } }
       ],
       hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles f?r deinen naechsten Live-Hunt.' } },
-        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite f?r Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles für deinen naechsten Live-Hunt.' } },
+        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite für Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
         { blockType: 'Button', dataJson: { label: 'Hunt Event starten', url: 'https://example.com/hunt-start' } }
       ],
       giveaway: [
@@ -1226,7 +1226,7 @@ app.post('/api/user/:id/setup', (req, res) => {
       const existingDealCount = db.prepare('SELECT COUNT(*) as c FROM deals WHERE userId = ?').get(userId)?.c || 0;
       if (existingDealCount === 0) {
         db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-          .run(userId, 'Weblone Partner', '100% Bonus bis 500?', 'Top Deal', 'Aktiv');
+          .run(userId, 'Weblone Partner', '100% Bonus bis 500€', 'Top Deal', 'Aktiv');
       }
 
       // 7. Create default pages
@@ -1369,7 +1369,7 @@ app.post('/api/user/:id/social/disconnect', (req, res) => {
     delete toolsConfig.socialAuth.kick;
     delete toolsConfig.socialMetrics.kick;
   } else {
-    return res.status(400).json({ success: false, error: 'Ung?ltige Plattform.' });
+    return res.status(400).json({ success: false, error: 'Ungültige Plattform.' });
   }
 
   writeUserToolsConfig(req.params.id, toolsConfig);
@@ -1386,7 +1386,7 @@ app.post('/api/user/:id/social/refresh', async (req, res) => {
     try {
       let twitchAuth = toolsConfig.socialAuth.twitch;
       if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) throw new Error('Twitch OAuth nicht konfiguriert.');
-      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollst?ndig verbunden.');
+      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollständig verbunden.');
 
       if (!twitchAuth.expiresAt || twitchAuth.expiresAt <= Date.now() + 60_000) {
         const refreshed = await refreshTwitchAccessToken(twitchAuth.refreshToken);
@@ -1452,7 +1452,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
     if (minutes > 0) {
       const timeoutId = setTimeout(async () => {
         try {
-          await broadcastToolsMessage(userId, `Punkte zum Abholen f?r "${tournamentTitle}" sind jetzt verf?gbar.`);
+          await broadcastToolsMessage(userId, `Punkte zum Abholen für "${tournamentTitle}" sind jetzt verfügbar.`);
         } catch (err) {
           console.error('Pickup reminder error:', err.message);
         } finally {
@@ -1470,7 +1470,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
 
 app.post('/api/user/:id/tools/tournament/pickup', async (req, res) => {
   const { message } = req.body;
-  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verf?gbar.').toString().trim();
+  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfügbar.').toString().trim();
   try {
     const result = await broadcastToolsMessage(req.params.id, pickupMessage);
     res.json({ success: true, result });
@@ -1494,7 +1494,7 @@ app.get('/api/user/:id/tools/ad-timer/status', (req, res) => {
 app.post('/api/user/:id/tools/ad-timer/start', async (req, res) => {
   const userId = String(req.params.id);
   const intervalMinutes = Number(req.body.intervalMinutes || 15);
-  const message = (req.body.message || 'Werbung: Unterst?tze den Stream ?ber die Links auf meiner Seite.').toString().trim();
+  const message = (req.body.message || 'Werbung: Unterstütze den Stream über die Links auf meiner Seite.').toString().trim();
 
   if (!Number.isFinite(intervalMinutes) || intervalMinutes < 1 || intervalMinutes > 240) {
     return res.status(400).json({ success: false, error: 'intervalMinutes muss zwischen 1 und 240 liegen.' });
@@ -1724,11 +1724,11 @@ app.get('/api/site/:id/settings', (req, res) => {
       stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
       stickyCtaUrl: '',
       trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-      urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler',
+      urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler',
       abTestEnabled: 0,
       ctaAText: 'Jetzt Bonus sichern',
       ctaAUrl: '',
-      ctaBText: 'Bonus f?r neue Spieler holen',
+      ctaBText: 'Bonus für neue Spieler holen',
       ctaBUrl: '',
       ...(settings || {})
     }
@@ -1782,11 +1782,11 @@ app.put('/api/site/:id/settings', (req, res) => {
     stickyCtaText || 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl || '',
     trustBadgeText || 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText || 'Nur heute: exklusive Freispiele f?r neue Spieler',
+    urgencyText || 'Nur heute: exklusive Freispiele für neue Spieler',
     abTestEnabled ? 1 : 0,
     ctaAText || 'Jetzt Bonus sichern',
     ctaAUrl || '',
-    ctaBText || 'Bonus f?r neue Spieler holen',
+    ctaBText || 'Bonus für neue Spieler holen',
     ctaBUrl || ''
   );
   res.json({ success: true });
@@ -1816,7 +1816,7 @@ app.put('/api/site/:id/pages/:pageId', (req, res) => {
 app.delete('/api/site/:id/pages/:pageId', (req, res) => {
   const page = db.prepare('SELECT type FROM streamer_pages WHERE id = ? AND userId = ?').get(req.params.pageId, req.params.id);
   if (page?.type === 'system') {
-    return res.status(400).json({ success: false, error: 'Systemseiten k?nnen nicht gel?scht werden.' });
+    return res.status(400).json({ success: false, error: 'Systemseiten können nicht gelöscht werden.' });
   }
   db.prepare('DELETE FROM streamer_pages WHERE id = ? AND userId = ?').run(req.params.pageId, req.params.id);
   db.prepare('DELETE FROM page_blocks WHERE pageId = ?').run(req.params.pageId);
@@ -1923,11 +1923,11 @@ app.get('/api/public/site/:slug', (req, res) => {
           stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
           stickyCtaUrl: '',
           trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-          urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler',
+          urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler',
           abTestEnabled: 0,
           ctaAText: 'Jetzt Bonus sichern',
           ctaAUrl: '',
-          ctaBText: 'Bonus f?r neue Spieler holen',
+          ctaBText: 'Bonus für neue Spieler holen',
           ctaBUrl: '',
           ...(settings || {})
         }, 
