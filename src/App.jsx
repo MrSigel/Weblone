@@ -2903,7 +2903,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               <div>
                 <h2 className="text-xl font-bold text-white">Inhalt: {activePage?.title}</h2>
                 <p className="text-xs text-[#A1A1A1]">
-                  {isCasinoPage ? 'Diese feste Seite wird automatisch aus aktiven Deals erzeugt.' : 'Verwalte die Bl?cke dieser Seite.'}
+                  {isCasinoPage ? 'Diese feste Seite wird automatisch aus aktiven Deals erzeugt.' : 'Verwalte die Bloecke dieser Seite.'}
                 </p>
               </div>
               {!isCasinoPage && (
@@ -2924,7 +2924,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
             <div className="space-y-4 flex-1">
               {isCasinoPage ? (
                 <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
-                  Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                  Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte koennen hier nicht manuell als Block hinzugefuegt werden.
                 </div>
               ) : blocks.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-white/10">
