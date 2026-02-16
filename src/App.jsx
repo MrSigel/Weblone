@@ -1750,16 +1750,29 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
   return (
     <div className={`${theme.bg} min-h-screen pt-28 pb-20 px-6 relative overflow-hidden`}>
       <BackgroundBubbles />
-      <div className="max-w-4xl mx-auto relative z-10 space-y-6">
-        <div className="text-center space-y-3">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#EDEDED]">Setup Wizard</h1>
-          <p className="text-[#A1A1A1]">Schritt {step + 1} von {stepLabels.length}: {stepLabels[step]}</p>
-          <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+      <div className="max-w-5xl mx-auto relative z-10 space-y-6">
+        <div className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} backdrop-blur-xl`}>
+          <div className="text-center space-y-3">
+            <h1 className="text-3xl md:text-4xl font-bold text-[#EDEDED]">Setup Wizard</h1>
+            <p className="text-[#A1A1A1]">Schritt {step + 1} von {stepLabels.length}: {stepLabels[step]}</p>
+          </div>
+          <div className="mt-5 w-full h-2 rounded-full bg-white/10 overflow-hidden">
             <div className="h-full bg-indigo-600 transition-all" style={{ width: `${((step + 1) / stepLabels.length) * 100}%` }} />
+          </div>
+          <div className="mt-5 grid grid-cols-2 md:grid-cols-7 gap-2">
+            {stepLabels.map((label, idx) => (
+              <button
+                key={label}
+                onClick={() => idx <= step && !saving ? setStep(idx) : null}
+                className={`px-3 py-2 rounded-xl text-xs font-bold border ${idx === step ? 'bg-indigo-600 border-indigo-500 text-white' : idx < step ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200' : 'bg-white/5 border-white/10 text-[#A1A1A1]'}`}
+              >
+                {idx + 1}. {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className={`p-6 md:p-8 rounded-2xl border ${theme.border} ${theme.surface} space-y-6`}>
+        <div className={`p-6 md:p-8 rounded-2xl border ${theme.border} ${theme.surface} shadow-2xl backdrop-blur-xl space-y-6`}>
           {error && <p className="text-sm text-red-300">{error}</p>}
           {status && <p className="text-sm text-indigo-300">{status}</p>}
 
@@ -1767,13 +1780,19 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             <div className="grid md:grid-cols-2 gap-4">
               <input value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} placeholder="Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
               <input value={basic.streamerName} onChange={(e) => setBasic({ ...basic, streamerName: e.target.value })} placeholder="Streamername" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={basic.siteSlug} onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })} placeholder="URL-Name (slug)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input
+                value={basic.siteSlug}
+                onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })}
+                placeholder="URL-Name (slug)"
+                className={`bg-[#0A0A0A] border rounded-xl px-4 py-3 ${slugState.checking ? 'border-amber-500/40' : slugState.available ? 'border-emerald-500/40' : 'border-red-500/40'}`}
+              />
               <select value={basic.category} onChange={(e) => setBasic({ ...basic, category: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3">
                 <option>Casino</option>
                 <option>Gaming</option>
                 <option>Just Chatting</option>
                 <option>Sports</option>
               </select>
+              <p className={`md:col-span-2 text-xs ${slugState.available ? 'text-emerald-300' : 'text-red-300'}`}>{slugState.message}</p>
             </div>
           )}
 
