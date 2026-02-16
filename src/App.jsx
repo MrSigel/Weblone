@@ -3380,6 +3380,7 @@ const SuperAdminPage = () => {
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
   const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
   const [analytics, setAnalytics] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -4477,7 +4478,6 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
-
 
 
 
