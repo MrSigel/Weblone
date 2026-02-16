@@ -4905,53 +4905,165 @@ const StreamerPageOverride = ({ slug }) => {
   return <PublicStreamerSite data={data} activePageSlug={activePageSlug} setActivePageSlug={setActivePageSlug} />;
 };
 
+const CasinoDealCard = ({ deal, ctaHref }) => {
+  const [deposit, setDeposit] = useState(60);
+  const bonus = Math.max(0, Number(deposit) || 0);
+  const total = bonus * 2;
+  const wager = total * 40;
+  const countries = ['DE', 'AT', 'CH', 'CA', 'NO', 'SE', 'FI', 'DK', 'NL'];
+  const payments = ['VISA', 'BANK', 'PaySafe', 'BTC', 'ETH'];
+  const providers = [
+    'Playn GO', 'Big Time', 'Pragmatic', 'Merkur', 'Relax', 'Nolimit',
+    'Greentube', 'Blueprint', 'Hacksaw', 'Elk', 'Endorphina', 'NetEnt',
+    'Microgaming', 'Push', 'Quickspin', 'Thunderkick', 'Yggdrasil', 'Red Tiger'
+  ];
+
+  return (
+    <article className="rounded-2xl border border-[#253252] bg-[#161d2f] overflow-hidden shadow-2xl">
+      <div className="grid md:grid-cols-[180px_1fr_auto] items-center border-b border-[#2a385c]">
+        <div className="h-full min-h-[90px] bg-[#11192b] border-r border-[#2a385c] flex items-center justify-center p-3">
+          {deal.imageUrl ? (
+            <img src={deal.imageUrl} alt={deal.name} className="max-h-14 md:max-h-16 max-w-full object-contain" />
+          ) : (
+            <p className="text-xl font-black tracking-tight text-white">{deal.name}</p>
+          )}
+        </div>
+        <div className="px-4 py-4">
+          <p className="text-3xl md:text-5xl font-black text-amber-300 leading-none">{deal.deal}</p>
+          <p className="text-sm text-white/80 mt-1"><span className="text-amber-300">?</span> 5.0/5</p>
+        </div>
+        <div className="px-4 pb-4 md:pb-0">
+          <a
+            href={ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-black px-7 py-3 rounded-md border border-green-300/20"
+          >
+            SPIELEN
+          </a>
+        </div>
+      </div>
+
+      <div className="px-4 py-3 border-b border-[#2a385c] text-center text-sm font-bold text-white">
+        100% Sticky - 300EUR Max Bonus - 40x Wager
+      </div>
+      <div className="px-4 py-3 border-b border-[#2a385c] text-sm text-[#d8def1]">
+        <span className="text-amber-300">?</span> Book of Ra
+        <span className="mx-3 text-amber-300">?</span> Lucky Lady
+        <span className="mx-3 text-amber-300">?</span> Keine 5 Sekunden Pause
+        <span className="mx-3 text-amber-300">?</span> Keine Maxbet-Sperre
+      </div>
+      <div className="px-4 py-3 border-b border-[#2a385c] text-center text-lg font-black text-amber-300">
+        Einfacher / Schneller VIP Transfer <span className="text-white font-semibold">Code:</span> DIEGAWINOS
+      </div>
+
+      <div className="grid md:grid-cols-[1.6fr_0.8fr_0.8fr] gap-4 p-4 border-b border-[#2a385c]">
+        <div>
+          <p className="font-bold mb-2">Features:</p>
+          <ul className="space-y-1 text-sm text-[#d8def1]">
+            <li><span className="text-emerald-400">+</span> Reloadboni ueber den VIP-Support anfragbar</li>
+            <li><span className="text-emerald-400">+</span> Alle Auszahlungen binnen Minuten auf dem Konto</li>
+            <li><span className="text-emerald-400">+</span> Keine verbotenen Spiele im Bonus</li>
+            <li><span className="text-emerald-400">+</span> VPN - Freundlich</li>
+            <li><span className="text-emerald-400">+</span> Paysafecard & Klarna ab der 2. Einzahlung</li>
+            <li><span className="text-red-400">-</span> Max-Cashout nur im Willkommensbonus</li>
+          </ul>
+        </div>
+        <div className="md:border-l md:border-[#2a385c] md:pl-4">
+          <p className="font-bold mb-2">Verfuegbarkeit:</p>
+          <div className="grid grid-cols-3 gap-1.5">
+            {countries.map((country) => (
+              <span key={country} className="text-[10px] text-center rounded bg-white/10 border border-white/10 py-1">{country}</span>
+            ))}
+          </div>
+        </div>
+        <div className="md:border-l md:border-[#2a385c] md:pl-4">
+          <p className="font-bold mb-2">Einzahlung:</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {payments.map((method) => (
+              <span key={method} className="text-[10px] text-center rounded bg-white/10 border border-white/10 py-1">{method}</span>
+            ))}
+          </div>
+          <div className="mt-2 text-center rounded bg-[#11192b] border border-white/10 text-xs py-2">
+            Crypto Guide
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 text-center border-b border-[#2a385c]">
+        <div className="p-4 md:border-r md:border-[#2a385c]">
+          <p className="text-sm font-bold">Max bet:</p>
+          <p className="text-4xl font-black text-amber-300">5EUR</p>
+        </div>
+        <div className="p-4 md:border-r md:border-[#2a385c]">
+          <p className="text-sm font-bold">Freispiele:</p>
+          <p className="text-4xl font-black text-amber-300">100</p>
+          <p className="text-sm text-white/80 italic">(in Sugar Rush 1000)</p>
+        </div>
+        <div className="p-4">
+          <p className="text-sm font-bold">Lizenz:</p>
+          <p className="text-2xl font-black text-[#8bb6ff]">CW</p>
+        </div>
+      </div>
+
+      <div className="p-4 border-b border-[#2a385c]">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+          {providers.map((provider) => (
+            <span key={provider} className="text-xs text-center rounded bg-white/5 border border-white/10 py-2 text-[#d8def1]">{provider}</span>
+          ))}
+        </div>
+      </div>
+
+      <div className="p-4">
+        <p className="font-bold">
+          Berechne dein Bonusguthaben:
+          <span className="font-normal italic text-[#d8def1]"> (Maximaler Bonus bei einer Einzahlung von 300EUR)</span>
+        </p>
+        <div className="mt-3 grid md:grid-cols-[220px_1fr_1fr_1fr] gap-3 items-end">
+          <div>
+            <label className="text-xs text-[#d8def1] block mb-1">Einzahlungsbetrag</label>
+            <div className="flex rounded border border-white/20 overflow-hidden">
+              <input
+                type="number"
+                min="0"
+                value={deposit}
+                onChange={(e) => setDeposit(Math.max(0, Number(e.target.value || 0)))}
+                className="w-full bg-[#0f172a] px-3 py-2 text-xl font-bold outline-none"
+              />
+              <span className="px-3 py-2 bg-[#1e293b] text-[#d8def1]">EUR</span>
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-black text-amber-300">{total.toLocaleString('de-DE')}EUR</p>
+            <p className="text-xs text-[#d8def1]">Gesamtguthaben</p>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-black text-amber-300">{bonus.toLocaleString('de-DE')}EUR</p>
+            <p className="text-xs text-[#d8def1]">Bonusguthaben</p>
+          </div>
+          <div className="text-center">
+            <p className="text-4xl font-black text-amber-300">{wager.toLocaleString('de-DE')}EUR</p>
+            <p className="text-xs text-[#d8def1]">Wager (D+B)</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+};
+
 const CasinoDealsSection = ({ deals = [], compact = false, ctaHref = '#' }) => {
   if (!deals.length) {
     return (
       <div className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center text-[#A1A1A1]">
-        Auf dieser Seite erscheinen Bonus-Angebote automatisch, sobald ein Deal hinzugefügt wurde.
+        Auf dieser Seite erscheinen Bonus-Angebote automatisch, sobald ein Deal hinzugefuegt wurde.
       </div>
     );
   }
 
   return (
-    <div className={`space-y-4 ${compact ? 'max-h-[480px] overflow-y-auto pr-1' : ''}`}>
+    <div className={'space-y-4 ' + (compact ? 'max-h-[640px] overflow-y-auto pr-1' : '')}>
       {deals.map((deal) => (
-        <article key={deal.id} className="rounded-2xl border border-white/10 bg-gradient-to-r from-[#131a2d] to-[#111827] overflow-hidden">
-          <div className="grid md:grid-cols-[170px_1fr_auto] items-center gap-3 border-b border-white/10">
-            <div className="h-full min-h-[88px] bg-[#0f172a] border-r border-white/10 flex items-center justify-center p-3">
-              {deal.imageUrl ? (
-                <img
-                  src={deal.imageUrl}
-                  alt={deal.name}
-                  className="max-h-14 md:max-h-16 max-w-full object-contain"
-                />
-              ) : (
-                <div className="text-center">
-                  <p className="text-lg font-black tracking-tight text-white">{deal.name}</p>
-                </div>
-              )}
-            </div>
-            <div className="px-2 py-3 md:py-0">
-              <p className="text-2xl md:text-4xl font-black text-amber-300 leading-tight">{deal.deal}</p>
-              <p className="text-xs md:text-sm text-[#A1A1A1] mt-1">Casino Bonus</p>
-            </div>
-            <div className="px-4 pb-4 md:pb-0">
-              <a
-                href={ctaHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-black px-6 py-3 rounded-md shadow-lg"
-              >
-                SPIELEN
-              </a>
-            </div>
-          </div>
-          <div className="px-4 py-3 grid md:grid-cols-2 gap-2 text-xs">
-            <p className="text-[#D1D5DB]"><span className="text-white font-bold">Casino:</span> {deal.name}</p>
-            <p className="text-[#D1D5DB]"><span className="text-white font-bold">Status:</span> {deal.status}</p>
-          </div>
-        </article>
+        <CasinoDealCard key={deal.id} deal={deal} ctaHref={ctaHref} />
       ))}
     </div>
   );
