@@ -3231,12 +3231,29 @@ const BlockEditor = ({ block, isFirst, isLast, onMoveUp, onMoveDown, onUpdate, o
 const DealsContent = ({ deals, userId, onUpdate }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingDeal, setEditingDeal] = useState(null);
-  const [newDeal, setNewDeal] = useState({ name: '', deal: '', status: 'Aktiv', imageUrl: '' });
+  const [newDeal, setNewDeal] = useState({
+    name: '',
+    deal: '',
+    status: 'Aktiv',
+    imageUrl: '',
+    promoCode: 'DIEGAWINOS',
+    bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
+  });
   const [dealImages, setDealImages] = useState({});
+  const [dealCodes, setDealCodes] = useState({});
+  const [dealTerms, setDealTerms] = useState({});
   useEffect(() => {
-    const next = {};
-    (deals || []).forEach((d) => { next[d.id] = d.imageUrl || ''; });
-    setDealImages(next);
+    const nextImages = {};
+    const nextCodes = {};
+    const nextTerms = {};
+    (deals || []).forEach((d) => {
+      nextImages[d.id] = d.imageUrl || '';
+      nextCodes[d.id] = d.promoCode || 'DIEGAWINOS';
+      nextTerms[d.id] = d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager';
+    });
+    setDealImages(nextImages);
+    setDealCodes(nextCodes);
+    setDealTerms(nextTerms);
   }, [deals]);
 
   const toggleDeal = async (id, currentStatus) => {
@@ -3266,7 +3283,14 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
         const result = await response.json();
         onUpdate([...deals, { id: result.dealId, ...newDeal, performance: '0 clicks' }]);
         setIsAdding(false);
-        setNewDeal({ name: '', deal: '', status: 'Aktiv', imageUrl: '' });
+        setNewDeal({
+          name: '',
+          deal: '',
+          status: 'Aktiv',
+          imageUrl: '',
+          promoCode: 'DIEGAWINOS',
+          bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager'
+        });
       }
     } catch (err) { console.error(err); }
   };
@@ -3282,16 +3306,18 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
     } catch (err) { console.error(err); }
   };
 
-  const saveDealImage = async (deal) => {
+  const saveDealConfig = async (deal) => {
     try {
       const imageUrl = (dealImages[deal.id] || '').trim();
+      const promoCode = (dealCodes[deal.id] || 'DIEGAWINOS').trim();
+      const bonusTerms = (dealTerms[deal.id] || '100% Sticky - 300EUR Max Bonus - 40x Wager').trim();
       const response = await fetch(`${API_BASE}/api/user/${userId}/deal/${deal.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...deal, imageUrl })
+        body: JSON.stringify({ ...deal, imageUrl, promoCode, bonusTerms })
       });
       if (response.ok) {
-        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, imageUrl } : d));
+        onUpdate(deals.map((d) => d.id === deal.id ? { ...d, imageUrl, promoCode, bonusTerms } : d));
       }
     } catch (err) { console.error(err); }
   };
@@ -3335,6 +3361,26 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                 value={newDeal.deal}
                 onChange={(e) => setNewDeal({...newDeal, deal: e.target.value})}
                 placeholder="z.B. 100% Bonus bis 500€"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-[#A1A1A1] uppercase mb-2 block">Code</label>
+              <input
+                type="text"
+                value={newDeal.promoCode || ''}
+                onChange={(e) => setNewDeal({ ...newDeal, promoCode: e.target.value })}
+                placeholder="z.B. DIEGAWINOS"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-[#A1A1A1] uppercase mb-2 block">Bonus Zeile</label>
+              <input
+                type="text"
+                value={newDeal.bonusTerms || ''}
+                onChange={(e) => setNewDeal({ ...newDeal, bonusTerms: e.target.value })}
+                placeholder="100% Sticky - 300EUR Max Bonus - 40x Wager"
                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
               />
             </div>
@@ -3392,6 +3438,22 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
             <h3 className="text-lg font-bold text-[#EDEDED] mb-1">{deal.name}</h3>
             <p className="text-sm text-indigo-500 font-medium mb-4">{deal.deal}</p>
             <div className="space-y-2 mb-4">
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Code</label>
+              <input
+                type="text"
+                value={dealCodes[deal.id] || ''}
+                onChange={(e) => setDealCodes({ ...dealCodes, [deal.id]: e.target.value })}
+                placeholder="DIEGAWINOS"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+              />
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Bonus Zeile</label>
+              <input
+                type="text"
+                value={dealTerms[deal.id] || ''}
+                onChange={(e) => setDealTerms({ ...dealTerms, [deal.id]: e.target.value })}
+                placeholder="100% Sticky - 300EUR Max Bonus - 40x Wager"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+              />
               <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Casino Bild URL</label>
               <div className="flex gap-2">
                 <input
@@ -3402,10 +3464,10 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                   className="flex-1 bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
                 />
                 <button
-                  onClick={() => saveDealImage(deal)}
+                  onClick={() => saveDealConfig(deal)}
                   className="px-3 py-2 rounded-lg bg-white/10 text-xs font-bold hover:bg-white/20"
                 >
-                  Bild speichern
+                  Deal speichern
                 </button>
               </div>
             </div>
