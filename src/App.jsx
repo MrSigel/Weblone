@@ -2978,10 +2978,10 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               {isCasinoPage ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
-                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte koennen hier nicht manuell als Block hinzugefuegt werden.
                   </div>
                   <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
-                    ?nderungen an Name, Deal-Text, Spielen-Link, Code, Bonus-Zeile und Bild verwaltest du zentral unter "Deals / Sponsorships".
+                    Aenderungen an Name, Deal-Text, Spielen-Link, Code, Bonus-Zeile und Bild verwaltest du zentral unter "Deals / Sponsorships".
                   </div>
                   {(previewDeals || []).length === 0 ? (
                     <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
@@ -3545,6 +3545,22 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                 value={dealNames[deal.id] || ''}
                 onChange={(e) => setDealNames({ ...dealNames, [deal.id]: e.target.value })}
                 placeholder="z.B. Razed"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+              />
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Deal Text</label>
+              <input
+                type="text"
+                value={dealTexts[deal.id] || ''}
+                onChange={(e) => setDealTexts({ ...dealTexts, [deal.id]: e.target.value })}
+                placeholder="z.B. 100% Bonus bis 500€"
+                className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
+              />
+              <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Spielen Link URL</label>
+              <input
+                type="text"
+                value={dealLinks[deal.id] || ''}
+                onChange={(e) => setDealLinks({ ...dealLinks, [deal.id]: e.target.value })}
+                placeholder="https://dein-casino-link.tld"
                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-xs text-white"
               />
               <label className="text-[10px] uppercase font-bold text-[#A1A1A1]">Code</label>
