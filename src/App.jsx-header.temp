@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
@@ -49,3 +50,56 @@ const Header = () => {
     </header>
   );
 };
+=======
+const Header = () => {
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+  
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Define auth/dashboard paths
+  const isAuthOrDashboard = ['/login', '/register', '/onboarding', '/dashboard'].some(path => location.pathname.startsWith(path));
+  
+  // Check if we are on a streamer page (any path that isn't root, privacy, terms, imprint, login, etc.)
+  const reservedPaths = ['/', '/login', '/register', '/onboarding', '/dashboard', '/privacy', '/terms', '/imprint'];
+  const isStreamerPage = !reservedPaths.includes(location.pathname) && !isAuthOrDashboard;
+
+  // We don't want the main Weblone Header on Streamer pages or Auth/Dashboard
+  if (isStreamerPage || isAuthOrDashboard) return null;
+
+  const links = [
+    { name: 'Funktionen', href: '#features' },
+    { name: 'Ablauf', href: '#workflow' },
+    { name: 'FAQ', href: '#faq' }
+  ];
+
+  return (
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'py-4' : 'py-8'}`}>
+      <div className={`max-w-[800px] mx-auto px-6 transition-all duration-300 ${scrolled ? 'scale-95' : 'scale-100'}`}>
+        <div className={`flex justify-between items-center px-6 py-2 rounded-full border transition-all duration-300 ${scrolled ? 'bg-[#0A0A0A]/40 backdrop-blur-xl border-white/5 shadow-2xl' : 'bg-transparent border-transparent'}`}>
+          <Link to="/" className="text-xl font-bold tracking-tight text-white/90 hover:text-white transition-colors">
+            Weblone
+          </Link>
+          
+          <nav className="hidden md:flex gap-8">
+            {links.map(link => (
+              <a key={link.name} href={link.href} className="text-[13px] font-medium text-white/50 hover:text-white transition-colors">
+                {link.name}
+              </a>
+            ))}
+          </nav>
+          <div className="flex items-center">
+            <Link to="/login" className="text-[13px] font-bold text-white/90 hover:text-white transition-colors">
+              Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+>>>>>>> 4a7fffa5 (chore: auto-sync 2026-02-16 15:38:18.633 UTC)
