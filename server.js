@@ -22,6 +22,8 @@ const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'leads.db');
 const SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL || 'admin@weblone2026.com';
 const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'graecodesigns.de2026!';
 const SUPERADMIN_SESSION_TOKEN = process.env.SUPERADMIN_SESSION_TOKEN || 'superadmin-session-token-2026';
+const SUPERADMIN_2FA_CODE = process.env.SUPERADMIN_2FA_CODE || '';
+const SUPERADMIN_IP_ALLOWLIST = (process.env.SUPERADMIN_IP_ALLOWLIST || '').split(',').map((x) => x.trim()).filter(Boolean);
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID || '';
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
 const TWITCH_REDIRECT_URI = process.env.TWITCH_REDIRECT_URI || '';
@@ -30,6 +32,7 @@ const adTimerJobs = new Map();
 const pickupReminderJobs = new Map();
 const chatReaderSessions = new Map();
 const pendingTwitchAuthStates = new Map();
+const superadminSessions = new Map();
 
 // DB Initialization
 const db = new Database(DB_PATH);
@@ -107,6 +110,40 @@ db.exec(`
     FOREIGN KEY(userId) REFERENCES users(id),
     FOREIGN KEY(pageId) REFERENCES streamer_pages(id)
   );
+
+  CREATE TABLE IF NOT EXISTS audit_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    actor TEXT,
+    action TEXT,
+    targetUserId INTEGER,
+    details TEXT,
+    createdAt TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS support_tickets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER,
+    subject TEXT,
+    status TEXT DEFAULT 'open',
+    priority TEXT DEFAULT 'normal',
+    message TEXT,
+    assignee TEXT,
+    createdAt TEXT,
+    updatedAt TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS payouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER,
+    amount REAL,
+    currency TEXT DEFAULT 'EUR',
+    status TEXT DEFAULT 'pending',
+    note TEXT,
+    period TEXT,
+    dueDate TEXT,
+    paidAt TEXT,
+    createdAt TEXT
+  );
 `);
 
 // Insert default superadmin if not exists
@@ -143,6 +180,21 @@ const readUserToolsConfig = (userId) => {
 const writeUserToolsConfig = (userId, toolsConfig) => {
   db.prepare('UPDATE users SET toolsConfig = ? WHERE id = ?')
     .run(JSON.stringify(toolsConfig || {}), userId);
+};
+
+const logAudit = (actor, action, targetUserId = null, details = null) => {
+  try {
+    db.prepare('INSERT INTO audit_logs (actor, action, targetUserId, details, createdAt) VALUES (?, ?, ?, ?, ?)')
+      .run(
+        actor || 'system',
+        action || 'unknown',
+        targetUserId === undefined ? null : targetUserId,
+        details ? JSON.stringify(details) : null,
+        new Date().toISOString()
+      );
+  } catch (err) {
+    console.error('Audit log error:', err.message);
+  }
 };
 
 const resolveFrontendBase = (req) => {
@@ -591,30 +643,84 @@ app.get('/api/social/twitch/callback', async (req, res) => {
 });
 
 app.post('/api/superadmin/login', (req, res) => {
-  const { email, password } = req.body;
-  if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
-    return res.json({ success: true, token: SUPERADMIN_SESSION_TOKEN, user: { email: SUPERADMIN_EMAIL } });
+  const { email, password, twoFactorCode } = req.body;
+  if (email !== SUPERADMIN_EMAIL || password !== SUPERADMIN_PASSWORD) {
+    return res.status(401).json({ success: false, error: 'Ungültige Superadmin-Zugangsdaten.' });
   }
-  res.status(401).json({ success: false, error: 'UngÃ¼ltige Superadmin-Zugangsdaten.' });
+  if (SUPERADMIN_2FA_CODE && twoFactorCode !== SUPERADMIN_2FA_CODE) {
+    return res.status(401).json({ success: false, error: '2FA Code ungültig.' });
+  }
+
+  const token = randomBytes(32).toString('hex');
+  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.ip;
+  const session = {
+    token,
+    email: SUPERADMIN_EMAIL,
+    createdAt: new Date().toISOString(),
+    lastSeenAt: new Date().toISOString(),
+    ip,
+    userAgent: req.headers['user-agent'] || ''
+  };
+  superadminSessions.set(token, session);
+  logAudit('superadmin', 'superadmin_login', null, { ip });
+  res.json({ success: true, token, user: { email: SUPERADMIN_EMAIL, session } });
 });
 
 const requireSuperadmin = (req, res, next) => {
   const authHeader = req.headers.authorization || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
-  if (token !== SUPERADMIN_SESSION_TOKEN) {
+  if (!token) return res.status(401).json({ success: false, error: 'Unauthorized' });
+
+  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0].trim() || req.ip;
+  if (SUPERADMIN_IP_ALLOWLIST.length > 0 && !SUPERADMIN_IP_ALLOWLIST.includes(ip)) {
+    return res.status(403).json({ success: false, error: 'IP nicht freigegeben.' });
+  }
+
+  const session = superadminSessions.get(token);
+  if (!session && token !== SUPERADMIN_SESSION_TOKEN) {
     return res.status(401).json({ success: false, error: 'Unauthorized' });
   }
+  if (session) {
+    session.lastSeenAt = new Date().toISOString();
+  }
+  req.superadmin = session || { email: SUPERADMIN_EMAIL, token: 'legacy' };
   next();
+};
+
+const computeUserHealth = (user, details) => {
+  const flags = [];
+  if (!user?.siteSlug) flags.push('missing_slug');
+  if (!user?.isSetupComplete) flags.push('setup_incomplete');
+  if ((details.deals || []).length === 0) flags.push('no_deals');
+  if ((details.pages || []).length === 0) flags.push('no_pages');
+
+  let toolsConfig = {};
+  try { toolsConfig = user?.toolsConfig ? JSON.parse(user.toolsConfig) : {}; } catch (err) {}
+  if (!toolsConfig?.socialAuth?.twitch) flags.push('twitch_not_connected');
+  if (!toolsConfig?.socialAuth?.kick) flags.push('kick_not_connected');
+  if (!chatReaderSessions.get(String(user?.id))?.running) flags.push('bot_reader_offline');
+
+  const score = Math.max(0, 100 - (flags.length * 15));
+  return { score, flags };
 };
 
 app.get('/api/superadmin/users', requireSuperadmin, (req, res) => {
   try {
     const users = db.prepare(`
-      SELECT id, email, username, siteSlug, category, templateId, isSetupComplete, avatarUrl
+      SELECT id, email, username, siteSlug, category, templateId, isSetupComplete, avatarUrl, toolsConfig
       FROM users
       ORDER BY id DESC
     `).all();
-    res.json({ success: true, users });
+
+    const hydrated = users.map((user) => {
+      const deals = db.prepare('SELECT id FROM deals WHERE userId = ?').all(user.id);
+      const pages = db.prepare('SELECT id FROM streamer_pages WHERE userId = ?').all(user.id);
+      return {
+        ...user,
+        health: computeUserHealth(user, { deals, pages })
+      };
+    });
+    res.json({ success: true, users: hydrated });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -631,6 +737,8 @@ app.get('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
     const settings = db.prepare('SELECT * FROM streamer_site_settings WHERE userId = ?').get(userId);
     const pages = db.prepare('SELECT * FROM streamer_pages WHERE userId = ? ORDER BY sortOrder ASC').all(userId);
     const pageBlocks = db.prepare('SELECT * FROM page_blocks WHERE userId = ? ORDER BY sortOrder ASC').all(userId);
+    const payouts = db.prepare('SELECT * FROM payouts WHERE userId = ? ORDER BY id DESC').all(userId);
+    const tickets = db.prepare('SELECT * FROM support_tickets WHERE userId = ? ORDER BY id DESC').all(userId);
 
     res.json({
       success: true,
@@ -640,7 +748,10 @@ app.get('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
         deals,
         settings: settings || { navTitle: user.username || '' },
         pages,
-        pageBlocks
+        pageBlocks,
+        payouts,
+        tickets,
+        health: computeUserHealth(user, { deals, pages })
       }
     });
   } catch (err) {
@@ -656,6 +767,7 @@ app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
   try {
     const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
       .run(req.params.id, name, deal, performance || '0 clicks', status || 'Aktiv');
+    logAudit(req.superadmin.email, 'deal_create', req.params.id, { dealId: info.lastInsertRowid, name });
     res.json({ success: true, dealId: info.lastInsertRowid });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -667,6 +779,7 @@ app.put('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) =
   try {
     db.prepare('UPDATE deals SET name = ?, deal = ?, performance = ?, status = ? WHERE id = ? AND userId = ?')
       .run(name, deal, performance, status, req.params.dealId, req.params.id);
+    logAudit(req.superadmin.email, 'deal_update', req.params.id, { dealId: req.params.dealId, status });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -676,10 +789,185 @@ app.put('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) =
 app.delete('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) => {
   try {
     db.prepare('DELETE FROM deals WHERE id = ? AND userId = ?').run(req.params.dealId, req.params.id);
+    logAudit(req.superadmin.email, 'deal_delete', req.params.id, { dealId: req.params.dealId });
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
+});
+
+app.post('/api/superadmin/deal-template/apply', requireSuperadmin, (req, res) => {
+  const { userIds, template } = req.body;
+  if (!Array.isArray(userIds) || userIds.length === 0) {
+    return res.status(400).json({ success: false, error: 'userIds fehlt.' });
+  }
+
+  const templates = {
+    starter: [
+      { name: 'Starter Deal', deal: '100% Bonus bis 100€', performance: '0 clicks', status: 'Aktiv' }
+    ],
+    pro: [
+      { name: 'VIP Cashback', deal: '15% Weekly Cashback', performance: '0 clicks', status: 'Aktiv' },
+      { name: 'Reload Bonus', deal: '50% bis 500€', performance: '0 clicks', status: 'Aktiv' }
+    ]
+  };
+  const selected = templates[template] || templates.starter;
+
+  const insert = db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)');
+  const tx = db.transaction(() => {
+    userIds.forEach((userId) => {
+      selected.forEach((d) => insert.run(userId, d.name, d.deal, d.performance, d.status));
+      logAudit(req.superadmin.email, 'deal_template_apply', userId, { template });
+    });
+  });
+  tx();
+  res.json({ success: true, appliedTo: userIds.length, template });
+});
+
+app.post('/api/superadmin/bulk/deals/status', requireSuperadmin, (req, res) => {
+  const { userIds, status } = req.body;
+  if (!Array.isArray(userIds) || userIds.length === 0 || !status) {
+    return res.status(400).json({ success: false, error: 'userIds und status erforderlich.' });
+  }
+  const update = db.prepare('UPDATE deals SET status = ? WHERE userId = ?');
+  const tx = db.transaction(() => {
+    userIds.forEach((userId) => {
+      update.run(status, userId);
+      logAudit(req.superadmin.email, 'bulk_deals_status', userId, { status });
+    });
+  });
+  tx();
+  res.json({ success: true, updatedUsers: userIds.length, status });
+});
+
+app.get('/api/superadmin/audit', requireSuperadmin, (req, res) => {
+  const limit = Math.max(1, Math.min(Number(req.query.limit || 100), 500));
+  const logs = db.prepare('SELECT * FROM audit_logs ORDER BY id DESC LIMIT ?').all(limit);
+  res.json({ success: true, logs });
+});
+
+app.get('/api/superadmin/analytics', requireSuperadmin, (req, res) => {
+  const totalUsers = db.prepare('SELECT COUNT(*) as c FROM users').get().c;
+  const setupDone = db.prepare('SELECT COUNT(*) as c FROM users WHERE isSetupComplete = 1').get().c;
+  const activeDeals = db.prepare("SELECT COUNT(*) as c FROM deals WHERE status = 'Aktiv'").get().c;
+  const pendingPayouts = db.prepare("SELECT COUNT(*) as c FROM payouts WHERE status = 'pending'").get().c;
+  const openTickets = db.prepare("SELECT COUNT(*) as c FROM support_tickets WHERE status IN ('open','in_progress')").get().c;
+  const botOnline = [...chatReaderSessions.values()].filter((s) => s.running).length;
+  res.json({
+    success: true,
+    analytics: {
+      totalUsers,
+      setupDone,
+      activeDeals,
+      pendingPayouts,
+      openTickets,
+      botOnline,
+      setupRate: totalUsers ? Math.round((setupDone / totalUsers) * 100) : 0
+    }
+  });
+});
+
+app.get('/api/superadmin/bot-monitor', requireSuperadmin, (req, res) => {
+  const users = db.prepare('SELECT id, username, siteSlug FROM users ORDER BY id DESC').all();
+  const monitor = users.map((u) => {
+    const reader = chatReaderSessions.get(String(u.id));
+    const adTimer = adTimerJobs.get(String(u.id));
+    return {
+      userId: u.id,
+      username: u.username,
+      siteSlug: u.siteSlug,
+      readerRunning: !!reader?.running,
+      readerChannels: reader?.channels || [],
+      lastReaderError: reader?.lastError || null,
+      adTimerRunning: !!adTimer,
+      adTimerIntervalMinutes: adTimer?.intervalMinutes || null
+    };
+  });
+  res.json({ success: true, monitor });
+});
+
+app.get('/api/superadmin/support-tickets', requireSuperadmin, (req, res) => {
+  const tickets = db.prepare('SELECT * FROM support_tickets ORDER BY id DESC').all();
+  res.json({ success: true, tickets });
+});
+
+app.post('/api/superadmin/support-tickets', requireSuperadmin, (req, res) => {
+  const { userId, subject, message, priority, assignee } = req.body;
+  const now = new Date().toISOString();
+  const info = db.prepare(`
+    INSERT INTO support_tickets (userId, subject, status, priority, message, assignee, createdAt, updatedAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(userId || null, subject || 'Support Ticket', 'open', priority || 'normal', message || '', assignee || null, now, now);
+  logAudit(req.superadmin.email, 'support_ticket_create', userId || null, { ticketId: info.lastInsertRowid });
+  res.json({ success: true, ticketId: info.lastInsertRowid });
+});
+
+app.put('/api/superadmin/support-tickets/:id', requireSuperadmin, (req, res) => {
+  const { status, priority, assignee, message } = req.body;
+  db.prepare(`
+    UPDATE support_tickets
+    SET status = COALESCE(?, status),
+        priority = COALESCE(?, priority),
+        assignee = COALESCE(?, assignee),
+        message = COALESCE(?, message),
+        updatedAt = ?
+    WHERE id = ?
+  `).run(status || null, priority || null, assignee || null, message || null, new Date().toISOString(), req.params.id);
+  logAudit(req.superadmin.email, 'support_ticket_update', null, { ticketId: req.params.id, status, priority });
+  res.json({ success: true });
+});
+
+app.get('/api/superadmin/payouts', requireSuperadmin, (req, res) => {
+  const payouts = db.prepare('SELECT * FROM payouts ORDER BY id DESC').all();
+  res.json({ success: true, payouts });
+});
+
+app.post('/api/superadmin/payouts', requireSuperadmin, (req, res) => {
+  const { userId, amount, currency, note, period, dueDate } = req.body;
+  const info = db.prepare(`
+    INSERT INTO payouts (userId, amount, currency, status, note, period, dueDate, createdAt)
+    VALUES (?, ?, ?, 'pending', ?, ?, ?, ?)
+  `).run(userId || null, Number(amount || 0), currency || 'EUR', note || '', period || '', dueDate || null, new Date().toISOString());
+  logAudit(req.superadmin.email, 'payout_create', userId || null, { payoutId: info.lastInsertRowid, amount });
+  res.json({ success: true, payoutId: info.lastInsertRowid });
+});
+
+app.put('/api/superadmin/payouts/:id', requireSuperadmin, (req, res) => {
+  const { status, paidAt, note } = req.body;
+  db.prepare(`
+    UPDATE payouts
+    SET status = COALESCE(?, status),
+        paidAt = COALESCE(?, paidAt),
+        note = COALESCE(?, note)
+    WHERE id = ?
+  `).run(status || null, paidAt || null, note || null, req.params.id);
+  logAudit(req.superadmin.email, 'payout_update', null, { payoutId: req.params.id, status });
+  res.json({ success: true });
+});
+
+app.get('/api/superadmin/security/sessions', requireSuperadmin, (req, res) => {
+  const sessions = [...superadminSessions.values()].map(({ token, ...rest }) => ({ tokenSuffix: token.slice(-8), ...rest }));
+  res.json({ success: true, sessions });
+});
+
+app.post('/api/superadmin/security/sessions/revoke', requireSuperadmin, (req, res) => {
+  const { tokenSuffix } = req.body;
+  for (const token of superadminSessions.keys()) {
+    if (token.endsWith(String(tokenSuffix || ''))) {
+      superadminSessions.delete(token);
+    }
+  }
+  logAudit(req.superadmin.email, 'security_revoke_session', null, { tokenSuffix });
+  res.json({ success: true });
+});
+
+app.post('/api/superadmin/security/sessions/revoke-all', requireSuperadmin, (req, res) => {
+  const keep = req.headers.authorization?.replace(/^Bearer\s+/i, '') || '';
+  for (const token of superadminSessions.keys()) {
+    if (token !== keep) superadminSessions.delete(token);
+  }
+  logAudit(req.superadmin.email, 'security_revoke_all', null, {});
+  res.json({ success: true });
 });
 
 app.get('/api/user/:id', (req, res) => {

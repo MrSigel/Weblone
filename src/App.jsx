@@ -1076,7 +1076,7 @@ const Login = ({ onLogin }) => {
                     </div>
                     <div>
                       <span className="text-xs text-[#A1A1A1] block uppercase tracking-wider font-bold mb-1">E-Mail</span>
-                      <a href="mailto:kontakt@weblone.com" className="text-[#EDEDED] font-medium hover:text-indigo-400 transition-colors">kontakt@weblone.com</a>
+                      <a href="mailto:kontakt@weblone.de" className="text-[#EDEDED] font-medium hover:text-indigo-400 transition-colors">kontakt@weblone.de</a>
                     </div>
                   </div>
 
@@ -3001,36 +3001,91 @@ const SuperAdminPage = () => {
   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [error, setError] = useState('');
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState('');
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedData, setSelectedData] = useState(null);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [activeTab, setActiveTab] = useState('overview');
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [newDeal, setNewDeal] = useState({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+  const [analytics, setAnalytics] = useState(null);
+  const [auditLogs, setAuditLogs] = useState([]);
+  const [monitor, setMonitor] = useState([]);
+  const [tickets, setTickets] = useState([]);
+  const [payouts, setPayouts] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [ticketForm, setTicketForm] = useState({ userId: '', subject: '', message: '', priority: 'normal', assignee: '' });
+  const [payoutForm, setPayoutForm] = useState({ userId: '', amount: '', currency: 'EUR', note: '', period: '', dueDate: '' });
+  const [dealTemplate, setDealTemplate] = useState('starter');
+  const [bulkStatus, setBulkStatus] = useState('Aktiv');
 
   const authHeaders = () => ({
     'Content-Type': 'application/json',
     Authorization: `Bearer ${token}`
   });
 
+  const authedFetch = async (url, options = {}) => {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...(options.headers || {}),
+        ...authHeaders()
+      }
+    });
+    const result = await response.json();
+    if (!response.ok || result.success === false) {
+      const err = new Error(result.error || 'API Fehler');
+      err.status = response.status;
+      throw err;
+    }
+    return result;
+  };
+
+  const fetchDashboardData = async () => {
+    if (!token) return;
+    try {
+      const [analyticsRes, auditRes, monitorRes, ticketsRes, payoutsRes, sessionsRes] = await Promise.all([
+        authedFetch(`${API_BASE}/api/superadmin/analytics`),
+        authedFetch(`${API_BASE}/api/superadmin/audit?limit=100`),
+        authedFetch(`${API_BASE}/api/superadmin/bot-monitor`),
+        authedFetch(`${API_BASE}/api/superadmin/support-tickets`),
+        authedFetch(`${API_BASE}/api/superadmin/payouts`),
+        authedFetch(`${API_BASE}/api/superadmin/security/sessions`)
+      ]);
+      setAnalytics(analyticsRes.analytics || null);
+      setAuditLogs(auditRes.logs || []);
+      setMonitor(monitorRes.monitor || []);
+      setTickets(ticketsRes.tickets || []);
+      setPayouts(payoutsRes.payouts || []);
+      setSessions(sessionsRes.sessions || []);
+    } catch (err) {
+      if (err.status === 401) {
+        handleLogout();
+      } else {
+        setError(err.message || 'Superadmin Daten konnten nicht geladen werden.');
+      }
+    }
+  };
+
   const fetchUsers = async () => {
     if (!token) return;
     setLoadingUsers(true);
     try {
-      const response = await fetch(`${API_BASE}/api/superadmin/users`, { headers: authHeaders() });
-      const result = await response.json();
-      if (result.success) {
-        setUsers(result.users);
-        if (!selectedUserId && result.users.length > 0) {
-          setSelectedUserId(result.users[0].id);
-        }
-      } else {
-        setError(result.error || 'Fehler beim Laden der Nutzer.');
+      const result = await authedFetch(`${API_BASE}/api/superadmin/users`);
+      setUsers(result.users || []);
+      if (!selectedUserId && (result.users || []).length > 0) {
+        setSelectedUserId(result.users[0].id);
       }
     } catch (err) {
-      setError('Superadmin-API nicht erreichbar.');
+      if (err.status === 401) {
+        handleLogout();
+      } else {
+        setError(err.message || 'Superadmin-API nicht erreichbar.');
+      }
     } finally {
       setLoadingUsers(false);
     }
@@ -3040,16 +3095,15 @@ const SuperAdminPage = () => {
     if (!token || !userId) return;
     setLoadingDetails(true);
     try {
-      const response = await fetch(`${API_BASE}/api/superadmin/user/${userId}`, { headers: authHeaders() });
-      const result = await response.json();
-      if (result.success) {
-        setSelectedData(result.data);
-      } else {
-        setSelectedData(null);
-        setError(result.error || 'Nutzerdetails konnten nicht geladen werden.');
-      }
+      const result = await authedFetch(`${API_BASE}/api/superadmin/user/${userId}`);
+      setSelectedData(result.data);
     } catch (err) {
-      setError('Nutzerdetails konnten nicht geladen werden.');
+      setSelectedData(null);
+      if (err.status === 401) {
+        handleLogout();
+      } else {
+        setError(err.message || 'Nutzerdetails konnten nicht geladen werden.');
+      }
     } finally {
       setLoadingDetails(false);
     }
@@ -3057,6 +3111,7 @@ const SuperAdminPage = () => {
 
   useEffect(() => {
     fetchUsers();
+    fetchDashboardData();
   }, [token]);
 
   useEffect(() => {
@@ -3070,7 +3125,7 @@ const SuperAdminPage = () => {
       const response = await fetch(`${API_BASE}/api/superadmin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password, twoFactorCode })
       });
       const result = await response.json();
       if (result.success) {
@@ -3095,46 +3150,168 @@ const SuperAdminPage = () => {
   const addDealToUser = async () => {
     if (!selectedUserId || !newDeal.name || !newDeal.deal) return;
     try {
-      const response = await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal`, {
+      await authedFetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal`, {
         method: 'POST',
-        headers: authHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newDeal)
       });
-      const result = await response.json();
-      if (result.success) {
-        setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
-        fetchUserDetails(selectedUserId);
-      } else {
-        setError(result.error || 'Deal konnte nicht hinzugefÃ¼gt werden.');
-      }
+      setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
+      fetchUserDetails(selectedUserId);
+      fetchDashboardData();
     } catch (err) {
-      setError('Deal konnte nicht hinzugefÃ¼gt werden.');
+      setError(err.message || 'Deal konnte nicht hinzugefuegt werden.');
     }
   };
 
   const updateDealStatus = async (deal) => {
     const nextStatus = deal.status === 'Aktiv' ? 'Deaktiviert' : 'Aktiv';
     try {
-      await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${deal.id}`, {
+      await authedFetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${deal.id}`, {
         method: 'PUT',
-        headers: authHeaders(),
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...deal, status: nextStatus })
       });
       fetchUserDetails(selectedUserId);
+      fetchDashboardData();
     } catch (err) {
-      setError('Deal-Status konnte nicht geÃ¤ndert werden.');
+      setError(err.message || 'Deal-Status konnte nicht geaendert werden.');
     }
   };
 
   const deleteDeal = async (dealId) => {
     try {
-      await fetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${dealId}`, {
+      await authedFetch(`${API_BASE}/api/superadmin/user/${selectedUserId}/deal/${dealId}`, {
         method: 'DELETE',
-        headers: authHeaders()
+        headers: { 'Content-Type': 'application/json' }
       });
       fetchUserDetails(selectedUserId);
+      fetchDashboardData();
     } catch (err) {
-      setError('Deal konnte nicht gelÃ¶scht werden.');
+      setError(err.message || 'Deal konnte nicht geloescht werden.');
+    }
+  };
+
+  const toggleUserSelection = (userId) => {
+    setSelectedUserIds((prev) => (
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    ));
+  };
+
+  const applyDealTemplate = async () => {
+    if (selectedUserIds.length === 0) return;
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/deal-template/apply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: selectedUserIds, template: dealTemplate })
+      });
+      fetchUserDetails(selectedUserId);
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Template konnte nicht angewendet werden.');
+    }
+  };
+
+  const applyBulkStatus = async () => {
+    if (selectedUserIds.length === 0) return;
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/bulk/deals/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIds: selectedUserIds, status: bulkStatus })
+      });
+      fetchUserDetails(selectedUserId);
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Bulk Status konnte nicht gesetzt werden.');
+    }
+  };
+
+  const createTicket = async () => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/support-tickets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...ticketForm,
+          userId: ticketForm.userId ? Number(ticketForm.userId) : null
+        })
+      });
+      setTicketForm({ userId: '', subject: '', message: '', priority: 'normal', assignee: '' });
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Ticket konnte nicht erstellt werden.');
+    }
+  };
+
+  const updateTicketStatus = async (ticketId, status) => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/support-tickets/${ticketId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Ticket konnte nicht aktualisiert werden.');
+    }
+  };
+
+  const createPayout = async () => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/payouts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...payoutForm,
+          userId: payoutForm.userId ? Number(payoutForm.userId) : null,
+          amount: Number(payoutForm.amount || 0)
+        })
+      });
+      setPayoutForm({ userId: '', amount: '', currency: 'EUR', note: '', period: '', dueDate: '' });
+      fetchDashboardData();
+      if (selectedUserId) fetchUserDetails(selectedUserId);
+    } catch (err) {
+      setError(err.message || 'Payout konnte nicht erstellt werden.');
+    }
+  };
+
+  const markPayoutPaid = async (payoutId) => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/payouts/${payoutId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'paid', paidAt: new Date().toISOString() })
+      });
+      fetchDashboardData();
+      if (selectedUserId) fetchUserDetails(selectedUserId);
+    } catch (err) {
+      setError(err.message || 'Payout konnte nicht aktualisiert werden.');
+    }
+  };
+
+  const revokeSession = async (tokenSuffix) => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/security/sessions/revoke`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tokenSuffix })
+      });
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Session konnte nicht beendet werden.');
+    }
+  };
+
+  const revokeAllSessions = async () => {
+    try {
+      await authedFetch(`${API_BASE}/api/superadmin/security/sessions/revoke-all`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      fetchDashboardData();
+    } catch (err) {
+      setError(err.message || 'Sessions konnten nicht beendet werden.');
     }
   };
 
@@ -3179,6 +3356,13 @@ const SuperAdminPage = () => {
               placeholder="Passwort"
               className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
             />
+            <input
+              type="text"
+              value={twoFactorCode}
+              onChange={(e) => setTwoFactorCode(e.target.value)}
+              placeholder="2FA Code (optional)"
+              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
+            />
             {error && <p className="text-red-400 text-sm">{error}</p>}
             <button type="submit" className="w-full bg-indigo-600 rounded-xl py-3 font-bold hover:bg-indigo-500 transition-all">
               Einloggen
@@ -3204,8 +3388,45 @@ const SuperAdminPage = () => {
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
+        <section className={`p-5 rounded-2xl border ${theme.border} ${theme.surface}`}>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">User</p>
+              <p className="text-2xl font-bold">{analytics?.totalUsers ?? '-'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">Setup Rate</p>
+              <p className="text-2xl font-bold">{analytics?.setupRate ?? '-'}%</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">Aktive Deals</p>
+              <p className="text-2xl font-bold">{analytics?.activeDeals ?? '-'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">Offene Tickets</p>
+              <p className="text-2xl font-bold">{analytics?.openTickets ?? '-'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">Pending Payouts</p>
+              <p className="text-2xl font-bold">{analytics?.pendingPayouts ?? '-'}</p>
+            </div>
+            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+              <p className="text-xs text-[#A1A1A1]">Bots Online</p>
+              <p className="text-2xl font-bold">{analytics?.botOnline ?? '-'}</p>
+            </div>
+          </div>
+        </section>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <aside className={`lg:col-span-4 p-4 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => setSelectedUserIds(users.map((u) => u.id))} className="text-xs px-3 py-2 rounded-lg bg-white/10">
+                Alle
+              </button>
+              <button onClick={() => setSelectedUserIds([])} className="text-xs px-3 py-2 rounded-lg bg-white/10">
+                Keine
+              </button>
+            </div>
             <input
               type="text"
               value={search}
@@ -3216,16 +3437,49 @@ const SuperAdminPage = () => {
             <div className="max-h-[70vh] overflow-y-auto space-y-2">
               {loadingUsers && <p className="text-sm text-[#A1A1A1]">Lade Nutzer...</p>}
               {!loadingUsers && filteredUsers.map((u) => (
-                <button
+                <div
                   key={u.id}
-                  onClick={() => setSelectedUserId(u.id)}
                   className={`w-full text-left p-3 rounded-xl border transition-all ${selectedUserId === u.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}
                 >
-                  <p className="font-bold">{u.username || 'Ohne Name'} <span className="text-[#A1A1A1]">#{u.id}</span></p>
-                  <p className="text-xs text-[#A1A1A1]">{u.email}</p>
-                  <p className="text-xs text-indigo-400">{u.siteSlug ? `/${u.siteSlug}` : 'Kein Slug'}</p>
-                </button>
+                  <div className="flex items-start justify-between gap-2">
+                    <button onClick={() => setSelectedUserId(u.id)} className="flex-1 text-left">
+                      <p className="font-bold">{u.username || 'Ohne Name'} <span className="text-[#A1A1A1]">#{u.id}</span></p>
+                      <p className="text-xs text-[#A1A1A1]">{u.email}</p>
+                      <p className="text-xs text-indigo-400">{u.siteSlug ? `/${u.siteSlug}` : 'Kein Slug'}</p>
+                    </button>
+                    <input
+                      type="checkbox"
+                      checked={selectedUserIds.includes(u.id)}
+                      onChange={() => toggleUserSelection(u.id)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <p className="text-xs mt-2">
+                    Health: <span className={`${(u.health?.score ?? 0) >= 70 ? 'text-emerald-400' : 'text-amber-300'}`}>{u.health?.score ?? 0}%</span>
+                  </p>
+                </div>
               ))}
+            </div>
+            <div className="pt-2 border-t border-white/10 space-y-3">
+              <p className="text-xs text-[#A1A1A1]">Bulk Aktionen ({selectedUserIds.length} selektiert)</p>
+              <div className="grid grid-cols-2 gap-2">
+                <select value={dealTemplate} onChange={(e) => setDealTemplate(e.target.value)} className="bg-[#0A0A0A] border border-white/10 rounded-lg px-2 py-2 text-xs">
+                  <option value="starter">Starter</option>
+                  <option value="pro">Pro</option>
+                </select>
+                <button onClick={applyDealTemplate} className="text-xs px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500">
+                  Template
+                </button>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <select value={bulkStatus} onChange={(e) => setBulkStatus(e.target.value)} className="bg-[#0A0A0A] border border-white/10 rounded-lg px-2 py-2 text-xs">
+                  <option value="Aktiv">Aktiv</option>
+                  <option value="Deaktiviert">Deaktiviert</option>
+                </select>
+                <button onClick={applyBulkStatus} className="text-xs px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20">
+                  Status setzen
+                </button>
+              </div>
             </div>
           </aside>
 
@@ -3250,6 +3504,12 @@ const SuperAdminPage = () => {
                       Streamer Ã¶ffnen
                     </a>
                   )}
+                </div>
+
+                <div className="p-4 rounded-xl border border-white/10 bg-white/5">
+                  <p className="font-bold mb-2">User Health</p>
+                  <p className="text-sm">Score: <span className="text-indigo-300">{selectedData.health?.score ?? 0}%</span></p>
+                  <p className="text-xs text-[#A1A1A1] mt-1">Flags: {(selectedData.health?.flags || []).join(', ') || 'none'}</p>
                 </div>
 
                 <section className="space-y-3">
@@ -3322,6 +3582,112 @@ const SuperAdminPage = () => {
                         ))}
                       </div>
                     </div>
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-lg font-bold">Support Inbox</h3>
+                  <div className="grid md:grid-cols-5 gap-3">
+                    <input type="number" placeholder="User ID" value={ticketForm.userId} onChange={(e) => setTicketForm({ ...ticketForm, userId: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <input type="text" placeholder="Subject" value={ticketForm.subject} onChange={(e) => setTicketForm({ ...ticketForm, subject: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <select value={ticketForm.priority} onChange={(e) => setTicketForm({ ...ticketForm, priority: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2">
+                      <option value="low">low</option>
+                      <option value="normal">normal</option>
+                      <option value="high">high</option>
+                    </select>
+                    <input type="text" placeholder="Assignee" value={ticketForm.assignee} onChange={(e) => setTicketForm({ ...ticketForm, assignee: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <button onClick={createTicket} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">Ticket erstellen</button>
+                  </div>
+                  <textarea placeholder="Message" value={ticketForm.message} onChange={(e) => setTicketForm({ ...ticketForm, message: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2 min-h-24" />
+                  <div className="space-y-2">
+                    {tickets.map((t) => (
+                      <div key={t.id} className="p-3 rounded-xl border border-white/10 bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="font-bold">#{t.id} {t.subject}</p>
+                          <p className="text-xs text-[#A1A1A1]">User {t.userId || '-'} | {t.priority} | {t.status}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <button onClick={() => updateTicketStatus(t.id, 'in_progress')} className="px-3 py-2 text-xs rounded-lg bg-white/10">In Progress</button>
+                          <button onClick={() => updateTicketStatus(t.id, 'closed')} className="px-3 py-2 text-xs rounded-lg bg-emerald-600/20 text-emerald-200">Close</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                  <h3 className="text-lg font-bold">Payout Management</h3>
+                  <div className="grid md:grid-cols-6 gap-3">
+                    <input type="number" placeholder="User ID" value={payoutForm.userId} onChange={(e) => setPayoutForm({ ...payoutForm, userId: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <input type="number" placeholder="Amount" value={payoutForm.amount} onChange={(e) => setPayoutForm({ ...payoutForm, amount: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <input type="text" placeholder="Currency" value={payoutForm.currency} onChange={(e) => setPayoutForm({ ...payoutForm, currency: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <input type="text" placeholder="Period" value={payoutForm.period} onChange={(e) => setPayoutForm({ ...payoutForm, period: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <input type="date" value={payoutForm.dueDate} onChange={(e) => setPayoutForm({ ...payoutForm, dueDate: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                    <button onClick={createPayout} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">Payout erstellen</button>
+                  </div>
+                  <input type="text" placeholder="Notiz" value={payoutForm.note} onChange={(e) => setPayoutForm({ ...payoutForm, note: e.target.value })} className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2" />
+                  <div className="space-y-2">
+                    {payouts.map((p) => (
+                      <div key={p.id} className="p-3 rounded-xl border border-white/10 bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="font-bold">#{p.id} User {p.userId || '-'} - {p.amount} {p.currency}</p>
+                          <p className="text-xs text-[#A1A1A1]">{p.status} | due: {p.dueDate || '-'} | {p.period || '-'}</p>
+                        </div>
+                        <button onClick={() => markPayoutPaid(p.id)} className="px-3 py-2 text-xs rounded-lg bg-emerald-600/20 text-emerald-200">
+                          Als bezahlt markieren
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-bold">Security Sessions</h3>
+                    <button onClick={revokeAllSessions} className="px-3 py-2 text-xs rounded-lg bg-red-500/20 text-red-300">
+                      Alle anderen Sessions beenden
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {sessions.map((s) => (
+                      <div key={`${s.tokenSuffix}-${s.createdAt}`} className="p-3 rounded-xl border border-white/10 bg-white/5 flex flex-wrap items-center justify-between gap-2">
+                        <div>
+                          <p className="font-bold">...{s.tokenSuffix}</p>
+                          <p className="text-xs text-[#A1A1A1]">{s.ip || 'n/a'} | created: {s.createdAt} | last: {s.lastSeenAt}</p>
+                        </div>
+                        <button onClick={() => revokeSession(s.tokenSuffix)} className="px-3 py-2 text-xs rounded-lg bg-white/10">
+                          Beenden
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-3">
+                  <h3 className="text-lg font-bold">Bot Monitoring</h3>
+                  <div className="space-y-2">
+                    {monitor.map((m) => (
+                      <div key={m.userId} className="p-3 rounded-xl border border-white/10 bg-white/5">
+                        <p className="font-bold">{m.username || 'NoName'} #{m.userId} {m.siteSlug ? `(/${m.siteSlug})` : ''}</p>
+                        <p className="text-xs text-[#A1A1A1]">
+                          Reader: {m.readerRunning ? 'online' : 'offline'} | Channels: {(m.readerChannels || []).join(', ') || '-'} | AdTimer: {m.adTimerRunning ? `on (${m.adTimerIntervalMinutes}m)` : 'off'}
+                        </p>
+                        {m.lastReaderError && <p className="text-xs text-red-300 mt-1">Last Error: {m.lastReaderError}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+
+                <section className="space-y-3">
+                  <h3 className="text-lg font-bold">Audit Log</h3>
+                  <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                    {auditLogs.map((log) => (
+                      <div key={log.id} className="p-3 rounded-xl border border-white/10 bg-white/5">
+                        <p className="font-bold">{log.action}</p>
+                        <p className="text-xs text-[#A1A1A1]">{log.actor} | userId: {log.targetUserId || '-'} | {log.createdAt}</p>
+                        <p className="text-xs text-indigo-300 mt-1">{log.payloadJson || '{}'}</p>
+                      </div>
+                    ))}
                   </div>
                 </section>
               </>
