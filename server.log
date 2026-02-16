@@ -1,0 +1,25 @@
+Server running on port 3001
+2026-02-16T11:05:56.320Z - GET /api/user/7/dashboard
+
+2026-02-16T11:05:56.327Z - GET /api/user/7/dashboard
+
+2026-02-16T11:05:56.336Z - GET /api/streamer/enricos
+
+Fetching streamer for slug: enricos
+Found user: {
+  id: 7,
+  username: 'Enrico',
+  siteSlug: 'enricos',
+  templateId: 1,
+  category: 'Casino'
+}
+2026-02-16T11:05:56.346Z - GET /api/streamer/enricos
+
+Fetching streamer for slug: enricos
+Found user: {
+  id: 7,
+  username: 'Enrico',
+  siteSlug: 'enricos',
+  templateId: 1,
+  category: 'Casino'
+}

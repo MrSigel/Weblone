@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Radikale Neutralisierung aller Standard-Hintergründe */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: transparent !important;
+  color: white;
+  overflow-x: hidden;
+}
+
+#root {
+  background-color: transparent !important;
+}
+
+@theme {
+  --animate-float: float 20s ease-in-out infinite;
+  --animate-float-slow: float 30s ease-in-out infinite;
+  --animate-float-reverse: float-reverse 25s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(2%, 4%) scale(1.05); }
+    66% { transform: translate(-2%, 2%) scale(0.95); }
+  }
+  @keyframes float-reverse {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-3%, -2%) scale(1.02); }
+    66% { transform: translate(1%, -4%) scale(0.98); }
+  }
+}
