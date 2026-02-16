@@ -721,14 +721,11 @@ const Home = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="flex flex-col sm:flex-row justify-center gap-4"
+            className="flex justify-center"
           >
-             <button className="bg-[#EDEDED] text-[#050505] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#D4D4D4] transition-all">
-               Jetzt Website erstellen
-             </button>
-             <button className={`bg-[#0A0A0A] text-[#EDEDED] px-10 py-4 rounded-full font-bold text-lg border ${theme.border} ${theme.borderHover} transition-all`}>
-               Demo anfordern
-             </button>
+            <Link to="/register" className="bg-[#EDEDED] text-[#050505] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#D4D4D4] transition-all inline-flex items-center justify-center">
+              Jetzt Website erstellen
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -1027,6 +1024,9 @@ const Login = ({ onLogin }) => {
             <Link to="/register" className="text-indigo-500 text-sm font-medium hover:text-indigo-400 transition-colors">
               Account erstellen
             </Link>
+            <Link to="/" className="text-[#A1A1A1] text-sm font-medium hover:text-white transition-colors">
+              Zurück zur Startseite
+            </Link>
             <button 
               onClick={() => setIsModalOpen(true)}
               className="text-[#555] text-sm font-medium hover:text-[#777] transition-colors"
@@ -1192,9 +1192,12 @@ const Register = ({ onRegister }) => {
               Registrieren
             </button>
           </form>
-          <div className="mt-8 pt-8 border-t border-white/5 text-center">
+          <div className="mt-8 pt-8 border-t border-white/5 text-center flex flex-col gap-4">
             <Link to="/login" className="text-indigo-500 text-sm font-medium hover:text-indigo-400 transition-colors">
               Bereits einen Account? Einloggen
+            </Link>
+            <Link to="/" className="text-[#A1A1A1] text-sm font-medium hover:text-white transition-colors">
+              Zurück zur Startseite
             </Link>
           </div>
         </motion.div>
