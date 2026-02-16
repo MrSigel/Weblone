@@ -194,6 +194,7 @@ ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 ensureColumn('deals', 'imageUrl', "TEXT DEFAULT ''");
 ensureColumn('deals', 'promoCode', "TEXT DEFAULT 'DIEGAWINOS'");
 ensureColumn('deals', 'bonusTerms', "TEXT DEFAULT '100% Sticky - 300EUR Max Bonus - 40x Wager'");
+ensureColumn('deals', 'ctaUrl', "TEXT DEFAULT ''");
 db.prepare("UPDATE streamer_pages SET title = 'Casinos' WHERE slug = 'shop'").run();
 
 // Insert default superadmin if not exists
@@ -867,12 +868,12 @@ app.delete('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
 });
 
 app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
-  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms } = req.body;
+  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl } = req.body;
   if (!name || !deal) {
     return res.status(400).json({ success: false, error: 'name und deal sind erforderlich.' });
   }
   try {
-    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .run(
         req.params.id,
         name,
@@ -881,7 +882,8 @@ app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
         status || 'Aktiv',
         imageUrl || '',
         promoCode || 'DIEGAWINOS',
-        bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'
+        bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        ctaUrl || ''
       );
     logAudit(req.superadmin.email, 'deal_create', req.params.id, { dealId: info.lastInsertRowid, name });
     res.json({ success: true, dealId: info.lastInsertRowid });
@@ -891,9 +893,9 @@ app.post('/api/superadmin/user/:id/deal', requireSuperadmin, (req, res) => {
 });
 
 app.put('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) => {
-  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms } = req.body;
+  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl } = req.body;
   try {
-    db.prepare('UPDATE deals SET name = ?, deal = ?, performance = ?, status = ?, imageUrl = ?, promoCode = ?, bonusTerms = ? WHERE id = ? AND userId = ?')
+    db.prepare('UPDATE deals SET name = ?, deal = ?, performance = ?, status = ?, imageUrl = ?, promoCode = ?, bonusTerms = ?, ctaUrl = ? WHERE id = ? AND userId = ?')
       .run(
         name,
         deal,
@@ -902,6 +904,7 @@ app.put('/api/superadmin/user/:id/deal/:dealId', requireSuperadmin, (req, res) =
         imageUrl || '',
         promoCode || 'DIEGAWINOS',
         bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        ctaUrl || '',
         req.params.dealId,
         req.params.id
       );
@@ -939,7 +942,7 @@ app.post('/api/superadmin/deal-template/apply', requireSuperadmin, (req, res) =>
   };
   const selected = templates[template] || templates.starter;
 
-  const insert = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+  const insert = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
   const tx = db.transaction(() => {
     userIds.forEach((userId) => {
       selected.forEach((d) => insert.run(
@@ -950,7 +953,8 @@ app.post('/api/superadmin/deal-template/apply', requireSuperadmin, (req, res) =>
         d.status,
         d.imageUrl || '',
         d.promoCode || 'DIEGAWINOS',
-        d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'
+        d.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        d.ctaUrl || ''
       ));
       logAudit(req.superadmin.email, 'deal_template_apply', userId, { template });
     });
@@ -1271,8 +1275,8 @@ app.post('/api/user/:id/setup', (req, res) => {
       // 5. Create a default deal only when no deal exists yet
       const existingDealCount = db.prepare('SELECT COUNT(*) as c FROM deals WHERE userId = ?').get(userId)?.c || 0;
       if (existingDealCount === 0) {
-        db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-          .run(userId, 'Weblone Partner', '100% Bonus bis 500€', 'Top Deal', 'Aktiv');
+        db.prepare('INSERT INTO deals (userId, name, deal, performance, status, ctaUrl) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(userId, 'Weblone Partner', '100% Bonus bis 500€', 'Top Deal', 'Aktiv', '');
       }
 
       // 7. Create default pages
@@ -1620,9 +1624,9 @@ app.get('/api/user/:id/tools/chat-reader/logs', (req, res) => {
 });
 
 app.post('/api/user/:id/deal', (req, res) => {
-  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms } = req.body;
+  const { name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl } = req.body;
   try {
-    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    const info = db.prepare('INSERT INTO deals (userId, name, deal, performance, status, imageUrl, promoCode, bonusTerms, ctaUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .run(
         req.params.id,
         name,
@@ -1631,7 +1635,8 @@ app.post('/api/user/:id/deal', (req, res) => {
         status || 'Aktiv',
         imageUrl || '',
         promoCode || 'DIEGAWINOS',
-        bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'
+        bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        ctaUrl || ''
       );
     res.json({ success: true, dealId: info.lastInsertRowid });
   } catch (err) {
@@ -1640,9 +1645,9 @@ app.post('/api/user/:id/deal', (req, res) => {
 });
 
 app.post('/api/user/:id/deal/:dealId', (req, res) => {
-  const { status, name, deal, performance, imageUrl, promoCode, bonusTerms } = req.body;
+  const { status, name, deal, performance, imageUrl, promoCode, bonusTerms, ctaUrl } = req.body;
   try {
-    db.prepare('UPDATE deals SET status = ?, name = ?, deal = ?, performance = ?, imageUrl = ?, promoCode = ?, bonusTerms = ? WHERE id = ? AND userId = ?')
+    db.prepare('UPDATE deals SET status = ?, name = ?, deal = ?, performance = ?, imageUrl = ?, promoCode = ?, bonusTerms = ?, ctaUrl = ? WHERE id = ? AND userId = ?')
       .run(
         status,
         name,
@@ -1651,6 +1656,7 @@ app.post('/api/user/:id/deal/:dealId', (req, res) => {
         imageUrl || '',
         promoCode || 'DIEGAWINOS',
         bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager',
+        ctaUrl || '',
         req.params.dealId,
         req.params.id
       );
