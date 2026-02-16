@@ -5002,13 +5002,45 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
   const bonus = Math.max(0, Number(deposit) || 0);
   const total = bonus * 2;
   const wager = total * 40;
-  const countries = ['DE', 'AT', 'CH', 'CA', 'NO', 'SE', 'FI', 'DK', 'NL'];
-  const payments = ['VISA', 'BANK', 'PaySafe', 'BTC', 'ETH'];
-  const providers = [
-    'Playn GO', 'Big Time', 'Pragmatic', 'Merkur', 'Relax', 'Nolimit',
-    'Greentube', 'Blueprint', 'Hacksaw', 'Elk', 'Endorphina', 'NetEnt',
-    'Microgaming', 'Push', 'Quickspin', 'Thunderkick', 'Yggdrasil', 'Red Tiger'
+  const countries = [
+    { code: 'DE', src: 'https://flagcdn.com/w80/de.png' },
+    { code: 'AT', src: 'https://flagcdn.com/w80/at.png' },
+    { code: 'CH', src: 'https://flagcdn.com/w80/ch.png' },
+    { code: 'CA', src: 'https://flagcdn.com/w80/ca.png' },
+    { code: 'NO', src: 'https://flagcdn.com/w80/no.png' },
+    { code: 'SE', src: 'https://flagcdn.com/w80/se.png' },
+    { code: 'FI', src: 'https://flagcdn.com/w80/fi.png' },
+    { code: 'DK', src: 'https://flagcdn.com/w80/dk.png' },
+    { code: 'NL', src: 'https://flagcdn.com/w80/nl.png' }
   ];
+  const payments = [
+    { name: 'Visa', src: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg' },
+    { name: 'Mastercard', src: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg' },
+    { name: 'PaySafe', src: 'https://logo.clearbit.com/paysafecard.com' },
+    { name: 'BTC', src: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg' },
+    { name: 'ETH', src: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg' }
+  ];
+  const providers = [
+    { name: 'Playn GO', src: 'https://logo.clearbit.com/playngo.com' },
+    { name: 'Big Time', src: 'https://logo.clearbit.com/bigtimegaming.com' },
+    { name: 'Pragmatic', src: 'https://logo.clearbit.com/pragmaticplay.com' },
+    { name: 'Merkur', src: 'https://logo.clearbit.com/merkur-gaming.com' },
+    { name: 'Relax', src: 'https://logo.clearbit.com/relax-gaming.com' },
+    { name: 'Nolimit', src: 'https://logo.clearbit.com/nolimitcity.com' },
+    { name: 'Greentube', src: 'https://logo.clearbit.com/greentube.com' },
+    { name: 'Blueprint', src: 'https://logo.clearbit.com/blueprintgaming.com' },
+    { name: 'Hacksaw', src: 'https://logo.clearbit.com/hacksawgaming.com' },
+    { name: 'Elk', src: 'https://logo.clearbit.com/elk-studios.com' },
+    { name: 'Endorphina', src: 'https://logo.clearbit.com/endorphina.com' },
+    { name: 'NetEnt', src: 'https://logo.clearbit.com/netent.com' },
+    { name: 'Microgaming', src: 'https://logo.clearbit.com/microgaming.co.uk' },
+    { name: 'Push', src: 'https://logo.clearbit.com/pushgaming.com' },
+    { name: 'Quickspin', src: 'https://logo.clearbit.com/quickspin.com' },
+    { name: 'Thunderkick', src: 'https://logo.clearbit.com/thunderkick.com' },
+    { name: 'Yggdrasil', src: 'https://logo.clearbit.com/yggdrasilgaming.com' },
+    { name: 'Red Tiger', src: 'https://logo.clearbit.com/redtigergaming.com' }
+  ];
+  const licenseLogo = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_Cura%C3%A7ao.svg';
 
   return (
     <article className="rounded-2xl border border-[#253252] bg-[#161d2f] overflow-hidden shadow-2xl">
