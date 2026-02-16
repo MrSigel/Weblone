@@ -2569,12 +2569,13 @@ const App = () => {
   const [subdomain, setSubdomain] = useState(null);
 
   useEffect(() => {
-    const host = window.location.hostname;
+    const host = window.location.hostname.toLowerCase();
     const parts = host.split('.');
+    const isRenderHost = host.endsWith('.onrender.com');
     
     // Main domains list
     const mainDomains = ['localhost', 'weblone.de', 'onrender.com'];
-    const isMainDomain = mainDomains.some(d => host === d || host === 'www.' + d);
+    const isMainDomain = isRenderHost || mainDomains.some(d => host === d || host === 'www.' + d);
 
     if (!isMainDomain) {
       // If it's something like streamer.weblone.de or streamer.onrender.com
