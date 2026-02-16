@@ -1844,6 +1844,11 @@ app.get('/api/site/:id/pages/:pageId/blocks', (req, res) => {
 
 app.post('/api/site/:id/pages/:pageId/blocks', (req, res) => {
   const { blockType, dataJson } = req.body;
+  const page = db.prepare('SELECT slug FROM streamer_pages WHERE id = ? AND userId = ?').get(req.params.pageId, req.params.id);
+  if (!page) return res.status(404).json({ success: false, error: 'Seite nicht gefunden.' });
+  if (page.slug === 'shop') {
+    return res.status(400).json({ success: false, error: 'Die Casinos-Seite wird automatisch aus Deals erzeugt.' });
+  }
   const lastBlock = db.prepare('SELECT MAX(sortOrder) as maxOrder FROM page_blocks WHERE pageId = ?').get(req.params.pageId);
   const nextOrder = (lastBlock?.maxOrder || 0) + 1;
   const info = db.prepare('INSERT INTO page_blocks (userId, pageId, blockType, dataJson, sortOrder) VALUES (?, ?, ?, ?, ?)')
