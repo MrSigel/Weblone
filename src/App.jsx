@@ -5426,9 +5426,11 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const isCasinoPage = currentPage?.slug === 'shop';
   const slug = user?.siteSlug;
   const activeDeals = (deals || []).filter((d) => d.status !== 'Deaktiviert');
+  const conversionBoosterEnabled = Number(settings?.conversionBoosterEnabled ?? 1) === 1;
+  const siteTheme = landingBackgroundThemes[settings?.backgroundTheme] || landingBackgroundThemes.dark;
 
   useEffect(() => {
-    if (!settings?.abTestEnabled) {
+    if (!conversionBoosterEnabled || !settings?.abTestEnabled) {
       setCtaVariant('default');
       return;
     }
@@ -5443,16 +5445,16 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
     } else {
       setCtaVariant('default');
     }
-  }, [settings?.abTestEnabled, settings?.ctaAUrl, settings?.ctaBUrl, slug]);
+  }, [conversionBoosterEnabled, settings?.abTestEnabled, settings?.ctaAUrl, settings?.ctaBUrl, slug]);
 
   useEffect(() => {
-    if (!slug) return;
+    if (!slug || !conversionBoosterEnabled) return;
     fetch(`${API_BASE}/api/public/site/${slug}/cta-impression`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ variant: ctaVariant })
     }).catch(() => {});
-  }, [slug, ctaVariant]);
+  }, [slug, ctaVariant, conversionBoosterEnabled]);
 
   const resolvedCtaText = ctaVariant === 'a'
     ? (settings.ctaAText || settings.primaryCtaText || 'Jetzt Bonus sichern')
@@ -5463,8 +5465,8 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const hasAnyCtaTarget = !!(settings.primaryCtaUrl || settings.stickyCtaUrl || settings.ctaAUrl || settings.ctaBUrl);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
-      <BackgroundBubbles />
+    <div className={`min-h-screen text-white font-sans selection:bg-indigo-500/30 flex flex-col ${siteTheme.siteClass}`}>
+      {siteTheme.bubbles && <BackgroundBubbles />}
       
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 py-3 md:py-6">
@@ -5494,13 +5496,13 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       {/* Hero / Header Area (Dynamic) */}
       <main className="pt-32 md:pt-40 pb-16 md:pb-20 flex-1">
         <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-20">
-          {!!settings.urgencyText && (
+          {!!conversionBoosterEnabled && !!settings.urgencyText && (
             <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-center text-amber-200 font-medium">
               {settings.urgencyText}
             </div>
           )}
 
-          {!!hasAnyCtaTarget && (
+          {!!conversionBoosterEnabled && !!hasAnyCtaTarget && (
             <div className="text-center">
               <a
                 href={trackedCtaHref}
@@ -5536,7 +5538,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
             ))
           )}
 
-          {!!settings.trustBadgeText && (
+          {!!conversionBoosterEnabled && !!settings.trustBadgeText && (
             <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-emerald-200 text-sm">
               {settings.trustBadgeText}
             </div>
@@ -5553,7 +5555,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
         </div>
       </footer>
 
-      {!!settings.stickyCtaEnabled && !!hasAnyCtaTarget && (
+      {!!conversionBoosterEnabled && !!settings.stickyCtaEnabled && !!hasAnyCtaTarget && (
         <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl">
           <div className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[#EDEDED]">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
