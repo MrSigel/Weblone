@@ -171,11 +171,11 @@ ensureColumn('streamer_site_settings', 'stickyCtaEnabled', 'INTEGER DEFAULT 1');
 ensureColumn('streamer_site_settings', 'stickyCtaText', "TEXT DEFAULT 'Jetzt registrieren & Bonus aktivieren'");
 ensureColumn('streamer_site_settings', 'stickyCtaUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'trustBadgeText', "TEXT DEFAULT 'Verifiziert | 18+ | Verantwortungsvoll spielen'");
-ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele fuer neue Spieler'");
+ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele f?r neue Spieler'");
 ensureColumn('streamer_site_settings', 'abTestEnabled', 'INTEGER DEFAULT 0');
 ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus sichern'");
 ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
-ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus fuer neue Spieler holen'");
+ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus f?r neue Spieler holen'");
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 
 // Insert default superadmin if not exists
@@ -1114,7 +1114,7 @@ app.post('/api/user/:id/setup', (req, res) => {
   const landingPresetsByTemplate = {
     1: {
       home: [
-        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights fuer deine Community.' } },
+        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights f?r deine Community.' } },
         { blockType: 'Text', dataJson: { content: 'Hier findest du meine handverlesenen Partner inklusive exklusiver Vorteile. Trage unten nur noch deine finalen Deal-Links ein.' } },
         { blockType: 'Button', dataJson: { label: 'Hauptdeal Link einfuegen', url: 'https://example.com/deal-main' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Twitch', url: 'https://twitch.tv/' }, { label: 'Kick', url: 'https://kick.com/' }] } }
@@ -1124,8 +1124,8 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Casino Deal 1', url: 'https://example.com/deal-1' }, { label: 'Casino Deal 2', url: 'https://example.com/deal-2' }, { label: 'VIP Deal', url: 'https://example.com/deal-vip' }] } }
       ],
       hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos fuer den naechsten Hunt-Stream.' } },
-        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise fuer die Community.' } },
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos f?r den naechsten Hunt-Stream.' } },
+        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise f?r die Community.' } },
         { blockType: 'Button', dataJson: { label: 'Hunt Teilnahme Link', url: 'https://example.com/hunt' } }
       ],
       giveaway: [
@@ -1142,7 +1142,7 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Discord Community', url: 'https://discord.com/' }, { label: 'Telegram News', url: 'https://t.me/' }] } }
       ],
       shop: [
-        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote fuer neue und bestehende Spieler.' } },
+        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote f?r neue und bestehende Spieler.' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Willkommensbonus', url: 'https://example.com/welcome' }, { label: 'Reload Bonus', url: 'https://example.com/reload' }, { label: 'Highroller Deal', url: 'https://example.com/highroller' }] } }
       ],
       hunt: [
@@ -1151,14 +1151,14 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'Button', dataJson: { label: 'Zum Hunt-Portal', url: 'https://example.com/hunt-portal' } }
       ],
       giveaway: [
-        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen fuer aktive Zuschauer.' } },
+        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen f?r aktive Zuschauer.' } },
         { blockType: 'Text', dataJson: { content: 'Definiere Teilnahmebedingungen transparent, damit Zuschauer schnell verstehen, wie sie mitmachen.' } },
         { blockType: 'Button', dataJson: { label: 'Jetzt teilnehmen', url: 'https://example.com/giveaway-entry' } }
       ]
     },
     3: {
       home: [
-        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs fuer maximale Einzahlungen.' } },
+        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs f?r maximale Einzahlungen.' } },
         { blockType: 'Text', dataJson: { content: 'Dieses Preset ist conversion-orientiert. Trage deine Partner-Links ein und starte direkt mit einer professionellen Struktur.' } },
         { blockType: 'Button', dataJson: { label: 'VIP Bonus aktivieren', url: 'https://example.com/vip-bonus' } },
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Live Stream', url: 'https://twitch.tv/' }, { label: 'Kick Stream', url: 'https://kick.com/' }, { label: 'Kontakt', url: 'mailto:kontakt@weblone.de' }] } }
@@ -1168,8 +1168,8 @@ app.post('/api/user/:id/setup', (req, res) => {
         { blockType: 'LinkList', dataJson: { links: [{ label: 'Top Casino #1', url: 'https://example.com/casino-1' }, { label: 'Top Casino #2', url: 'https://example.com/casino-2' }, { label: 'Exklusiv Deal', url: 'https://example.com/exclusive' }] } }
       ],
       hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles fuer deinen naechsten Live-Hunt.' } },
-        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite fuer Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
+        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles f?r deinen naechsten Live-Hunt.' } },
+        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite f?r Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
         { blockType: 'Button', dataJson: { label: 'Hunt Event starten', url: 'https://example.com/hunt-start' } }
       ],
       giveaway: [
@@ -1369,7 +1369,7 @@ app.post('/api/user/:id/social/disconnect', (req, res) => {
     delete toolsConfig.socialAuth.kick;
     delete toolsConfig.socialMetrics.kick;
   } else {
-    return res.status(400).json({ success: false, error: 'Ung?ltige Platform.' });
+    return res.status(400).json({ success: false, error: 'Ung?ltige Plattform.' });
   }
 
   writeUserToolsConfig(req.params.id, toolsConfig);
@@ -1724,11 +1724,11 @@ app.get('/api/site/:id/settings', (req, res) => {
       stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
       stickyCtaUrl: '',
       trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-      urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+      urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler',
       abTestEnabled: 0,
       ctaAText: 'Jetzt Bonus sichern',
       ctaAUrl: '',
-      ctaBText: 'Bonus fuer neue Spieler holen',
+      ctaBText: 'Bonus f?r neue Spieler holen',
       ctaBUrl: '',
       ...(settings || {})
     }
@@ -1782,11 +1782,11 @@ app.put('/api/site/:id/settings', (req, res) => {
     stickyCtaText || 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl || '',
     trustBadgeText || 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText || 'Nur heute: exklusive Freispiele fuer neue Spieler',
+    urgencyText || 'Nur heute: exklusive Freispiele f?r neue Spieler',
     abTestEnabled ? 1 : 0,
     ctaAText || 'Jetzt Bonus sichern',
     ctaAUrl || '',
-    ctaBText || 'Bonus fuer neue Spieler holen',
+    ctaBText || 'Bonus f?r neue Spieler holen',
     ctaBUrl || ''
   );
   res.json({ success: true });
@@ -1923,11 +1923,11 @@ app.get('/api/public/site/:slug', (req, res) => {
           stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
           stickyCtaUrl: '',
           trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-          urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+          urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler',
           abTestEnabled: 0,
           ctaAText: 'Jetzt Bonus sichern',
           ctaAUrl: '',
-          ctaBText: 'Bonus fuer neue Spieler holen',
+          ctaBText: 'Bonus f?r neue Spieler holen',
           ctaBUrl: '',
           ...(settings || {})
         }, 

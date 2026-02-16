@@ -1450,7 +1450,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl: '',
     trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler'
+    urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler'
   });
   const [pageVisibility, setPageVisibility] = useState({
     '': true,
@@ -1800,8 +1800,8 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             <div className="grid md:grid-cols-3 gap-4">
               {[
                 { id: 1, name: 'Neon Night', preset: 'Dynamische Promo-Struktur mit schnellen CTA-Flaechen' },
-                { id: 2, name: 'Minimal Pro', preset: 'Klarer Baukasten fuer einfache Link-Pflege' },
-                { id: 3, name: 'Casino Master', preset: 'Conversion-fokussiertes Setup fuer Casino Traffic' }
+                { id: 2, name: 'Minimal Pro', preset: 'Klarer Baukasten f?r einfache Link-Pflege' },
+                { id: 3, name: 'Casino Master', preset: 'Conversion-fokussiertes Setup f?r Casino Traffic' }
               ].map((tpl) => (
                 <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
                   <p className="font-bold text-white">{tpl.name}</p>
@@ -2435,11 +2435,11 @@ const SiteBuilder = ({ user, onUpdate }) => {
     stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl: '',
     trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText: 'Nur heute: exklusive Freispiele fuer neue Spieler',
+    urgencyText: 'Nur heute: exklusive Freispiele f?r neue Spieler',
     abTestEnabled: 0,
     ctaAText: 'Jetzt Bonus sichern',
     ctaAUrl: '',
-    ctaBText: 'Bonus fuer neue Spieler holen',
+    ctaBText: 'Bonus f?r neue Spieler holen',
     ctaBUrl: ''
   });
   const [ctaStats, setCtaStats] = useState({ default: { impressions: 0, clicks: 0, ctr: 0 }, a: { impressions: 0, clicks: 0, ctr: 0 }, b: { impressions: 0, clicks: 0, ctr: 0 } });
@@ -2758,7 +2758,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
                   onChange={(e) => setSettings({ ...settings, urgencyText: e.target.value })}
                   onBlur={saveSettings}
                   className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-2 text-white focus:border-indigo-500 outline-none text-sm"
-                  placeholder="Nur heute: exklusive Freispiele fuer neue Spieler"
+                  placeholder="Nur heute: exklusive Freispiele f?r neue Spieler"
                 />
               </div>
 
@@ -2766,7 +2766,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-bold text-white">A/B Test CTA</p>
-                    <p className="text-xs text-[#A1A1A1]">Teste 2 Varianten fuer bessere Klickrate.</p>
+                    <p className="text-xs text-[#A1A1A1]">Teste 2 Varianten f?r bessere Klickrate.</p>
                   </div>
                   <input
                     type="checkbox"
@@ -3471,14 +3471,14 @@ const ToolsContent = ({ user, onUpdate }) => {
     { name: 'Bonushunt List', id: 'bonushunt', desc: 'Verwalte deine Boni und teile die Liste live mit deinem Stream.', icon: List },
     { name: 'Wagerbar', id: 'wagerbar', desc: 'Visualisiere deinen Fortschritt beim Umsetzen von Boni.', icon: Activity },
     { name: 'Slottracker', id: 'slottracker', desc: 'Behalte den Ueberblick ueber deine gespielten Slots und Ergebnisse.', icon: BarChart3 },
-    { name: 'Tournament System', id: 'tournament', desc: 'Erstelle Giveaways und Turniere fuer deine Community.', icon: Trophy }
+    { name: 'Tournament System', id: 'tournament', desc: 'Erstelle Giveaways und Turniere f?r deine Community.', icon: Trophy }
   ];
 
   return (
     <div className="space-y-8">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Streaming Tools</h1>
-        <p className="text-[#A1A1A1]">Bots fuer Twitch/Kick konfigurieren: Channels joinen, schreiben, Turnier-/Timer-Aktionen.</p>
+        <p className="text-[#A1A1A1]">Bots f?r Twitch/Kick konfigurieren: Channels joinen, schreiben, Turnier-/Timer-Aktionen.</p>
       </motion.div>
 
       <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
@@ -3586,7 +3586,7 @@ const ToolsContent = ({ user, onUpdate }) => {
               value={manualMessage}
               onChange={(e) => setManualMessage(e.target.value)}
               className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-sm text-white"
-              placeholder="Nachricht fuer Twitch/Kick"
+              placeholder="Nachricht f?r Twitch/Kick"
             />
             <button
               onClick={() => runToolAction(`/api/user/${user.id}/tools/chat/test`, { message: manualMessage })}
