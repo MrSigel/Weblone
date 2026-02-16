@@ -132,6 +132,33 @@ const theme = {
   accentHover: 'hover:bg-indigo-500'
 };
 
+const landingBackgroundThemes = {
+  dark: {
+    label: 'Dark Classic',
+    siteClass: 'bg-[#050505]',
+    previewClass: 'bg-[#050505]',
+    bubbles: true
+  },
+  ocean: {
+    label: 'Ocean Blue',
+    siteClass: 'bg-gradient-to-br from-[#0b1020] via-[#10223f] to-[#0a1730]',
+    previewClass: 'bg-gradient-to-br from-[#0b1020] via-[#10223f] to-[#0a1730]',
+    bubbles: false
+  },
+  sunset: {
+    label: 'Sunset Gold',
+    siteClass: 'bg-gradient-to-br from-[#1a1020] via-[#3a1b2f] to-[#4a2a12]',
+    previewClass: 'bg-gradient-to-br from-[#1a1020] via-[#3a1b2f] to-[#4a2a12]',
+    bubbles: false
+  },
+  emerald: {
+    label: 'Emerald Night',
+    siteClass: 'bg-gradient-to-br from-[#071713] via-[#0f2a22] to-[#102720]',
+    previewClass: 'bg-gradient-to-br from-[#071713] via-[#0f2a22] to-[#102720]',
+    bubbles: false
+  }
+};
+
 // --- SHARED COMPONENTS ---
 
 const ScrollReveal = ({ children, delay = 0 }) => (
@@ -2433,6 +2460,8 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   const [settings, setSettings] = useState({
     navTitle: user?.username || '',
     slogan: '',
+    backgroundTheme: 'dark',
+    conversionBoosterEnabled: 1,
     primaryCtaText: 'Jetzt Bonus sichern',
     primaryCtaUrl: '',
     stickyCtaEnabled: 1,
@@ -2455,6 +2484,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
   const [loading, setLoading] = useState(true);
   const [isAddingPage, setIsAddingPage] = useState(false);
   const [newPage, setNewPage] = useState({ title: '', slug: '' });
+  const activeBackgroundTheme = landingBackgroundThemes[settings.backgroundTheme] || landingBackgroundThemes.dark;
 
   useEffect(() => {
     setPreviewDeals(deals || []);

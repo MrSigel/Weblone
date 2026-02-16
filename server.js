@@ -191,6 +191,8 @@ ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus si
 ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus für neue Spieler holen'");
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
+ensureColumn('streamer_site_settings', 'conversionBoosterEnabled', 'INTEGER DEFAULT 1');
+ensureColumn('streamer_site_settings', 'backgroundTheme', "TEXT DEFAULT 'dark'");
 ensureColumn('deals', 'imageUrl', "TEXT DEFAULT ''");
 ensureColumn('deals', 'promoCode', "TEXT DEFAULT 'DIEGAWINOS'");
 ensureColumn('deals', 'bonusTerms', "TEXT DEFAULT '100% Sticky - 300EUR Max Bonus - 40x Wager'");
@@ -1801,6 +1803,8 @@ app.get('/api/site/:id/settings', (req, res) => {
       ctaAUrl: '',
       ctaBText: 'Bonus für neue Spieler holen',
       ctaBUrl: '',
+      conversionBoosterEnabled: 1,
+      backgroundTheme: 'dark',
       ...(settings || {})
     }
   });
@@ -1821,13 +1825,15 @@ app.put('/api/site/:id/settings', (req, res) => {
     ctaAText,
     ctaAUrl,
     ctaBText,
-    ctaBUrl
+    ctaBUrl,
+    conversionBoosterEnabled,
+    backgroundTheme
   } = req.body || {};
   db.prepare(`
     INSERT INTO streamer_site_settings (
-      userId, navTitle, slogan, primaryCtaText, primaryCtaUrl, stickyCtaEnabled, stickyCtaText, stickyCtaUrl, trustBadgeText, urgencyText, abTestEnabled, ctaAText, ctaAUrl, ctaBText, ctaBUrl
+      userId, navTitle, slogan, primaryCtaText, primaryCtaUrl, stickyCtaEnabled, stickyCtaText, stickyCtaUrl, trustBadgeText, urgencyText, abTestEnabled, ctaAText, ctaAUrl, ctaBText, ctaBUrl, conversionBoosterEnabled, backgroundTheme
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT(userId) DO UPDATE SET
       navTitle = excluded.navTitle,
       slogan = excluded.slogan,
@@ -1842,7 +1848,9 @@ app.put('/api/site/:id/settings', (req, res) => {
       ctaAText = excluded.ctaAText,
       ctaAUrl = excluded.ctaAUrl,
       ctaBText = excluded.ctaBText,
-      ctaBUrl = excluded.ctaBUrl
+      ctaBUrl = excluded.ctaBUrl,
+      conversionBoosterEnabled = excluded.conversionBoosterEnabled,
+      backgroundTheme = excluded.backgroundTheme
   `).run(
     req.params.id,
     navTitle || '',
@@ -1858,7 +1866,9 @@ app.put('/api/site/:id/settings', (req, res) => {
     ctaAText || 'Jetzt Bonus sichern',
     ctaAUrl || '',
     ctaBText || 'Bonus für neue Spieler holen',
-    ctaBUrl || ''
+    ctaBUrl || '',
+    conversionBoosterEnabled ? 1 : 0,
+    backgroundTheme || 'dark'
   );
   res.json({ success: true });
 });
@@ -2005,6 +2015,8 @@ app.get('/api/public/site/:slug', (req, res) => {
           ctaAUrl: '',
           ctaBText: 'Bonus für neue Spieler holen',
           ctaBUrl: '',
+          conversionBoosterEnabled: 1,
+          backgroundTheme: 'dark',
           ...(settings || {})
         }, 
         pages, 
