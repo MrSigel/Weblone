@@ -281,7 +281,7 @@ const refreshTwitchAccessToken = async (refreshToken) => {
 
 const fetchTwitchMetrics = async (auth) => {
   if (!auth?.accessToken || !auth?.twitchUserId) {
-    throw new Error('Twitch Auth nicht vollstÃ¤ndig.');
+    throw new Error('Twitch Auth nicht vollst?ndig.');
   }
 
   const headers = {
@@ -303,7 +303,7 @@ const fetchTwitchMetrics = async (auth) => {
     if (subsRes.ok) {
       subs = subsData.total ?? 0;
     } else {
-      subsError = subsData.message || 'Subs nicht verfÃ¼gbar.';
+      subsError = subsData.message || 'Subs nicht verf?gbar.';
     }
   } catch (err) {
     subsError = err.message;
@@ -359,7 +359,7 @@ const collectToolChannels = (toolsConfig) => {
 const sendTwitchChatMessage = ({ botUsername, oauthToken, channel, message }) => {
   return new Promise((resolve, reject) => {
     if (!botUsername || !oauthToken || !channel || !message) {
-      return reject(new Error('Twitch-Konfiguration unvollstÃ¤ndig.'));
+      return reject(new Error('Twitch-Konfiguration unvollst?ndig.'));
     }
 
     const token = oauthToken.startsWith('oauth:') ? oauthToken : `oauth:${oauthToken}`;
@@ -577,7 +577,7 @@ app.post('/api/auth/login', (req, res) => {
   if (user && user.password === password) {
     res.json({ success: true, user: { id: user.id, email: user.email, username: user.username, isSetupComplete: user.isSetupComplete, isSuperadmin: false } });
   } else {
-    res.status(401).json({ success: false, error: 'UngÃ¼ltige Anmeldedaten.' });
+    res.status(401).json({ success: false, error: 'Ung?ltige Anmeldedaten.' });
   }
 });
 
@@ -585,7 +585,7 @@ app.post('/api/auth/register', (req, res) => {
   const { email, password, inviteCode } = req.body;
   
   if (inviteCode !== 'weblone2026!') {
-    return res.status(400).json({ success: false, error: 'UngÃ¼ltiger Einladungscode.' });
+    return res.status(400).json({ success: false, error: 'Ung?ltiger Einladungscode.' });
   }
 
   try {
@@ -1088,7 +1088,7 @@ app.post('/api/user/:id/setup', (req, res) => {
       // 5. Create a default deal
       db.prepare('DELETE FROM deals WHERE userId = ?').run(userId);
       db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-        .run(userId, 'Weblone Partner', '100% Bonus bis 500â‚¬', 'Top Deal', 'Aktiv');
+        .run(userId, 'Weblone Partner', '100% Bonus bis 500?', 'Top Deal', 'Aktiv');
 
       // 6. Create default site settings
       db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
@@ -1205,7 +1205,7 @@ app.post('/api/user/:id/social/disconnect', (req, res) => {
     delete toolsConfig.socialAuth.kick;
     delete toolsConfig.socialMetrics.kick;
   } else {
-    return res.status(400).json({ success: false, error: 'UngÃ¼ltige Platform.' });
+    return res.status(400).json({ success: false, error: 'Ung?ltige Platform.' });
   }
 
   writeUserToolsConfig(req.params.id, toolsConfig);
@@ -1222,7 +1222,7 @@ app.post('/api/user/:id/social/refresh', async (req, res) => {
     try {
       let twitchAuth = toolsConfig.socialAuth.twitch;
       if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) throw new Error('Twitch OAuth nicht konfiguriert.');
-      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollstÃ¤ndig verbunden.');
+      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollst?ndig verbunden.');
 
       if (!twitchAuth.expiresAt || twitchAuth.expiresAt <= Date.now() + 60_000) {
         const refreshed = await refreshTwitchAccessToken(twitchAuth.refreshToken);
@@ -1288,7 +1288,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
     if (minutes > 0) {
       const timeoutId = setTimeout(async () => {
         try {
-          await broadcastToolsMessage(userId, `Punkte zum Abholen fÃ¼r "${tournamentTitle}" sind jetzt verfÃ¼gbar.`);
+          await broadcastToolsMessage(userId, `Punkte zum Abholen f?r "${tournamentTitle}" sind jetzt verf?gbar.`);
         } catch (err) {
           console.error('Pickup reminder error:', err.message);
         } finally {
@@ -1306,7 +1306,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
 
 app.post('/api/user/:id/tools/tournament/pickup', async (req, res) => {
   const { message } = req.body;
-  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfÃ¼gbar.').toString().trim();
+  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verf?gbar.').toString().trim();
   try {
     const result = await broadcastToolsMessage(req.params.id, pickupMessage);
     res.json({ success: true, result });
@@ -1330,7 +1330,7 @@ app.get('/api/user/:id/tools/ad-timer/status', (req, res) => {
 app.post('/api/user/:id/tools/ad-timer/start', async (req, res) => {
   const userId = String(req.params.id);
   const intervalMinutes = Number(req.body.intervalMinutes || 15);
-  const message = (req.body.message || 'Werbung: UnterstÃ¼tze den Stream Ã¼ber die Links auf meiner Seite.').toString().trim();
+  const message = (req.body.message || 'Werbung: Unterst?tze den Stream ?ber die Links auf meiner Seite.').toString().trim();
 
   if (!Number.isFinite(intervalMinutes) || intervalMinutes < 1 || intervalMinutes > 240) {
     return res.status(400).json({ success: false, error: 'intervalMinutes muss zwischen 1 und 240 liegen.' });
@@ -1652,7 +1652,7 @@ app.put('/api/site/:id/pages/:pageId', (req, res) => {
 app.delete('/api/site/:id/pages/:pageId', (req, res) => {
   const page = db.prepare('SELECT type FROM streamer_pages WHERE id = ? AND userId = ?').get(req.params.pageId, req.params.id);
   if (page?.type === 'system') {
-    return res.status(400).json({ success: false, error: 'Systemseiten kÃ¶nnen nicht gelÃ¶scht werden.' });
+    return res.status(400).json({ success: false, error: 'Systemseiten k?nnen nicht gel?scht werden.' });
   }
   db.prepare('DELETE FROM streamer_pages WHERE id = ? AND userId = ?').run(req.params.pageId, req.params.id);
   db.prepare('DELETE FROM page_blocks WHERE pageId = ?').run(req.params.pageId);
