@@ -1912,14 +1912,25 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             </button>
             {step < 6 && (
               <button
-                onClick={() => setStep((s) => Math.min(6, s + 1))}
-                disabled={saving}
+                onClick={() => {
+                  const msg = getStepError(step);
+                  if (msg) {
+                    setError(msg);
+                    return;
+                  }
+                  setError('');
+                  setStep((s) => Math.min(6, s + 1));
+                }}
+                disabled={saving || !!currentStepError || (step === 0 && slugState.checking)}
                 className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 disabled:opacity-50"
               >
                 Weiter
               </button>
             )}
           </div>
+          {!!currentStepError && step < 6 && (
+            <p className="text-xs text-amber-300">{currentStepError}</p>
+          )}
         </div>
       </div>
     </div>
