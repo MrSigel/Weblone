@@ -2902,23 +2902,31 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h2 className="text-xl font-bold text-white">Inhalt: {activePage?.title}</h2>
-                <p className="text-xs text-[#A1A1A1]">Verwalte die Blöcke dieser Seite.</p>
+                <p className="text-xs text-[#A1A1A1]">
+                  {isCasinoPage ? 'Diese feste Seite wird automatisch aus aktiven Deals erzeugt.' : 'Verwalte die Bl?cke dieser Seite.'}
+                </p>
               </div>
-              <div className="flex gap-2">
-                {['Hero', 'Text', 'Button', 'LinkList'].map(type => (
-                  <button 
-                    key={type}
-                    onClick={() => addBlock(type)}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-white hover:bg-white/10 transition-all uppercase tracking-wider"
-                  >
-                    + {type}
-                  </button>
-                ))}
-              </div>
+              {!isCasinoPage && (
+                <div className="flex gap-2">
+                  {['Hero', 'Text', 'Button', 'LinkList'].map(type => (
+                    <button 
+                      key={type}
+                      onClick={() => addBlock(type)}
+                      className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-[10px] font-bold text-white hover:bg-white/10 transition-all uppercase tracking-wider"
+                    >
+                      + {type}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div className="space-y-4 flex-1">
-              {blocks.length === 0 ? (
+              {isCasinoPage ? (
+                <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
+                  Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                </div>
+              ) : blocks.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-white/10">
                   <Layers size={48} className="mb-4" />
                   <p className="font-bold">Keine Blöcke vorhanden</p>
