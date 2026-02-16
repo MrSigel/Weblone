@@ -2978,7 +2978,7 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               {isCasinoPage ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
-                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte können hier nicht manuell als Block hinzugefügt werden.
                   </div>
                   {(previewDeals || []).length === 0 ? (
                     <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
@@ -3080,7 +3080,7 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
     <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-[#A1A1A1] uppercase tracking-wider">Live Vorschau</h3>
-        <span className="text-xs text-[#A1A1A1]">?nderungen erscheinen sofort</span>
+        <span className="text-xs text-[#A1A1A1]">Änderungen erscheinen sofort</span>
       </div>
 
       <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#050505]">
