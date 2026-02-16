@@ -3642,7 +3642,7 @@ const ToolsContent = ({ user, onUpdate }) => {
       }
       const attempted = result.result?.attempted ?? 0;
       const errorCount = result.result?.errors?.length ?? 0;
-      setStatus(`Gesendet an ${attempted} Kanal/Kan?le${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
+      setStatus(`Gesendet an ${attempted} Kanal/Kanäle${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
     } catch (err) {
       setStatus('Aktion fehlgeschlagen.');
     }
@@ -4602,27 +4602,27 @@ const SuperAdminPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">User</p>
-              <p className="text-2xl font-bold">{analytics?.totalUsers ? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.totalUsers ?? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Setup Rate</p>
-              <p className="text-2xl font-bold">{analytics?.setupRate ? '-'}%</p>
+              <p className="text-2xl font-bold">{analytics?.setupRate ?? '-'}%</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Aktive Deals</p>
-              <p className="text-2xl font-bold">{analytics?.activeDeals ? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.activeDeals ?? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Offene Tickets</p>
-              <p className="text-2xl font-bold">{analytics?.openTickets ? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.openTickets ?? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Pending Payouts</p>
-              <p className="text-2xl font-bold">{analytics?.pendingPayouts ? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.pendingPayouts ?? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Bots Online</p>
-              <p className="text-2xl font-bold">{analytics?.botOnline ? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.botOnline ?? '-'}</p>
             </div>
           </div>
         </section>
@@ -4666,7 +4666,7 @@ const SuperAdminPage = () => {
                     />
                   </div>
                   <p className="text-xs mt-2">
-                    Health: <span className={`${(u.health?.score ? 0) >= 70 ? 'text-emerald-400' : 'text-amber-300'}`}>{u.health?.score ? 0}%</span>
+                    Health: <span className={`${(u.health?.score ?? 0) >= 70 ? 'text-emerald-400' : 'text-amber-300'}`}>{u.health?.score ?? 0}%</span>
                   </p>
                 </div>
               ))}
@@ -4751,7 +4751,7 @@ const SuperAdminPage = () => {
 
                 <div className="p-4 rounded-xl border border-white/10 bg-white/5">
                   <p className="font-bold mb-2">User Health</p>
-                  <p className="text-sm">Score: <span className="text-indigo-300">{selectedData.health?.score ? 0}%</span></p>
+                  <p className="text-sm">Score: <span className="text-indigo-300">{selectedData.health?.score ?? 0}%</span></p>
                   <p className="text-xs text-[#A1A1A1] mt-1">Flags: {(selectedData.health?.flags || []).join(', ') || 'none'}</p>
                 </div>
 
