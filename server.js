@@ -1,7 +1,8 @@
-import express from 'express';
+﻿import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import tls from 'tls';
+import { randomBytes } from 'crypto';
 import Database from 'better-sqlite3';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -21,9 +22,14 @@ const DB_PATH = process.env.DATABASE_PATH || path.join(__dirname, 'leads.db');
 const SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL || 'admin@weblone2026.com';
 const SUPERADMIN_PASSWORD = process.env.SUPERADMIN_PASSWORD || 'graecodesigns.de2026!';
 const SUPERADMIN_SESSION_TOKEN = process.env.SUPERADMIN_SESSION_TOKEN || 'superadmin-session-token-2026';
+const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID || '';
+const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET || '';
+const TWITCH_REDIRECT_URI = process.env.TWITCH_REDIRECT_URI || '';
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || '';
 const adTimerJobs = new Map();
 const pickupReminderJobs = new Map();
 const chatReaderSessions = new Map();
+const pendingTwitchAuthStates = new Map();
 
 // DB Initialization
 const db = new Database(DB_PATH);
@@ -134,6 +140,121 @@ const readUserToolsConfig = (userId) => {
   }
 };
 
+const writeUserToolsConfig = (userId, toolsConfig) => {
+  db.prepare('UPDATE users SET toolsConfig = ? WHERE id = ?')
+    .run(JSON.stringify(toolsConfig || {}), userId);
+};
+
+const resolveFrontendBase = (req) => {
+  if (FRONTEND_BASE_URL) return FRONTEND_BASE_URL.replace(/\/$/, '');
+  return `${req.protocol}://${req.get('host')}`;
+};
+
+const resolveTwitchRedirectUri = (req) => {
+  if (TWITCH_REDIRECT_URI) return TWITCH_REDIRECT_URI;
+  return `${req.protocol}://${req.get('host')}/api/social/twitch/callback`;
+};
+
+const twitchScopes = [
+  'user:read:email',
+  'moderator:read:followers',
+  'channel:read:subscriptions'
+];
+
+const parseKickFollowers = (payload) => (
+  payload?.followersCount ??
+  payload?.followers_count ??
+  payload?.followers ??
+  payload?.subscriber_count ??
+  0
+);
+
+const parseKickSubs = (payload) => (
+  payload?.subscribersCount ??
+  payload?.subscribers_count ??
+  payload?.subscribers ??
+  null
+);
+
+const refreshTwitchAccessToken = async (refreshToken) => {
+  const params = new URLSearchParams();
+  params.set('client_id', TWITCH_CLIENT_ID);
+  params.set('client_secret', TWITCH_CLIENT_SECRET);
+  params.set('grant_type', 'refresh_token');
+  params.set('refresh_token', refreshToken);
+
+  const response = await fetch('https://id.twitch.tv/oauth2/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString()
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || 'Twitch Token Refresh fehlgeschlagen.');
+  }
+  return data;
+};
+
+const fetchTwitchMetrics = async (auth) => {
+  if (!auth?.accessToken || !auth?.twitchUserId) {
+    throw new Error('Twitch Auth nicht vollstÃ¤ndig.');
+  }
+
+  const headers = {
+    'Client-Id': TWITCH_CLIENT_ID,
+    Authorization: `Bearer ${auth.accessToken}`
+  };
+
+  const followersRes = await fetch(`https://api.twitch.tv/helix/channels/followers?broadcaster_id=${encodeURIComponent(auth.twitchUserId)}&first=100`, { headers });
+  const followersData = await followersRes.json();
+  if (!followersRes.ok) {
+    throw new Error(followersData.message || 'Follower konnten nicht geladen werden.');
+  }
+
+  let subs = null;
+  let subsError = null;
+  try {
+    const subsRes = await fetch(`https://api.twitch.tv/helix/subscriptions?broadcaster_id=${encodeURIComponent(auth.twitchUserId)}&first=1`, { headers });
+    const subsData = await subsRes.json();
+    if (subsRes.ok) {
+      subs = subsData.total ?? 0;
+    } else {
+      subsError = subsData.message || 'Subs nicht verfÃ¼gbar.';
+    }
+  } catch (err) {
+    subsError = err.message;
+  }
+
+  const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
+  const newFollowers24h = Array.isArray(followersData.data)
+    ? followersData.data.filter((f) => new Date(f.followed_at).getTime() >= dayAgo).length
+    : 0;
+
+  return {
+    followers: followersData.total ?? 0,
+    subs,
+    subsError,
+    newFollowers24h,
+    lastSync: new Date().toISOString()
+  };
+};
+
+const fetchKickMetrics = async (channel) => {
+  if (!channel) throw new Error('Kick Channel fehlt.');
+  const response = await fetch(`https://kick.com/api/v2/channels/${encodeURIComponent(channel)}`);
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload?.message || 'Kick Daten konnten nicht geladen werden.');
+  }
+
+  return {
+    followers: parseKickFollowers(payload),
+    subs: parseKickSubs(payload),
+    newFollowers24h: null,
+    lastSync: new Date().toISOString()
+  };
+};
+
 const collectToolChannels = (toolsConfig) => {
   const toolIds = ['bonushunt', 'wagerbar', 'slottracker', 'tournament'];
   const twitch = new Set();
@@ -154,7 +275,7 @@ const collectToolChannels = (toolsConfig) => {
 const sendTwitchChatMessage = ({ botUsername, oauthToken, channel, message }) => {
   return new Promise((resolve, reject) => {
     if (!botUsername || !oauthToken || !channel || !message) {
-      return reject(new Error('Twitch-Konfiguration unvollständig.'));
+      return reject(new Error('Twitch-Konfiguration unvollstÃ¤ndig.'));
     }
 
     const token = oauthToken.startsWith('oauth:') ? oauthToken : `oauth:${oauthToken}`;
@@ -353,12 +474,26 @@ const startTwitchChatReader = (userId) => {
 
 app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body;
+
+  if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
+    return res.json({
+      success: true,
+      user: {
+        id: 'superadmin',
+        email: SUPERADMIN_EMAIL,
+        username: 'SuperAdmin',
+        isSetupComplete: 1,
+        isSuperadmin: true
+      }
+    });
+  }
+
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
   
   if (user && user.password === password) {
-    res.json({ success: true, user: { id: user.id, email: user.email, username: user.username, isSetupComplete: user.isSetupComplete } });
+    res.json({ success: true, user: { id: user.id, email: user.email, username: user.username, isSetupComplete: user.isSetupComplete, isSuperadmin: false } });
   } else {
-    res.status(401).json({ success: false, error: 'Ungültige Anmeldedaten.' });
+    res.status(401).json({ success: false, error: 'UngÃ¼ltige Anmeldedaten.' });
   }
 });
 
@@ -366,7 +501,7 @@ app.post('/api/auth/register', (req, res) => {
   const { email, password, inviteCode } = req.body;
   
   if (inviteCode !== 'weblone2026!') {
-    return res.status(400).json({ success: false, error: 'Ungültiger Einladungscode.' });
+    return res.status(400).json({ success: false, error: 'UngÃ¼ltiger Einladungscode.' });
   }
 
   try {
@@ -377,12 +512,90 @@ app.post('/api/auth/register', (req, res) => {
   }
 });
 
+app.get('/api/social/twitch/start', (req, res) => {
+  const userId = String(req.query.userId || '').trim();
+  if (!userId) return res.status(400).send('userId fehlt.');
+  if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) return res.status(500).send('Twitch OAuth ist nicht konfiguriert.');
+
+  const state = randomBytes(24).toString('hex');
+  pendingTwitchAuthStates.set(state, { userId, expiresAt: Date.now() + (10 * 60 * 1000) });
+  const redirectUri = resolveTwitchRedirectUri(req);
+
+  const params = new URLSearchParams();
+  params.set('client_id', TWITCH_CLIENT_ID);
+  params.set('redirect_uri', redirectUri);
+  params.set('response_type', 'code');
+  params.set('scope', twitchScopes.join(' '));
+  params.set('state', state);
+
+  res.redirect(`https://id.twitch.tv/oauth2/authorize?${params.toString()}`);
+});
+
+app.get('/api/social/twitch/callback', async (req, res) => {
+  const { code, state, error, error_description } = req.query;
+  const frontend = resolveFrontendBase(req);
+
+  if (error) {
+    return res.redirect(`${frontend}/dashboard?social_error=${encodeURIComponent(String(error_description || error))}`);
+  }
+
+  const stateData = pendingTwitchAuthStates.get(String(state || ''));
+  pendingTwitchAuthStates.delete(String(state || ''));
+  if (!stateData || stateData.expiresAt < Date.now()) {
+    return res.redirect(`${frontend}/dashboard?social_error=invalid_state`);
+  }
+
+  try {
+    const tokenParams = new URLSearchParams();
+    tokenParams.set('client_id', TWITCH_CLIENT_ID);
+    tokenParams.set('client_secret', TWITCH_CLIENT_SECRET);
+    tokenParams.set('code', String(code || ''));
+    tokenParams.set('grant_type', 'authorization_code');
+    tokenParams.set('redirect_uri', resolveTwitchRedirectUri(req));
+
+    const tokenResponse = await fetch('https://id.twitch.tv/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: tokenParams.toString()
+    });
+    const tokenData = await tokenResponse.json();
+    if (!tokenResponse.ok) throw new Error(tokenData.message || 'Twitch Token Request fehlgeschlagen.');
+
+    const userResponse = await fetch('https://api.twitch.tv/helix/users', {
+      headers: {
+        'Client-Id': TWITCH_CLIENT_ID,
+        Authorization: `Bearer ${tokenData.access_token}`
+      }
+    });
+    const userData = await userResponse.json();
+    if (!userResponse.ok || !userData?.data?.[0]) throw new Error(userData.message || 'Twitch Userdaten konnten nicht geladen werden.');
+    const twitchUser = userData.data[0];
+
+    const toolsConfig = readUserToolsConfig(stateData.userId);
+    toolsConfig.socialAuth = toolsConfig.socialAuth || {};
+    toolsConfig.socialAuth.twitch = {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token,
+      expiresAt: Date.now() + ((tokenData.expires_in || 0) * 1000),
+      twitchUserId: twitchUser.id,
+      login: twitchUser.login,
+      displayName: twitchUser.display_name,
+      profileImageUrl: twitchUser.profile_image_url
+    };
+    writeUserToolsConfig(stateData.userId, toolsConfig);
+
+    res.redirect(`${frontend}/dashboard?social=twitch_connected`);
+  } catch (err) {
+    res.redirect(`${frontend}/dashboard?social_error=${encodeURIComponent(err.message)}`);
+  }
+});
+
 app.post('/api/superadmin/login', (req, res) => {
   const { email, password } = req.body;
   if (email === SUPERADMIN_EMAIL && password === SUPERADMIN_PASSWORD) {
     return res.json({ success: true, token: SUPERADMIN_SESSION_TOKEN, user: { email: SUPERADMIN_EMAIL } });
   }
-  res.status(401).json({ success: false, error: 'Ungültige Superadmin-Zugangsdaten.' });
+  res.status(401).json({ success: false, error: 'UngÃ¼ltige Superadmin-Zugangsdaten.' });
 });
 
 const requireSuperadmin = (req, res, next) => {
@@ -521,7 +734,7 @@ app.post('/api/user/:id/setup', (req, res) => {
       // 5. Create a default deal
       db.prepare('DELETE FROM deals WHERE userId = ?').run(userId);
       db.prepare('INSERT INTO deals (userId, name, deal, performance, status) VALUES (?, ?, ?, ?, ?)')
-        .run(userId, 'Weblone Partner', '100% Bonus bis 500€', 'Top Deal', 'Aktiv');
+        .run(userId, 'Weblone Partner', '100% Bonus bis 500â‚¬', 'Top Deal', 'Aktiv');
 
       // 6. Create default site settings
       db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
@@ -605,6 +818,91 @@ app.post('/api/user/:id/tools', (req, res) => {
   }
 });
 
+app.post('/api/user/:id/social/kick/connect', async (req, res) => {
+  const { channel } = req.body;
+  const normalizedChannel = String(channel || '').trim().toLowerCase();
+  if (!normalizedChannel) {
+    return res.status(400).json({ success: false, error: 'Kick Channel ist erforderlich.' });
+  }
+  try {
+    const metrics = await fetchKickMetrics(normalizedChannel);
+    const toolsConfig = readUserToolsConfig(req.params.id);
+    toolsConfig.socialAuth = toolsConfig.socialAuth || {};
+    toolsConfig.socialAuth.kick = { channel: normalizedChannel, connectedAt: new Date().toISOString() };
+    toolsConfig.socialMetrics = toolsConfig.socialMetrics || {};
+    toolsConfig.socialMetrics.kick = metrics;
+    writeUserToolsConfig(req.params.id, toolsConfig);
+    res.json({ success: true, metrics });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/user/:id/social/disconnect', (req, res) => {
+  const { platform } = req.body;
+  const toolsConfig = readUserToolsConfig(req.params.id);
+  toolsConfig.socialAuth = toolsConfig.socialAuth || {};
+  toolsConfig.socialMetrics = toolsConfig.socialMetrics || {};
+
+  if (platform === 'twitch') {
+    delete toolsConfig.socialAuth.twitch;
+    delete toolsConfig.socialMetrics.twitch;
+  } else if (platform === 'kick') {
+    delete toolsConfig.socialAuth.kick;
+    delete toolsConfig.socialMetrics.kick;
+  } else {
+    return res.status(400).json({ success: false, error: 'UngÃ¼ltige Platform.' });
+  }
+
+  writeUserToolsConfig(req.params.id, toolsConfig);
+  res.json({ success: true });
+});
+
+app.post('/api/user/:id/social/refresh', async (req, res) => {
+  const toolsConfig = readUserToolsConfig(req.params.id);
+  toolsConfig.socialAuth = toolsConfig.socialAuth || {};
+  toolsConfig.socialMetrics = toolsConfig.socialMetrics || {};
+  const result = { twitch: null, kick: null, errors: [] };
+
+  if (toolsConfig.socialAuth.twitch) {
+    try {
+      let twitchAuth = toolsConfig.socialAuth.twitch;
+      if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) throw new Error('Twitch OAuth nicht konfiguriert.');
+      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollstÃ¤ndig verbunden.');
+
+      if (!twitchAuth.expiresAt || twitchAuth.expiresAt <= Date.now() + 60_000) {
+        const refreshed = await refreshTwitchAccessToken(twitchAuth.refreshToken);
+        twitchAuth = {
+          ...twitchAuth,
+          accessToken: refreshed.access_token,
+          refreshToken: refreshed.refresh_token || twitchAuth.refreshToken,
+          expiresAt: Date.now() + ((refreshed.expires_in || 0) * 1000)
+        };
+        toolsConfig.socialAuth.twitch = twitchAuth;
+      }
+
+      const twitchMetrics = await fetchTwitchMetrics(twitchAuth);
+      toolsConfig.socialMetrics.twitch = twitchMetrics;
+      result.twitch = twitchMetrics;
+    } catch (err) {
+      result.errors.push(`Twitch: ${err.message}`);
+    }
+  }
+
+  if (toolsConfig.socialAuth.kick?.channel) {
+    try {
+      const kickMetrics = await fetchKickMetrics(toolsConfig.socialAuth.kick.channel);
+      toolsConfig.socialMetrics.kick = kickMetrics;
+      result.kick = kickMetrics;
+    } catch (err) {
+      result.errors.push(`Kick: ${err.message}`);
+    }
+  }
+
+  writeUserToolsConfig(req.params.id, toolsConfig);
+  res.json({ success: true, result, socialAuth: toolsConfig.socialAuth, socialMetrics: toolsConfig.socialMetrics });
+});
+
 app.post('/api/user/:id/tools/chat/test', async (req, res) => {
   const { message } = req.body;
   if (!message || !String(message).trim()) {
@@ -636,7 +934,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
     if (minutes > 0) {
       const timeoutId = setTimeout(async () => {
         try {
-          await broadcastToolsMessage(userId, `Punkte zum Abholen für "${tournamentTitle}" sind jetzt verfügbar.`);
+          await broadcastToolsMessage(userId, `Punkte zum Abholen fÃ¼r "${tournamentTitle}" sind jetzt verfÃ¼gbar.`);
         } catch (err) {
           console.error('Pickup reminder error:', err.message);
         } finally {
@@ -654,7 +952,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
 
 app.post('/api/user/:id/tools/tournament/pickup', async (req, res) => {
   const { message } = req.body;
-  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfügbar.').toString().trim();
+  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfÃ¼gbar.').toString().trim();
   try {
     const result = await broadcastToolsMessage(req.params.id, pickupMessage);
     res.json({ success: true, result });
@@ -678,7 +976,7 @@ app.get('/api/user/:id/tools/ad-timer/status', (req, res) => {
 app.post('/api/user/:id/tools/ad-timer/start', async (req, res) => {
   const userId = String(req.params.id);
   const intervalMinutes = Number(req.body.intervalMinutes || 15);
-  const message = (req.body.message || 'Werbung: Unterstütze den Stream über die Links auf meiner Seite.').toString().trim();
+  const message = (req.body.message || 'Werbung: UnterstÃ¼tze den Stream Ã¼ber die Links auf meiner Seite.').toString().trim();
 
   if (!Number.isFinite(intervalMinutes) || intervalMinutes < 1 || intervalMinutes > 240) {
     return res.status(400).json({ success: false, error: 'intervalMinutes muss zwischen 1 und 240 liegen.' });
@@ -854,6 +1152,12 @@ app.get('/api/user/:id/dashboard', (req, res) => {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
     const blocks = db.prepare('SELECT * FROM site_blocks WHERE userId = ? ORDER BY orderIndex ASC').all(req.params.id);
     const userDeals = db.prepare('SELECT * FROM deals WHERE userId = ?').all(req.params.id);
+    let toolsConfig = {};
+    try {
+      toolsConfig = user?.toolsConfig ? JSON.parse(user.toolsConfig) : {};
+    } catch (err) {
+      toolsConfig = {};
+    }
     
     // Echte Statistiken (initial 0)
     const stats = {
@@ -862,8 +1166,25 @@ app.get('/api/user/:id/dashboard', (req, res) => {
       conversions: 0,
       conversionsChange: '0%'
     };
+
+    const social = {
+      twitchConnected: !!toolsConfig?.socialAuth?.twitch,
+      kickConnected: !!toolsConfig?.socialAuth?.kick,
+      twitch: toolsConfig?.socialMetrics?.twitch || null,
+      kick: toolsConfig?.socialMetrics?.kick || null,
+      twitchAccount: toolsConfig?.socialAuth?.twitch
+        ? {
+            login: toolsConfig.socialAuth.twitch.login,
+            displayName: toolsConfig.socialAuth.twitch.displayName,
+            profileImageUrl: toolsConfig.socialAuth.twitch.profileImageUrl
+          }
+        : null,
+      kickAccount: toolsConfig?.socialAuth?.kick
+        ? { channel: toolsConfig.socialAuth.kick.channel }
+        : null
+    };
     
-    res.json({ success: true, data: { user, blocks, deals: userDeals, stats } });
+    res.json({ success: true, data: { user, blocks, deals: userDeals, stats, social } });
   } catch (err) {
     console.error('Dashboard Error:', err);
     res.status(500).json({ success: false, error: err.message });
@@ -908,7 +1229,7 @@ app.put('/api/site/:id/pages/:pageId', (req, res) => {
 app.delete('/api/site/:id/pages/:pageId', (req, res) => {
   const page = db.prepare('SELECT type FROM streamer_pages WHERE id = ? AND userId = ?').get(req.params.pageId, req.params.id);
   if (page?.type === 'system') {
-    return res.status(400).json({ success: false, error: 'Systemseiten können nicht gelöscht werden.' });
+    return res.status(400).json({ success: false, error: 'Systemseiten kÃ¶nnen nicht gelÃ¶scht werden.' });
   }
   db.prepare('DELETE FROM streamer_pages WHERE id = ? AND userId = ?').run(req.params.pageId, req.params.id);
   db.prepare('DELETE FROM page_blocks WHERE pageId = ?').run(req.params.pageId);
@@ -1069,3 +1390,4 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+

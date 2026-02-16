@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useParams } from 'react-router-dom';
 import { 
   ArrowRight, 
@@ -52,7 +52,7 @@ const GlobeBackground = () => {
         fill="none" 
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Längengrade */}
+        {/* LÃ¤ngengrade */}
         <ellipse cx="300" cy="300" rx="250" ry="250" stroke="white" strokeWidth="0.5" />
         <ellipse cx="300" cy="300" rx="180" ry="250" stroke="white" strokeWidth="0.5" />
         <ellipse cx="300" cy="300" rx="100" ry="250" stroke="white" strokeWidth="0.5" />
@@ -349,10 +349,10 @@ const Home = () => {
             <div className="max-w-4xl">
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tighter text-[#EDEDED] mb-8 leading-[1.1]">
                   Die professionelle Zentrale <br />
-                  für deinen <span className="text-indigo-500">Stream.</span>
+                  fÃ¼r deinen <span className="text-indigo-500">Stream.</span>
                 </h1>
                 <p className="text-lg md:text-xl text-[#A1A1A1] mb-12 leading-relaxed max-w-xl">
-                  Etabliere deine eigene Marke, verwalte deine Partnerschaften effizient und biete deiner Community ein interaktives Zuhause – Website + Dashboard.
+                  Etabliere deine eigene Marke, verwalte deine Partnerschaften effizient und biete deiner Community ein interaktives Zuhause â€“ Website + Dashboard.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 mb-16">
                   <Link to="/register" className="bg-[#EDEDED] text-[#050505] px-8 py-4 rounded-full font-bold text-lg flex items-center justify-center gap-2 hover:bg-[#D4D4D4] transition-all group">
@@ -366,7 +366,7 @@ const Home = () => {
                   transition={{ delay: 0.5, duration: 1 }}
                   className="flex items-center gap-8 pt-8 border-t border-[#1A1A1A]"
                 >
-                  <span className="text-sm font-bold tracking-widest text-[#A1A1A1]">OPTIMIERT FÜR</span>
+                  <span className="text-sm font-bold tracking-widest text-[#A1A1A1]">OPTIMIERT FÃœR</span>
                   <div className="flex items-center gap-6">
                     <a href="https://twitch.tv" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity">
                       <svg className="h-6 w-auto" viewBox="0 0 24 28" xmlns="http://www.w3.org/2000/svg">
@@ -413,7 +413,7 @@ const Home = () => {
             <SectionHeader 
               label="Features"
               title="Alles, was du zum Wachsen brauchst."
-              subtitle="Eine umfassende Suite an Tools, entwickelt für höchste Performance und maximale Conversion."
+              subtitle="Eine umfassende Suite an Tools, entwickelt fÃ¼r hÃ¶chste Performance und maximale Conversion."
             />
           </ScrollReveal>
           <div className="grid md:grid-cols-3 gap-6">
@@ -421,7 +421,7 @@ const Home = () => {
               index={0}
               icon={Globe}
               title="Eigene Creator-Website"
-              description="Erstelle in Minuten eine vollwertige Webpräsenz mit integriertem Shop, Giveaways und Partner-Landingpages."
+              description="Erstelle in Minuten eine vollwertige WebprÃ¤senz mit integriertem Shop, Giveaways und Partner-Landingpages."
             />
             <FeatureCard 
               index={1}
@@ -433,7 +433,7 @@ const Home = () => {
               index={2}
               icon={Zap}
               title="Twitch/Kick Anbindung"
-              description="Verbinde deine Accounts direkt. Unser Bot übernimmt die Chat-Analyse und liefert Community-Insights."
+              description="Verbinde deine Accounts direkt. Unser Bot Ã¼bernimmt die Chat-Analyse und liefert Community-Insights."
             />
             <FeatureCard 
               index={3}
@@ -445,13 +445,13 @@ const Home = () => {
               index={4}
               icon={BarChart3}
               title="Deals & Monetarisierung"
-              description="Nutze vordefinierte Deals und verwalte deine Partnerschaften über ein hochpräzises Postback-System."
+              description="Nutze vordefinierte Deals und verwalte deine Partnerschaften Ã¼ber ein hochprÃ¤zises Postback-System."
             />
             <FeatureCard 
               index={5}
               icon={Activity}
               title="Live-Tracking"
-              description="Behalte deine Einnahmen und Conversions in Echtzeit im Blick – mit chirurgischer Präzision."
+              description="Behalte deine Einnahmen und Conversions in Echtzeit im Blick â€“ mit chirurgischer PrÃ¤zision."
             />
           </div>
         </div>
@@ -501,7 +501,7 @@ const Home = () => {
                 <SectionHeader 
                   label="Werde Casino-Streamer"
                   title="Dein Weg zum Slot-Profi."
-                  subtitle="Die größten Schwierigkeiten als Slot-Streamer sind der Content, ein sauberes Overlay und auch die entsprechenden Sponsoren."
+                  subtitle="Die grÃ¶ÃŸten Schwierigkeiten als Slot-Streamer sind der Content, ein sauberes Overlay und auch die entsprechenden Sponsoren."
                 />
                 <motion.p 
                   initial={{ opacity: 0 }}
@@ -510,7 +510,7 @@ const Home = () => {
                   transition={{ delay: 0.3 }}
                   className="text-[#A1A1A1] leading-relaxed mb-8"
                 >
-                  Dennoch ist jeder dieser Punkte notwendig, um einen hoch qualitativen Stream zu bieten. Weblone liefert dir die Infrastruktur, um genau diese Hürden zu meistern.
+                  Dennoch ist jeder dieser Punkte notwendig, um einen hoch qualitativen Stream zu bieten. Weblone liefert dir die Infrastruktur, um genau diese HÃ¼rden zu meistern.
                 </motion.p>
               </div>
             </div>
@@ -529,9 +529,9 @@ const Home = () => {
             />
             <div className="grid md:grid-cols-4 gap-12 text-center">
               {[
-                { step: '01', title: 'Anmeldung & Check', desc: 'Registriere dich auf Weblone und lass deinen Kanal von unserem Expertenteam prüfen.' },
+                { step: '01', title: 'Anmeldung & Check', desc: 'Registriere dich auf Weblone und lass deinen Kanal von unserem Expertenteam prÃ¼fen.' },
                 { step: '02', title: 'Setup & Design', desc: 'Wir richten dein All-in-One Paket ein und erstellen deine personalisierten Overlays & Designs.' },
-                { step: '03', title: 'Deals & Sponsoren', desc: 'Wähle aus unseren exklusiven Casino-Deals und starte deine profitablen Partnerschaften.' },
+                { step: '03', title: 'Deals & Sponsoren', desc: 'WÃ¤hle aus unseren exklusiven Casino-Deals und starte deine profitablen Partnerschaften.' },
                 { step: '04', title: 'Live & Profit', desc: 'Geh live mit vollem Support und erhalte deine automatisierten Auszahlungen direkt aufs Dashboard.' }
               ].map((item, i) => (
                 <div 
@@ -554,7 +554,7 @@ const Home = () => {
           <ScrollReveal>
             <SectionHeader 
               label="Benefits"
-              title="Alle Vorteile im Überblick."
+              title="Alle Vorteile im Ãœberblick."
             />
           </ScrollReveal>
         </div>
@@ -574,13 +574,13 @@ const Home = () => {
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="flex gap-6">
                   {[
-                    { title: 'Einfach nur Streamen', desc: 'Du kannst dich voll und ganz auf das Streamen konzentrieren. Um alles andere kümmern wir uns!' },
-                    { title: 'Die Software', desc: 'Wir haben ein komplettes All-in-One Paket nur für Slotstreamer entwickelt. Du profitierst von unserem technischen Know-How!' },
-                    { title: 'Pünktliche Auszahlungen', desc: 'Wir zahlen automatisiert an jedem 15. des Monats über unser Dashboard aus. Verlässlich und pünktlich.' },
-                    { title: 'Die besten Casino-Deals', desc: 'Ein einziger Ansprechpartner für alle deine Casino-Deals. Übersichtlich und transparent.' },
-                    { title: 'Qualitätsberatung', desc: 'Regelmäßige Konversationen um gemeinsam Lösungen zu finden. Kontinuierliche Verbesserung ist das Geheimnis.' },
+                    { title: 'Einfach nur Streamen', desc: 'Du kannst dich voll und ganz auf das Streamen konzentrieren. Um alles andere kÃ¼mmern wir uns!' },
+                    { title: 'Die Software', desc: 'Wir haben ein komplettes All-in-One Paket nur fÃ¼r Slotstreamer entwickelt. Du profitierst von unserem technischen Know-How!' },
+                    { title: 'PÃ¼nktliche Auszahlungen', desc: 'Wir zahlen automatisiert an jedem 15. des Monats Ã¼ber unser Dashboard aus. VerlÃ¤sslich und pÃ¼nktlich.' },
+                    { title: 'Die besten Casino-Deals', desc: 'Ein einziger Ansprechpartner fÃ¼r alle deine Casino-Deals. Ãœbersichtlich und transparent.' },
+                    { title: 'QualitÃ¤tsberatung', desc: 'RegelmÃ¤ÃŸige Konversationen um gemeinsam LÃ¶sungen zu finden. Kontinuierliche Verbesserung ist das Geheimnis.' },
                     { title: 'Starthilfe', desc: 'Unser Netzwerk aus Slotstreamern hilft jedem Neuling durch Raids, Hosts und Shoutouts.' },
-                    { title: 'Persönlicher Support', desc: 'Unser Team nimmt sich zu allen Zeiten deinen Problemen an. Ein Ansprechpartner für alle Fälle.' },
+                    { title: 'PersÃ¶nlicher Support', desc: 'Unser Team nimmt sich zu allen Zeiten deinen Problemen an. Ein Ansprechpartner fÃ¼r alle FÃ¤lle.' },
                     { title: 'Designs', desc: 'Ein Designer plant deinen kompletten Auftritt: Overlays, Banner, Animationen und Alerts.' }
                   ].map((adv, idx) => (
                     <div 
@@ -607,7 +607,7 @@ const Home = () => {
                 <SectionHeader 
                   label="Monetarisierung"
                   title="Wie werde ich bezahlt?"
-                  subtitle="Wir bieten zwei verschiedene Möglichkeiten an, um deine Einnahmen zu maximieren."
+                  subtitle="Wir bieten zwei verschiedene MÃ¶glichkeiten an, um deine Einnahmen zu maximieren."
                 />
                 <div className="space-y-8">
                   <div className="flex gap-4">
@@ -617,7 +617,7 @@ const Home = () => {
                     <div>
                       <h4 className="text-[#EDEDED] font-bold mb-2">Monatliches Fixum</h4>
                       <p className="text-[#A1A1A1] text-sm leading-relaxed">
-                        Bekannteren Streamern bieten wir eine monatliche Summe an, welche je nach Größe und Reichweite deines Kanals variieren kann.
+                        Bekannteren Streamern bieten wir eine monatliche Summe an, welche je nach GrÃ¶ÃŸe und Reichweite deines Kanals variieren kann.
                       </p>
                     </div>
                   </div>
@@ -627,9 +627,9 @@ const Home = () => {
                       <BarChart3 size={24} />
                     </div>
                     <div>
-                      <h4 className="text-[#EDEDED] font-bold mb-2">CPA-Vergütung</h4>
+                      <h4 className="text-[#EDEDED] font-bold mb-2">CPA-VergÃ¼tung</h4>
                       <p className="text-[#A1A1A1] text-sm leading-relaxed">
-                        Alternativ kannst du nach Ersteinzahlungen (FTDs) verrechnen. Du wirst für jeden neuen Spieler, der eine Einzahlung tätigt, entsprechend vergütet.
+                        Alternativ kannst du nach Ersteinzahlungen (FTDs) verrechnen. Du wirst fÃ¼r jeden neuen Spieler, der eine Einzahlung tÃ¤tigt, entsprechend vergÃ¼tet.
                       </p>
                     </div>
                   </div>
@@ -678,16 +678,16 @@ const Home = () => {
             <SectionHeader 
               center
               label="FAQ"
-              title="Häufig gestellte Fragen."
+              title="HÃ¤ufig gestellte Fragen."
             />
             <div className="space-y-2">
               {[
-                { q: 'Benötige ich Programmierkenntnisse?', a: 'Nein. Das gesamte System ist als No-Code-Plattform konzipiert. Du kannst alles visuell über dein Dashboard steuern.' },
+                { q: 'BenÃ¶tige ich Programmierkenntnisse?', a: 'Nein. Das gesamte System ist als No-Code-Plattform konzipiert. Du kannst alles visuell Ã¼ber dein Dashboard steuern.' },
                 { q: 'Kann ich meine eigene Domain nutzen?', a: 'Ja, du kannst jede vorhandene Domain mit deiner Website verbinden oder eine Subdomain von uns nutzen.' },
-                { q: 'Welche Plattformen werden unterstützt?', a: 'Wir bieten eine vollständige Integration für Twitch und Kick, inklusive Chat-Bot-Anbindung und Live-Daten.' },
-                { q: 'Wie sicher sind meine Daten?', a: 'Sicherheit hat Priorität. Alle Daten werden verschlüsselt übertragen und auf hochsicheren Servern verarbeitet.' },
-                { q: 'Gibt es eine Mindestlaufzeit?', a: 'Nein, unsere Abonnements sind flexibel und können jederzeit zum Ende des Abrechnungszeitraums gekündigt werden.' },
-                { q: 'Wird die Website mobil gut dargestellt?', a: 'Ja, alle Websites und Dashboards sind vollständig responsive und für Smartphones sowie Tablets optimiert.' }
+                { q: 'Welche Plattformen werden unterstÃ¼tzt?', a: 'Wir bieten eine vollstÃ¤ndige Integration fÃ¼r Twitch und Kick, inklusive Chat-Bot-Anbindung und Live-Daten.' },
+                { q: 'Wie sicher sind meine Daten?', a: 'Sicherheit hat PrioritÃ¤t. Alle Daten werden verschlÃ¼sselt Ã¼bertragen und auf hochsicheren Servern verarbeitet.' },
+                { q: 'Gibt es eine Mindestlaufzeit?', a: 'Nein, unsere Abonnements sind flexibel und kÃ¶nnen jederzeit zum Ende des Abrechnungszeitraums gekÃ¼ndigt werden.' },
+                { q: 'Wird die Website mobil gut dargestellt?', a: 'Ja, alle Websites und Dashboards sind vollstÃ¤ndig responsive und fÃ¼r Smartphones sowie Tablets optimiert.' }
               ].map((faq, i) => (
                 <AccordionItem key={i} question={faq.q} answer={faq.a} />
               ))}
@@ -705,7 +705,7 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-4xl md:text-6xl font-bold tracking-tighter text-[#EDEDED] mb-8 leading-tight"
           >
-            Bereit, deinen Stream auf <br /> das nächste Level zu heben?
+            Bereit, deinen Stream auf <br /> das nÃ¤chste Level zu heben?
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -714,7 +714,7 @@ const Home = () => {
             transition={{ delay: 0.1 }}
             className="text-[#A1A1A1] text-lg md:text-xl mb-12 max-w-xl mx-auto leading-relaxed"
           >
-            Hör auf, dich mit Notlösungen zufrieden zu geben. Baue die Infrastruktur, die dein Content verdient.
+            HÃ¶r auf, dich mit NotlÃ¶sungen zufrieden zu geben. Baue die Infrastruktur, die dein Content verdient.
           </motion.p>
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -742,11 +742,11 @@ const Home = () => {
                 <span>Weblone</span>
               </div>
               <p className="text-sm text-[#A1A1A1] leading-relaxed">
-                Der moderne Standard für Creator-Management und Markenaufbau.
+                Der moderne Standard fÃ¼r Creator-Management und Markenaufbau.
               </p>
             </div>
             {[
-              { title: 'Produkt', links: ['Funktionen', 'Lösungen'] },
+              { title: 'Produkt', links: ['Funktionen', 'LÃ¶sungen'] },
               { title: 'Rechtliches', links: ['Datenschutz', 'AGB'] }
             ].map(col => (
               <div key={col.title}>
@@ -768,7 +768,7 @@ const Home = () => {
           </div>
           <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-[#1A1A1A] gap-4">
             <p className="text-xs text-[#555]">
-              © {new Date().getFullYear()} Weblone Infrastructure Inc. Alle Rechte vorbehalten.
+              Â© {new Date().getFullYear()} Weblone Infrastructure Inc. Alle Rechte vorbehalten.
             </p>
             <div className="flex gap-6 text-[#555] text-xs">
               <Link to="/privacy" className="hover:text-white">Datenschutz</Link>
@@ -785,22 +785,22 @@ const Privacy = () => (
   <div className={`${theme.bg} min-h-screen text-[#EDEDED] pt-32 pb-20 relative overflow-hidden`}>
     <BackgroundBubbles />
     <div className="max-w-[800px] mx-auto px-6 relative z-10">
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Datenschutzerklärung</h1>
+      <h1 className="text-4xl font-bold tracking-tight mb-8">DatenschutzerklÃ¤rung</h1>
       <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-12">1. Datenschutz auf einen Blick</h2>
-          <p>Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können.</p>
+          <p>Die folgenden Hinweise geben einen einfachen Ãœberblick darÃ¼ber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persÃ¶nlich identifiziert werden kÃ¶nnen.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">2. Datenerfassung auf dieser Website</h2>
           <h3 className="text-lg font-bold text-[#EDEDED] mt-4">Cookies & Tracking</h3>
-          <p>Unsere Website verwendet technische Cookies, die für den Betrieb der Plattform notwendig sind. Wir nutzen Analysetools nur mit Ihrer ausdrücklichen Zustimmung, um die Benutzererfahrung zu verbessern.</p>
+          <p>Unsere Website verwendet technische Cookies, die fÃ¼r den Betrieb der Plattform notwendig sind. Wir nutzen Analysetools nur mit Ihrer ausdrÃ¼cklichen Zustimmung, um die Benutzererfahrung zu verbessern.</p>
           <h3 className="text-lg font-bold text-[#EDEDED] mt-4">Server-Log-Dateien</h3>
-          <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt. Dies sind: Browsertyp, Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners und Uhrzeit der Serveranfrage.</p>
+          <p>Der Provider der Seiten erhebt und speichert automatisch Informationen in sogenannten Server-Log-Dateien, die Ihr Browser automatisch an uns Ã¼bermittelt. Dies sind: Browsertyp, Betriebssystem, Referrer URL, Hostname des zugreifenden Rechners und Uhrzeit der Serveranfrage.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">3. Rechte der betroffenen Person</h2>
-          <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten. Sie haben außerdem ein Recht, die Berichtigung oder Löschung dieser Daten zu verlangen.</p>
+          <p>Sie haben jederzeit das Recht auf unentgeltliche Auskunft Ã¼ber Herkunft, EmpfÃ¤nger und Zweck Ihrer gespeicherten personenbezogenen Daten. Sie haben auÃŸerdem ein Recht, die Berichtigung oder LÃ¶schung dieser Daten zu verlangen.</p>
         </section>
       </div>
     </div>
@@ -811,23 +811,23 @@ const Terms = () => (
   <div className={`${theme.bg} min-h-screen text-[#EDEDED] pt-32 pb-20 relative overflow-hidden`}>
     <BackgroundBubbles />
     <div className="max-w-[800px] mx-auto px-6 relative z-10">
-      <h1 className="text-4xl font-bold tracking-tight mb-8">Allgemeine Geschäftsbedingungen (AGB)</h1>
+      <h1 className="text-4xl font-bold tracking-tight mb-8">Allgemeine GeschÃ¤ftsbedingungen (AGB)</h1>
       <div className="prose prose-invert text-[#A1A1A1] leading-relaxed space-y-6">
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-12">1. Geltungsbereich</h2>
-          <p>Diese AGB gelten für alle Verträge zwischen Weblone Infrastructure Inc. und den Nutzern der Plattform. Mit der Registrierung erklärt sich der Nutzer mit diesen Bedingungen einverstanden.</p>
+          <p>Diese AGB gelten fÃ¼r alle VertrÃ¤ge zwischen Weblone Infrastructure Inc. und den Nutzern der Plattform. Mit der Registrierung erklÃ¤rt sich der Nutzer mit diesen Bedingungen einverstanden.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">2. Leistungsbeschreibung</h2>
-          <p>Weblone bietet eine Infrastruktur für Creator, einschließlich Website-Builder, Dashboard-Systemen und Vermittlung von Werbepartnern. Der genaue Leistungsumfang ergibt sich aus der jeweiligen Leistungsbeschreibung zum Zeitpunkt des Vertragsschlusses.</p>
+          <p>Weblone bietet eine Infrastruktur fÃ¼r Creator, einschlieÃŸlich Website-Builder, Dashboard-Systemen und Vermittlung von Werbepartnern. Der genaue Leistungsumfang ergibt sich aus der jeweiligen Leistungsbeschreibung zum Zeitpunkt des Vertragsschlusses.</p>
         </section>
         <section>
           <h2 className="text-xl font-bold text-[#EDEDED] mt-8">3. Pflichten des Nutzers</h2>
-          <p>Der Nutzer ist verpflichtet, bei der Registrierung wahrheitsgemäße Angaben zu machen. Es ist untersagt, die Plattform für illegale Aktivitäten oder zur Verbreitung von schädlicher Software zu nutzen.</p>
+          <p>Der Nutzer ist verpflichtet, bei der Registrierung wahrheitsgemÃ¤ÃŸe Angaben zu machen. Es ist untersagt, die Plattform fÃ¼r illegale AktivitÃ¤ten oder zur Verbreitung von schÃ¤dlicher Software zu nutzen.</p>
         </section>
         <section>
-          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">4. Auszahlungen & Vergütung</h2>
-          <p>Auszahlungen erfolgen gemäß den im Dashboard vereinbarten Konditionen. Weblone behält sich das Recht vor, Auszahlungen bei Verdacht auf Betrug oder Manipulation bis zur Klärung einzubehalten.</p>
+          <h2 className="text-xl font-bold text-[#EDEDED] mt-8">4. Auszahlungen & VergÃ¼tung</h2>
+          <p>Auszahlungen erfolgen gemÃ¤ÃŸ den im Dashboard vereinbarten Konditionen. Weblone behÃ¤lt sich das Recht vor, Auszahlungen bei Verdacht auf Betrug oder Manipulation bis zur KlÃ¤rung einzubehalten.</p>
         </section>
       </div>
     </div>
@@ -925,10 +925,10 @@ const StreamerPageContent = ({ data }) => {
                   </span>
                   <h2 className="text-3xl font-bold mb-4">{block.name}</h2>
                   <p className="text-[#A1A1A1] max-w-lg mb-8">
-                    Sichere dir jetzt exklusive Vorteile und unterstütze den Stream direkt über diesen Link.
+                    Sichere dir jetzt exklusive Vorteile und unterstÃ¼tze den Stream direkt Ã¼ber diesen Link.
                   </p>
                   <button className={`px-8 py-3 rounded-xl font-bold border ${style.border} hover:bg-white hover:text-black transition-all`}>
-                    Angebot öffnen
+                    Angebot Ã¶ffnen
                   </button>
                 </div>
               </div>
@@ -966,7 +966,11 @@ const Login = ({ onLogin }) => {
       const data = await response.json();
       if (data.success) {
         onLogin(data.user);
-        navigate(data.user.isSetupComplete ? '/dashboard' : '/onboarding');
+        if (data.user?.isSuperadmin) {
+          navigate('/superadmin');
+        } else {
+          navigate(data.user.isSetupComplete ? '/dashboard' : '/onboarding');
+        }
       } else {
         setError(data.error);
       }
@@ -985,7 +989,7 @@ const Login = ({ onLogin }) => {
           className={`p-8 rounded-3xl border ${theme.border} ${theme.surface} backdrop-blur-xl shadow-2xl`}
         >
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zurück</h1>
+            <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zurÃ¼ck</h1>
             <p className="text-[#A1A1A1]">Logge dich in dein Streamer-Dashboard ein.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-6">
@@ -1009,7 +1013,7 @@ const Login = ({ onLogin }) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={`w-full bg-white/5 border ${theme.border} rounded-xl px-4 py-3 text-[#EDEDED] focus:outline-none focus:border-indigo-500 transition-colors`}
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               />
             </div>
             <button 
@@ -1082,9 +1086,9 @@ const Login = ({ onLogin }) => {
                       Wichtige Hinweise
                     </h4>
                     <ul className="text-xs text-[#A1A1A1] space-y-2 leading-relaxed">
-                      <li>• Freischaltung erfolgt manuell nach Prüfung deines Kanals.</li>
-                      <li>• Antwortzeit in der Regel innerhalb von 24 Stunden.</li>
-                      <li>• Exklusiver Zugang für verifizierte Streamer (Twitch/Kick).</li>
+                      <li>â€¢ Freischaltung erfolgt manuell nach PrÃ¼fung deines Kanals.</li>
+                      <li>â€¢ Antwortzeit in der Regel innerhalb von 24 Stunden.</li>
+                      <li>â€¢ Exklusiver Zugang fÃ¼r verifizierte Streamer (Twitch/Kick).</li>
                     </ul>
                   </div>
 
@@ -1092,7 +1096,7 @@ const Login = ({ onLogin }) => {
                     onClick={() => setIsModalOpen(false)}
                     className="w-full bg-[#EDEDED] text-[#050505] py-3 rounded-xl font-bold mt-4 hover:bg-[#D4D4D4] transition-all"
                   >
-                    Schließen
+                    SchlieÃŸen
                   </button>
                 </div>
               </div>
@@ -1167,7 +1171,7 @@ const Register = ({ onRegister }) => {
                 value={formData.password}
                 onChange={(e) => setFormData({...formData, password: e.target.value})}
                 className={`w-full bg-white/5 border ${theme.border} rounded-xl px-4 py-3 text-[#EDEDED] focus:outline-none focus:border-indigo-500 transition-colors`}
-                placeholder="••••••••"
+                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
               />
             </div>
             <div>
@@ -1222,7 +1226,7 @@ const OnboardingStart = ({ user }) => {
             Willkommen. In wenigen Schritten zu deiner eigenen Streamer-Website.
           </h1>
           <p className="text-[#A1A1A1] text-lg max-w-lg mx-auto leading-relaxed">
-            Wir führen dich durch den Prozess, um deine Marke zu stärken und deine Community zu begeistern.
+            Wir fÃ¼hren dich durch den Prozess, um deine Marke zu stÃ¤rken und deine Community zu begeistern.
           </p>
           <button 
             onClick={() => navigate('/onboarding/template')}
@@ -1260,8 +1264,8 @@ const TemplateSelection = ({ user }) => {
       <BackgroundBubbles />
       <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-[#EDEDED] mb-4">Wähle dein Template</h2>
-          <p className="text-[#A1A1A1]">Dieses Design wird die Basis für deine neue Website sein.</p>
+          <h2 className="text-3xl font-bold text-[#EDEDED] mb-4">WÃ¤hle dein Template</h2>
+          <p className="text-[#A1A1A1]">Dieses Design wird die Basis fÃ¼r deine neue Website sein.</p>
         </div>
         
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -1398,7 +1402,7 @@ const BaseSetup = ({ user, onComplete }) => {
             disabled={loading || !formData.username || !formData.siteSlug}
             className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
           >
-            {loading ? 'Wird eingerichtet...' : 'Setup abschließen'}
+            {loading ? 'Wird eingerichtet...' : 'Setup abschlieÃŸen'}
           </button>
         </div>
       </div>
@@ -1462,6 +1466,20 @@ const Dashboard = ({ user }) => {
   const [data, setData] = useState({ user: null, blocks: [], deals: [] });
   const [loading, setLoading] = useState(true);
 
+  const loadDashboardData = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${user.id}/dashboard`);
+      const result = await response.json();
+      if (result.success) {
+        setData(result.data);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) {
       navigate('/login');
@@ -1480,28 +1498,14 @@ const Dashboard = ({ user }) => {
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/user/${user.id}/dashboard`);
-        const result = await response.json();
-        if (result.success) {
-          setData(result.data);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
+    loadDashboardData();
   }, [user, navigate, slug]);
 
-  if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white font-bold text-2xl">Lädt dein Dashboard...</div>;
+  if (loading) return <div className="h-screen bg-[#050505] flex items-center justify-center text-white font-bold text-2xl">LÃ¤dt dein Dashboard...</div>;
 
   const renderContent = () => {
     switch(activeTab) {
-      case 'overview': return <DashboardOverview data={data} setActiveTab={setActiveTab} />;
+      case 'overview': return <DashboardOverview data={data} setActiveTab={setActiveTab} onRefresh={loadDashboardData} />;
       case 'builder': return (
         <SiteBuilder 
           user={user} 
@@ -1512,7 +1516,7 @@ const Dashboard = ({ user }) => {
       case 'tools': return <ToolsContent user={data.user} onUpdate={(newUser) => setData({...data, user: newUser})} />;
       case 'domain': return <DomainContent user={data.user} />;
       case 'settings': return <SettingsContent user={data.user} onUpdate={(newUser) => setData({...data, user: newUser})} />;
-      default: return <DashboardOverview data={data} setActiveTab={setActiveTab} />;
+      default: return <DashboardOverview data={data} setActiveTab={setActiveTab} onRefresh={loadDashboardData} />;
     }
   };
 
@@ -1529,103 +1533,223 @@ const Dashboard = ({ user }) => {
   );
 };
 
-const DashboardOverview = ({ data, setActiveTab }) => (
-  <div className="space-y-8">
-    <div className="flex justify-between items-center">
-      <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-        <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zurück, {data.user?.username || 'Streamer'}!</h1>
-        <p className="text-[#A1A1A1]">Verwalte hier deine Website, Inhalte, Tools und Deals.</p>
-      </motion.div>
-      <div className="flex gap-4">
-        <div className="bg-[#0A0A0A] border border-white/5 rounded-xl px-4 py-2 flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          <span className="text-sm font-medium text-[#A1A1A1]">Site Online</span>
-        </div>
-      </div>
-    </div>
+const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
+  const [kickChannel, setKickChannel] = useState(data.social?.kickAccount?.channel || '');
+  const [socialStatus, setSocialStatus] = useState('');
+  const userId = data?.user?.id;
 
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} flex items-center justify-between group hover:border-indigo-500/30 transition-all`}
-    >
-      <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
-          <LinkIcon size={24} />
-        </div>
-        <div>
-          <span className="text-sm text-[#A1A1A1] block">Deine Website</span>
-          <a href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{window.location.host}/{data.user?.siteSlug}</a>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        <a 
-          href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition-all"
-        >
-          Seite besuchen
-        </a>
-        <button 
-          onClick={() => setActiveTab('builder')}
-          className="bg-[#EDEDED] text-[#050505] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#D4D4D4] transition-all"
-        >
-          Editor
-        </button>
-      </div>
-    </motion.div>
+  useEffect(() => {
+    setKickChannel(data.social?.kickAccount?.channel || '');
+  }, [data.social?.kickAccount?.channel]);
 
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {[
-        { title: 'Besucher heute', value: data.stats?.visitors || '0', change: data.stats?.visitorsChange || '0%', icon: User },
-        { title: 'Deals Aktiv', value: data.deals?.filter(d => d.status === 'Aktiv').length || 0, change: 'Live', icon: Briefcase },
-        { title: 'Conversions', value: data.stats?.conversions || '0', change: data.stats?.conversionsChange || '0%', icon: MousePointer2 }
-      ].map((stat, i) => (
-        <motion.div 
-          key={i} 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.1 }}
-          className={`p-6 rounded-2xl border ${theme.border} ${theme.surface}`}
-        >
-          <div className="flex justify-between items-start mb-4">
-            <div className="p-2 rounded-lg bg-white/5 text-indigo-500">
-              <stat.icon size={20} />
-            </div>
-            <span className={`text-xs font-bold px-2 py-1 rounded-full ${stat.change.includes('+') ? 'bg-green-500/10 text-green-500' : 'bg-indigo-500/10 text-indigo-500'}`}>
-              {stat.change}
-            </span>
-          </div>
-          <span className="text-sm text-[#A1A1A1]">{stat.title}</span>
-          <div className="text-2xl font-bold text-[#EDEDED] mt-1">{stat.value}</div>
+  const connectTwitch = () => {
+    if (!userId) return;
+    window.location.href = `${API_BASE}/api/social/twitch/start?userId=${userId}`;
+  };
+
+  const connectKick = async () => {
+    if (!userId || !kickChannel.trim()) {
+      setSocialStatus('Bitte Kick Channel eingeben.');
+      return;
+    }
+    setSocialStatus('');
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${userId}/social/kick/connect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel: kickChannel.trim() })
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setSocialStatus(result.error || 'Kick Verbindung fehlgeschlagen.');
+        return;
+      }
+      await onRefresh?.();
+      setSocialStatus('Kick Konto verbunden.');
+    } catch (err) {
+      setSocialStatus('Kick Verbindung fehlgeschlagen.');
+    }
+  };
+
+  const disconnectSocial = async (platform) => {
+    if (!userId) return;
+    try {
+      await fetch(`${API_BASE}/api/user/${userId}/social/disconnect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ platform })
+      });
+      await onRefresh?.();
+      setSocialStatus(`${platform} getrennt.`);
+    } catch (err) {
+      setSocialStatus(`${platform} konnte nicht getrennt werden.`);
+    }
+  };
+
+  const refreshSocialStats = async () => {
+    if (!userId) return;
+    setSocialStatus('Synchronisiere Social-Daten...');
+    try {
+      const response = await fetch(`${API_BASE}/api/user/${userId}/social/refresh`, { method: 'POST' });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        setSocialStatus(result.error || 'Sync fehlgeschlagen.');
+        return;
+      }
+      await onRefresh?.();
+      setSocialStatus(result.result?.errors?.length ? `Teilweise aktualisiert: ${result.result.errors.join(' | ')}` : 'Social-Daten aktualisiert.');
+    } catch (err) {
+      setSocialStatus('Sync fehlgeschlagen.');
+    }
+  };
+
+  const overviewStats = [
+    { title: 'Besucher heute', value: data.stats?.visitors || '0', change: data.stats?.visitorsChange || '0%', icon: User },
+    { title: 'Deals Aktiv', value: data.deals?.filter(d => d.status === 'Aktiv').length || 0, change: 'Live', icon: Briefcase },
+    { title: 'Conversions', value: data.stats?.conversions || '0', change: data.stats?.conversionsChange || '0%', icon: MousePointer2 },
+    { title: 'Twitch Follower', value: data.social?.twitch?.followers ?? '-', change: data.social?.twitchConnected ? 'Connected' : 'Nicht verbunden', icon: Activity },
+    { title: 'Twitch Subs', value: data.social?.twitch?.subs ?? '-', change: data.social?.twitch?.subsError ? 'Scope fehlt' : 'Live', icon: Trophy },
+    { title: 'Neue Follower 24h', value: data.social?.twitch?.newFollowers24h ?? '-', change: data.social?.twitch?.lastSync ? new Date(data.social.twitch.lastSync).toLocaleTimeString() : 'Kein Sync', icon: BarChart3 }
+  ];
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
+          <h1 className="text-3xl font-bold text-[#EDEDED] mb-2">Willkommen zurück, {data.user?.username || 'Streamer'}!</h1>
+          <p className="text-[#A1A1A1]">Verwalte hier deine Website, Inhalte, Tools und Deals.</p>
         </motion.div>
-      ))}
-    </div>
+        <div className="flex gap-4">
+          <div className="bg-[#0A0A0A] border border-white/5 rounded-xl px-4 py-2 flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-sm font-medium text-[#A1A1A1]">Site Online</span>
+          </div>
+        </div>
+      </div>
 
-    <div>
-      <h3 className="text-xl font-bold text-[#EDEDED] mb-6">Quick-Links</h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { id: 'builder', name: 'Site Builder', icon: Monitor },
-          { id: 'deals', name: 'Deals', icon: Briefcase },
-          { id: 'tools', name: 'Tools', icon: Wrench },
-          { id: 'domain', name: 'Domain', icon: Globe }
-        ].map((link, i) => (
-          <button 
-            key={i} 
-            onClick={() => setActiveTab(link.id)}
-            className={`p-4 rounded-xl border ${theme.border} ${theme.surface} hover:border-indigo-500/50 transition-all text-left group`}
-          >
-            <link.icon size={20} className="text-[#A1A1A1] group-hover:text-indigo-500 transition-colors mb-3" />
-            <span className="text-sm font-bold text-[#EDEDED]">{link.name}</span>
+      <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-4`}>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-xl font-bold text-[#EDEDED]">Twitch/Kick Verbindung</h3>
+            <p className="text-sm text-[#A1A1A1]">Verbinde deine Accounts und lade Follower/Subs/Trenddaten in das Dashboard.</p>
+          </div>
+          <button onClick={refreshSocialStats} className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition-all">
+            Daten aktualisieren
           </button>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-white">Twitch</h4>
+              {data.social?.twitchConnected ? (
+                <button onClick={() => disconnectSocial('twitch')} className="text-xs text-red-300 bg-red-500/20 px-3 py-1 rounded-lg">Trennen</button>
+              ) : (
+                <button onClick={connectTwitch} className="text-xs text-white bg-indigo-600 px-3 py-1 rounded-lg">Mit Twitch anmelden</button>
+              )}
+            </div>
+            <p className="text-xs text-[#A1A1A1]">{data.social?.twitchConnected ? `Verbunden als ${data.social?.twitchAccount?.displayName || data.social?.twitchAccount?.login}` : 'Nicht verbunden'}</p>
+          </div>
+
+          <div className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-white">Kick</h4>
+              {data.social?.kickConnected && <button onClick={() => disconnectSocial('kick')} className="text-xs text-red-300 bg-red-500/20 px-3 py-1 rounded-lg">Trennen</button>}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={kickChannel}
+                onChange={(e) => setKickChannel(e.target.value)}
+                placeholder="Kick Channel (z.B. enricos)"
+                className="flex-1 bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm text-white"
+              />
+              <button onClick={connectKick} className="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-bold">Verbinden</button>
+            </div>
+            <p className="text-xs text-[#A1A1A1]">{data.social?.kickConnected ? `Verbunden: ${data.social?.kickAccount?.channel}` : 'Nicht verbunden'}</p>
+          </div>
+        </div>
+        {socialStatus && <p className="text-sm text-[#A1A1A1]">{socialStatus}</p>}
+      </section>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} flex items-center justify-between group hover:border-indigo-500/30 transition-all`}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
+            <LinkIcon size={24} />
+          </div>
+          <div>
+            <span className="text-sm text-[#A1A1A1] block">Deine Website</span>
+            <a href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{window.location.host}/{data.user?.siteSlug}</a>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <a
+            href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition-all"
+          >
+            Seite besuchen
+          </a>
+          <button
+            onClick={() => setActiveTab('builder')}
+            className="bg-[#EDEDED] text-[#050505] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#D4D4D4] transition-all"
+          >
+            Editor
+          </button>
+        </div>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {overviewStats.map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+            className={`p-6 rounded-2xl border ${theme.border} ${theme.surface}`}
+          >
+            <div className="flex justify-between items-start mb-4">
+              <div className="p-2 rounded-lg bg-white/5 text-indigo-500">
+                <stat.icon size={20} />
+              </div>
+              <span className="text-xs font-bold px-2 py-1 rounded-full bg-indigo-500/10 text-indigo-500">
+                {stat.change}
+              </span>
+            </div>
+            <span className="text-sm text-[#A1A1A1]">{stat.title}</span>
+            <div className="text-2xl font-bold text-[#EDEDED] mt-1">{stat.value}</div>
+          </motion.div>
         ))}
       </div>
-    </div>
-  </div>
-);
 
+      <div>
+        <h3 className="text-xl font-bold text-[#EDEDED] mb-6">Quick-Links</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { id: 'builder', name: 'Site Builder', icon: Monitor },
+            { id: 'deals', name: 'Deals', icon: Briefcase },
+            { id: 'tools', name: 'Tools', icon: Wrench },
+            { id: 'domain', name: 'Domain', icon: Globe }
+          ].map((link, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveTab(link.id)}
+              className={`p-4 rounded-xl border ${theme.border} ${theme.surface} hover:border-indigo-500/50 transition-all text-left group`}
+            >
+              <link.icon size={20} className="text-[#A1A1A1] group-hover:text-indigo-500 transition-colors mb-3" />
+              <span className="text-sm font-bold text-[#EDEDED]">{link.name}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 const SiteBuilder = ({ user, onUpdate }) => {
   const [settings, setSettings] = useState({ navTitle: user?.username || '', slogan: '' });
   const [pages, setPages] = useState([]);
@@ -1727,7 +1851,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
 
   const addBlock = async (blockType) => {
     const defaultData = {
-      Hero: { title: 'Willkommen', subtitle: 'Schön dass du da bist!' },
+      Hero: { title: 'Willkommen', subtitle: 'SchÃ¶n dass du da bist!' },
       Text: { content: 'Hier steht dein Text...' },
       Button: { label: 'Klick mich', url: '#' },
       LinkList: { links: [{ label: 'Twitch', url: 'https://twitch.tv' }] }
@@ -1788,7 +1912,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
     persistBlockOrder(normalized.map((b) => b.id));
   };
 
-  if (loading) return <div className="p-12 text-center text-white">Lädt Site Builder...</div>;
+  if (loading) return <div className="p-12 text-center text-white">LÃ¤dt Site Builder...</div>;
 
   const activePage = pages.find(p => p.id === activePageId);
 
@@ -1868,7 +1992,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
                 />
                 <div className="flex gap-2">
                   <button onClick={() => setIsAddingPage(false)} className="flex-1 py-1.5 text-xs text-[#A1A1A1]">Abbrechen</button>
-                  <button onClick={addPage} className="flex-1 py-1.5 bg-indigo-600 rounded-lg text-xs font-bold text-white">Hinzufügen</button>
+                  <button onClick={addPage} className="flex-1 py-1.5 bg-indigo-600 rounded-lg text-xs font-bold text-white">HinzufÃ¼gen</button>
                 </div>
               </div>
             )}
@@ -1912,7 +2036,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
             <div className="flex justify-between items-center mb-8">
               <div>
                 <h2 className="text-xl font-bold text-white">Inhalt: {activePage?.title}</h2>
-                <p className="text-xs text-[#A1A1A1]">Verwalte die Blöcke dieser Seite.</p>
+                <p className="text-xs text-[#A1A1A1]">Verwalte die BlÃ¶cke dieser Seite.</p>
               </div>
               <div className="flex gap-2">
                 {['Hero', 'Text', 'Button', 'LinkList'].map(type => (
@@ -1931,7 +2055,7 @@ const SiteBuilder = ({ user, onUpdate }) => {
               {blocks.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-white/10">
                   <Layers size={48} className="mb-4" />
-                  <p className="font-bold">Keine Blöcke vorhanden</p>
+                  <p className="font-bold">Keine BlÃ¶cke vorhanden</p>
                 </div>
               ) : (
                 blocks.map((block, index) => (
@@ -1973,7 +2097,7 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
     <section className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-5`}>
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-[#A1A1A1] uppercase tracking-wider">Live Vorschau</h3>
-        <span className="text-xs text-[#A1A1A1]">Änderungen erscheinen sofort</span>
+        <span className="text-xs text-[#A1A1A1]">Ã„nderungen erscheinen sofort</span>
       </div>
 
       <div className="rounded-2xl border border-white/10 overflow-hidden bg-[#050505]">
@@ -1997,7 +2121,7 @@ const BuilderPreview = ({ user, settings, pages, blocks, activePageId, setActive
         <div className="p-6 space-y-6">
           {pageBlocks.length === 0 ? (
             <div className="text-center py-12 text-[#A1A1A1]">
-              Diese Seite hat noch keine Blöcke.
+              Diese Seite hat noch keine BlÃ¶cke.
             </div>
           ) : (
             pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
@@ -2177,7 +2301,7 @@ const BlockEditor = ({ block, isFirst, isLast, onMoveUp, onMoveDown, onUpdate, o
                     onClick={() => handleChange('links', [...(data.links || []), { label: 'Neuer Link', url: '#' }])}
                     className="text-xs text-indigo-500 font-bold"
                    >
-                     + Link hinzufügen
+                     + Link hinzufÃ¼gen
                    </button>
                 </div>
               )}
@@ -2275,7 +2399,7 @@ const DealsContent = ({ deals, userId, onUpdate }) => {
                 type="text"
                 value={newDeal.deal}
                 onChange={(e) => setNewDeal({...newDeal, deal: e.target.value})}
-                placeholder="z.B. 100% Bonus bis 500€"
+                placeholder="z.B. 100% Bonus bis 500â‚¬"
                 className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-all"
               />
             </div>
@@ -2688,7 +2812,7 @@ const ToolsContent = ({ user, onUpdate }) => {
           </div>
 
           <p className="text-xs text-[#A1A1A1]">
-            Status: {readerStatus.running ? 'Läuft' : 'Gestoppt'}
+            Status: {readerStatus.running ? 'LÃ¤uft' : 'Gestoppt'}
             {readerStatus.channels?.length ? ` | Channels: ${readerStatus.channels.join(', ')}` : ''}
             {readerStatus.lastError ? ` | Letzter Fehler: ${readerStatus.lastError}` : ''}
           </p>
@@ -2864,7 +2988,7 @@ const SettingsContent = ({ user, onUpdate }) => {
             disabled={isSaving}
             className="bg-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
           >
-            {isSaving ? 'Speichert...' : 'Änderungen speichern'}
+            {isSaving ? 'Speichert...' : 'Ã„nderungen speichern'}
           </button>
         </div>
       </div>
@@ -2981,10 +3105,10 @@ const SuperAdminPage = () => {
         setNewDeal({ name: '', deal: '', performance: '0 clicks', status: 'Aktiv' });
         fetchUserDetails(selectedUserId);
       } else {
-        setError(result.error || 'Deal konnte nicht hinzugefügt werden.');
+        setError(result.error || 'Deal konnte nicht hinzugefÃ¼gt werden.');
       }
     } catch (err) {
-      setError('Deal konnte nicht hinzugefügt werden.');
+      setError('Deal konnte nicht hinzugefÃ¼gt werden.');
     }
   };
 
@@ -2998,7 +3122,7 @@ const SuperAdminPage = () => {
       });
       fetchUserDetails(selectedUserId);
     } catch (err) {
-      setError('Deal-Status konnte nicht geändert werden.');
+      setError('Deal-Status konnte nicht geÃ¤ndert werden.');
     }
   };
 
@@ -3010,7 +3134,7 @@ const SuperAdminPage = () => {
       });
       fetchUserDetails(selectedUserId);
     } catch (err) {
-      setError('Deal konnte nicht gelöscht werden.');
+      setError('Deal konnte nicht gelÃ¶scht werden.');
     }
   };
 
@@ -3107,14 +3231,14 @@ const SuperAdminPage = () => {
 
           <main className={`lg:col-span-8 p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-6`}>
             {loadingDetails && <p className="text-sm text-[#A1A1A1]">Lade Nutzerdetails...</p>}
-            {!loadingDetails && !selectedData && <p className="text-sm text-[#A1A1A1]">Wähle links einen Nutzer aus.</p>}
+            {!loadingDetails && !selectedData && <p className="text-sm text-[#A1A1A1]">WÃ¤hle links einen Nutzer aus.</p>}
             {!loadingDetails && selectedData && (
               <>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <h2 className="text-2xl font-bold">{selectedData.user.username || 'Unbenannter Nutzer'}</h2>
                     <p className="text-[#A1A1A1] text-sm">{selectedData.user.email}</p>
-                    <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine öffentliche URL'}</p>
+                    <p className="text-indigo-400 text-sm">{selectedData.user.siteSlug ? `${window.location.host}/${selectedData.user.siteSlug}` : 'Keine Ã¶ffentliche URL'}</p>
                   </div>
                   {selectedData.user.siteSlug && (
                     <a
@@ -3123,7 +3247,7 @@ const SuperAdminPage = () => {
                       rel="noopener noreferrer"
                       className="bg-indigo-600 px-4 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
                     >
-                      Streamer öffnen
+                      Streamer Ã¶ffnen
                     </a>
                   )}
                 </div>
@@ -3153,7 +3277,7 @@ const SuperAdminPage = () => {
                       className="bg-[#0A0A0A] border border-white/10 rounded-xl px-3 py-2"
                     />
                     <button onClick={addDealToUser} className="bg-indigo-600 rounded-xl font-bold hover:bg-indigo-500 transition-all">
-                      Deal hinzufügen
+                      Deal hinzufÃ¼gen
                     </button>
                   </div>
                   <div className="space-y-2">
@@ -3169,7 +3293,7 @@ const SuperAdminPage = () => {
                             {deal.status}
                           </button>
                           <button onClick={() => deleteDeal(deal.id)} className="px-3 py-2 rounded-lg bg-red-500/20 text-red-300 text-sm">
-                            Löschen
+                            LÃ¶schen
                           </button>
                         </div>
                       </div>
@@ -3331,7 +3455,7 @@ const StreamerPageOverride = ({ slug }) => {
     <div className="h-screen bg-[#050505] flex flex-col items-center justify-center text-white p-6 text-center">
       <h1 className="text-4xl font-bold mb-4">Ups!</h1>
       <p className="text-[#A1A1A1] mb-8">Streamer "{slug}" nicht gefunden.</p>
-      <a href={`${window.location.protocol}//${window.location.host}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">Zurück zur Startseite</a>
+      <a href={`${window.location.protocol}//${window.location.host}`} className="bg-indigo-600 px-6 py-3 rounded-xl font-bold">ZurÃ¼ck zur Startseite</a>
     </div>
   );
 
@@ -3345,7 +3469,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const pageBlocks = blocks.filter(b => b.pageId === currentPage?.id);
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-indigo-500/30 flex flex-col">
       <BackgroundBubbles />
       
       {/* Navigation */}
@@ -3374,7 +3498,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       </nav>
 
       {/* Hero / Header Area (Dynamic) */}
-      <main className="pt-32 md:pt-40 pb-16 md:pb-20">
+      <main className="pt-32 md:pt-40 pb-16 md:pb-20 flex-1">
         <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-20">
           {pageBlocks.length === 0 ? (
             <div className="text-center py-20">
@@ -3403,7 +3527,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
       <footer className="py-12 md:py-20 border-t border-white/5 text-center">
         <div className="max-w-5xl mx-auto px-4 md:px-6">
           <p className="text-sm text-[#555] font-medium">
-            © 2026 {settings.navTitle || user.username} • Powered by <span className="text-indigo-500 font-bold">Weblone</span>
+            Â© 2026 {settings.navTitle || user.username} â€¢ Powered by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500 font-bold hover:text-indigo-400 transition-colors">Weblone</a>
           </p>
         </div>
       </footer>
@@ -3475,6 +3599,8 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
+
 
 
 
