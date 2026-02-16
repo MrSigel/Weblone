@@ -1,4 +1,5 @@
 ﻿import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import tls from 'tls';
@@ -35,7 +36,20 @@ const pendingTwitchAuthStates = new Map();
 const superadminSessions = new Map();
 
 // DB Initialization
-const db = new Database(DB_PATH);
+const LOCAL_DB_FALLBACK = path.join(__dirname, 'leads.db');
+let activeDbPath = DB_PATH;
+let db;
+
+try {
+  fs.mkdirSync(path.dirname(activeDbPath), { recursive: true });
+  db = new Database(activeDbPath);
+} catch (err) {
+  console.error(`Database open failed for \"${activeDbPath}\": ${err.message}`);
+  activeDbPath = LOCAL_DB_FALLBACK;
+  fs.mkdirSync(path.dirname(activeDbPath), { recursive: true });
+  db = new Database(activeDbPath);
+  console.warn(`Falling back to local database path: ${activeDbPath}`);
+}
 db.exec(`
   CREATE TABLE IF NOT EXISTS leads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -2139,5 +2153,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Database path: ${DB_PATH}`);
+  console.log(`Database path: ${activeDbPath}`);
 });
