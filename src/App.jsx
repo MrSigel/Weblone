@@ -2978,66 +2978,26 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
               {isCasinoPage ? (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
-                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte können hier nicht manuell als Block hinzugefügt werden.
+                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                  </div>
+                  <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
+                    ?nderungen an Name, Deal-Text, Spielen-Link, Code, Bonus-Zeile und Bild verwaltest du zentral unter "Deals / Sponsorships".
                   </div>
                   {(previewDeals || []).length === 0 ? (
                     <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
                       Es sind noch keine Deals vorhanden.
                     </div>
                   ) : (
-                    (previewDeals || []).map((deal) => {
-                      const draft = casinoDealDrafts[deal.id] || {};
-                      return (
-                        <div key={deal.id} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
-                          <div className="flex items-center justify-between gap-3">
-                            <p className="font-bold text-white">{draft.name || deal.name}</p>
-                            <button
-                              onClick={() => saveCasinoDeal(deal.id)}
-                              className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-all"
-                            >
-                              Deal speichern
-                            </button>
-                          </div>
-                          <div className="grid md:grid-cols-2 gap-3">
-                            <input
-                              type="text"
-                              value={draft.name || ''}
-                              onChange={(e) => updateCasinoDealDraft(deal.id, 'name', e.target.value)}
-                              placeholder="Casino Name"
-                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            />
-                            <input
-                              type="text"
-                              value={draft.deal || ''}
-                              onChange={(e) => updateCasinoDealDraft(deal.id, 'deal', e.target.value)}
-                              placeholder="Bonus-Text"
-                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            />
-                            <input
-                              type="text"
-                              value={draft.bonusTerms || ''}
-                              onChange={(e) => updateCasinoDealDraft(deal.id, 'bonusTerms', e.target.value)}
-                              placeholder="Bonus-Zeile"
-                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            />
-                            <input
-                              type="text"
-                              value={draft.promoCode || ''}
-                              onChange={(e) => updateCasinoDealDraft(deal.id, 'promoCode', e.target.value)}
-                              placeholder="Code"
-                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            />
-                            <input
-                              type="text"
-                              value={draft.imageUrl || ''}
-                              onChange={(e) => updateCasinoDealDraft(deal.id, 'imageUrl', e.target.value)}
-                              placeholder="Bild URL"
-                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
-                            />
-                          </div>
+                    <div className="space-y-2">
+                      {(previewDeals || []).map((deal) => (
+                        <div key={deal.id} className="p-3 rounded-xl border border-white/10 bg-white/5 flex items-center justify-between gap-3">
+                          <p className="text-sm font-bold text-white">{deal.name || 'Deal'}</p>
+                          <span className="text-[10px] font-bold uppercase px-2 py-1 rounded-full border border-white/15 text-[#A1A1A1]">
+                            {deal.status || 'Aktiv'}
+                          </span>
                         </div>
-                      );
-                    })
+                      ))}
+                    </div>
                   )}
                 </div>
               ) : blocks.length === 0 ? (
@@ -5209,7 +5169,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         </div>
         <div className="px-4 pb-4 md:pb-0">
           <a
-            href={ctaHref}
+            href={deal.ctaUrl || ctaHref || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-black px-7 py-3 rounded-md border border-green-300/20"
