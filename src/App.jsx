@@ -5069,7 +5069,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
       </div>
 
       <div className="px-4 py-3 border-b border-[#2a385c] text-center text-sm font-bold text-white">
-        100% Sticky - 300EUR Max Bonus - 40x Wager
+        {deal.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'}
       </div>
       <div className="px-4 py-3 border-b border-[#2a385c] text-sm text-[#d8def1]">
         <span className="text-amber-300">&#10003;</span> Book of Ra
@@ -5078,7 +5078,7 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         <span className="mx-3 text-amber-300">&#10003;</span> Keine Maxbet-Sperre
       </div>
       <div className="px-4 py-3 border-b border-[#2a385c] text-center text-lg font-black text-amber-300">
-        Einfacher / Schneller VIP Transfer <span className="text-white font-semibold">Code:</span> DIEGAWINOS
+        Einfacher / Schneller VIP Transfer <span className="text-white font-semibold">Code:</span> {deal.promoCode || 'DIEGAWINOS'}
       </div>
 
       <div className="grid md:grid-cols-[1.6fr_0.8fr_0.8fr] gap-4 p-4 border-b border-[#2a385c]">
@@ -5097,7 +5097,15 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
           <p className="font-bold mb-2">Verfuegbarkeit:</p>
           <div className="grid grid-cols-3 gap-1.5">
             {countries.map((country) => (
-              <span key={country} className="text-[10px] text-center rounded bg-white/10 border border-white/10 py-1">{country}</span>
+              <div key={country.code} className="rounded bg-white/10 border border-white/10 p-1 flex items-center justify-center">
+                <img
+                  src={country.src}
+                  alt={country.code}
+                  className="h-4 w-auto"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -5105,7 +5113,15 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
           <p className="font-bold mb-2">Einzahlung:</p>
           <div className="grid grid-cols-2 gap-1.5">
             {payments.map((method) => (
-              <span key={method} className="text-[10px] text-center rounded bg-white/10 border border-white/10 py-1">{method}</span>
+              <div key={method.name} className="rounded bg-white/10 border border-white/10 p-1 flex items-center justify-center h-8">
+                <img
+                  src={method.src}
+                  alt={method.name}
+                  className="max-h-5 w-auto"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.textContent = method.name; }}
+                />
+              </div>
             ))}
           </div>
           <div className="mt-2 text-center rounded bg-[#11192b] border border-white/10 text-xs py-2">
@@ -5126,14 +5142,31 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
         </div>
         <div className="p-4">
           <p className="text-sm font-bold">Lizenz:</p>
-          <p className="text-2xl font-black text-[#8bb6ff]">CW</p>
+          <div className="mt-2 flex flex-col items-center gap-1">
+            <img
+              src={licenseLogo}
+              alt="Curacao Lizenz"
+              className="h-8 w-auto rounded-sm border border-white/20"
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            <p className="text-xs text-[#d8def1]">Curacao</p>
+          </div>
         </div>
       </div>
 
       <div className="p-4 border-b border-[#2a385c]">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
           {providers.map((provider) => (
-            <span key={provider} className="text-xs text-center rounded bg-white/5 border border-white/10 py-2 text-[#d8def1]">{provider}</span>
+            <div key={provider.name} className="rounded bg-white/5 border border-white/10 py-2 px-2 flex items-center justify-center h-10">
+              <img
+                src={provider.src}
+                alt={provider.name}
+                className="max-h-5 w-auto"
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.textContent = provider.name; }}
+              />
+            </div>
           ))}
         </div>
       </div>
