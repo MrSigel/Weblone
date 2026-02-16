@@ -1894,7 +1894,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               </ul>
               <button
                 onClick={finalizeWizard}
-                disabled={saving || !basic.streamerName || !normalizeSlug(basic.siteSlug || basic.streamerName)}
+                disabled={saving || !!getStepError(0) || !!getStepError(2) || !!getStepError(4) || !!getStepError(5) || slugState.checking}
                 className="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-black hover:bg-indigo-500 transition-all disabled:opacity-50"
               >
                 {saving ? 'Richte ein...' : 'Verbindung starten'}
