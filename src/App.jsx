@@ -2264,9 +2264,9 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
     { title: 'Besucher heute', value: data.stats?.visitors || '0', change: data.stats?.visitorsChange || '0%', icon: User },
     { title: 'Deals Aktiv', value: data.deals?.filter(d => d.status === 'Aktiv').length || 0, change: 'Live', icon: Briefcase },
     { title: 'Conversions', value: data.stats?.conversions || '0', change: data.stats?.conversionsChange || '0%', icon: MousePointer2 },
-    { title: 'Twitch Follower', value: data.social?.twitch?.followers ?? '-', change: data.social?.twitchConnected ? 'Connected' : 'Nicht verbunden', icon: Activity },
-    { title: 'Twitch Subs', value: data.social?.twitch?.subs ?? '-', change: data.social?.twitch?.subsError ? 'Scope fehlt' : 'Live', icon: Trophy },
-    { title: 'Neue Follower 24h', value: data.social?.twitch?.newFollowers24h ?? '-', change: data.social?.twitch?.lastSync ? new Date(data.social.twitch.lastSync).toLocaleTimeString() : 'Kein Sync', icon: BarChart3 }
+    { title: 'Twitch Follower', value: data.social?.twitch?.followers ? '-', change: data.social?.twitchConnected ? 'Connected' : 'Nicht verbunden', icon: Activity },
+    { title: 'Twitch Subs', value: data.social?.twitch?.subs ? '-', change: data.social?.twitch?.subsError ? 'Scope fehlt' : 'Live', icon: Trophy },
+    { title: 'Neue Follower 24h', value: data.social?.twitch?.newFollowers24h ? '-', change: data.social?.twitch?.lastSync ? new Date(data.social.twitch.lastSync).toLocaleTimeString() : 'Kein Sync', icon: BarChart3 }
   ];
   const checklist = [
     { label: 'Site Builder eingerichtet', done: !!data.user?.siteSlug, action: () => setActiveTab('builder') },
@@ -2873,15 +2873,15 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">A CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.a?.ctr ?? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.a?.ctr ? 0}%</p>
                   </div>
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">B CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.b?.ctr ?? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.b?.ctr ? 0}%</p>
                   </div>
                   <div className="p-2 rounded-lg bg-white/5 border border-white/10">
                     <p className="text-[#A1A1A1]">Default CTR</p>
-                    <p className="font-bold text-white">{ctaStats?.default?.ctr ?? 0}%</p>
+                    <p className="font-bold text-white">{ctaStats?.default?.ctr ? 0}%</p>
                   </div>
                 </div>
               </div>
@@ -2976,8 +2976,62 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
 
             <div className="space-y-4 flex-1">
               {isCasinoPage ? (
-                <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
-                  Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte koennen hier nicht manuell als Block hinzugefuegt werden.
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-sm text-indigo-200">
+                    Die Seite "Casinos" zeigt automatisch alle aktiven Deals. Inhalte k?nnen hier nicht manuell als Block hinzugef?gt werden.
+                  </div>
+                  {(previewDeals || []).length === 0 ? (
+                    <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-[#A1A1A1]">
+                      Es sind noch keine Deals vorhanden.
+                    </div>
+                  ) : (
+                    (previewDeals || []).map((deal) => {
+                      const draft = casinoDealDrafts[deal.id] || {};
+                      return (
+                        <div key={deal.id} className="p-4 rounded-xl border border-white/10 bg-white/5 space-y-3">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="font-bold text-white">{deal.name}</p>
+                            <button
+                              onClick={() => saveCasinoDeal(deal.id)}
+                              className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 transition-all"
+                            >
+                              Deal speichern
+                            </button>
+                          </div>
+                          <div className="grid md:grid-cols-2 gap-3">
+                            <input
+                              type="text"
+                              value={draft.deal || ''}
+                              onChange={(e) => updateCasinoDealDraft(deal.id, 'deal', e.target.value)}
+                              placeholder="Bonus-Text"
+                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
+                            />
+                            <input
+                              type="text"
+                              value={draft.bonusTerms || ''}
+                              onChange={(e) => updateCasinoDealDraft(deal.id, 'bonusTerms', e.target.value)}
+                              placeholder="Bonus-Zeile"
+                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
+                            />
+                            <input
+                              type="text"
+                              value={draft.promoCode || ''}
+                              onChange={(e) => updateCasinoDealDraft(deal.id, 'promoCode', e.target.value)}
+                              placeholder="Code"
+                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
+                            />
+                            <input
+                              type="text"
+                              value={draft.imageUrl || ''}
+                              onChange={(e) => updateCasinoDealDraft(deal.id, 'imageUrl', e.target.value)}
+                              placeholder="Bild URL"
+                              className="bg-[#0A0A0A] border border-white/10 rounded-lg px-3 py-2 text-sm"
+                            />
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               ) : blocks.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center text-white/10">
@@ -3586,8 +3640,8 @@ const ToolsContent = ({ user, onUpdate }) => {
         setStatus(result.error || 'Aktion fehlgeschlagen.');
         return;
       }
-      const attempted = result.result?.attempted ?? 0;
-      const errorCount = result.result?.errors?.length ?? 0;
+      const attempted = result.result?.attempted ? 0;
+      const errorCount = result.result?.errors?.length ? 0;
       setStatus(`Gesendet an ${attempted} Kanal/Kanaele${errorCount ? ` (${errorCount} Fehler)` : ''}.`);
     } catch (err) {
       setStatus('Aktion fehlgeschlagen.');
@@ -4548,27 +4602,27 @@ const SuperAdminPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">User</p>
-              <p className="text-2xl font-bold">{analytics?.totalUsers ?? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.totalUsers ? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Setup Rate</p>
-              <p className="text-2xl font-bold">{analytics?.setupRate ?? '-'}%</p>
+              <p className="text-2xl font-bold">{analytics?.setupRate ? '-'}%</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Aktive Deals</p>
-              <p className="text-2xl font-bold">{analytics?.activeDeals ?? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.activeDeals ? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Offene Tickets</p>
-              <p className="text-2xl font-bold">{analytics?.openTickets ?? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.openTickets ? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Pending Payouts</p>
-              <p className="text-2xl font-bold">{analytics?.pendingPayouts ?? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.pendingPayouts ? '-'}</p>
             </div>
             <div className="p-3 rounded-xl bg-white/5 border border-white/10">
               <p className="text-xs text-[#A1A1A1]">Bots Online</p>
-              <p className="text-2xl font-bold">{analytics?.botOnline ?? '-'}</p>
+              <p className="text-2xl font-bold">{analytics?.botOnline ? '-'}</p>
             </div>
           </div>
         </section>
@@ -4612,7 +4666,7 @@ const SuperAdminPage = () => {
                     />
                   </div>
                   <p className="text-xs mt-2">
-                    Health: <span className={`${(u.health?.score ?? 0) >= 70 ? 'text-emerald-400' : 'text-amber-300'}`}>{u.health?.score ?? 0}%</span>
+                    Health: <span className={`${(u.health?.score ? 0) >= 70 ? 'text-emerald-400' : 'text-amber-300'}`}>{u.health?.score ? 0}%</span>
                   </p>
                 </div>
               ))}
@@ -4697,7 +4751,7 @@ const SuperAdminPage = () => {
 
                 <div className="p-4 rounded-xl border border-white/10 bg-white/5">
                   <p className="font-bold mb-2">User Health</p>
-                  <p className="text-sm">Score: <span className="text-indigo-300">{selectedData.health?.score ?? 0}%</span></p>
+                  <p className="text-sm">Score: <span className="text-indigo-300">{selectedData.health?.score ? 0}%</span></p>
                   <p className="text-xs text-[#A1A1A1] mt-1">Flags: {(selectedData.health?.flags || []).join(', ') || 'none'}</p>
                 </div>
 
