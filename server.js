@@ -193,11 +193,13 @@ ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus für neu
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'conversionBoosterEnabled', 'INTEGER DEFAULT 1');
 ensureColumn('streamer_site_settings', 'backgroundTheme', "TEXT DEFAULT 'dark'");
+ensureColumn('users', 'customDomain', "TEXT DEFAULT ''");
 ensureColumn('deals', 'imageUrl', "TEXT DEFAULT ''");
 ensureColumn('deals', 'promoCode', "TEXT DEFAULT 'DIEGAWINOS'");
 ensureColumn('deals', 'bonusTerms', "TEXT DEFAULT '100% Sticky - 300EUR Max Bonus - 40x Wager'");
 ensureColumn('deals', 'ctaUrl', "TEXT DEFAULT ''");
 db.prepare("UPDATE streamer_pages SET title = 'Casinos' WHERE slug = 'shop'").run();
+db.prepare("UPDATE users SET customDomain = category WHERE (customDomain IS NULL OR customDomain = '') AND instr(category, '.') > 0").run();
 
 // Insert default superadmin if not exists
 const adminEmail = 'admin@weblone.de';
@@ -1680,9 +1682,10 @@ app.delete('/api/user/:id/deal/:dealId', (req, res) => {
 
 app.post('/api/user/:id/domain', (req, res) => {
   const { customDomain } = req.body;
+  const normalizedDomain = String(customDomain || '').trim().toLowerCase();
   try {
-    db.prepare('UPDATE users SET category = ? WHERE id = ?')
-      .run(customDomain, req.params.id);
+    db.prepare('UPDATE users SET customDomain = ? WHERE id = ?')
+      .run(normalizedDomain, req.params.id);
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
@@ -1965,7 +1968,13 @@ app.post('/api/site/:id/pages/:pageId/blocks/reorder', (req, res) => {
 app.get('/api/public/site/:slug', (req, res) => {
   try {
     const slug = req.params.slug.toLowerCase().trim();
-    const user = db.prepare('SELECT id, username, siteSlug, templateId, category, avatarUrl, toolsConfig FROM users WHERE siteSlug = ? OR category = ?').get(slug, slug);
+    const user = db.prepare(`
+      SELECT id, username, siteSlug, templateId, category, customDomain, avatarUrl, toolsConfig
+      FROM users
+      WHERE lower(siteSlug) = ?
+         OR lower(customDomain) = ?
+         OR (lower(category) = ? AND instr(category, '.') > 0)
+    `).get(slug, slug, slug);
     
     if (!user) {
       return res.status(404).json({ success: false, error: 'Streamer nicht gefunden.' });
@@ -2125,8 +2134,13 @@ app.get('/api/streamer/:slug', (req, res) => {
   try {
     const slug = req.params.slug.toLowerCase().trim();
     console.log('Fetching streamer for slug/domain:', slug);
-    // Search by siteSlug OR custom domain (stored in category)
-    const user = db.prepare('SELECT id, username, siteSlug, templateId, category, avatarUrl, toolsConfig FROM users WHERE siteSlug = ? OR category = ?').get(slug, slug);
+    const user = db.prepare(`
+      SELECT id, username, siteSlug, templateId, category, customDomain, avatarUrl, toolsConfig
+      FROM users
+      WHERE lower(siteSlug) = ?
+         OR lower(customDomain) = ?
+         OR (lower(category) = ? AND instr(category, '.') > 0)
+    `).get(slug, slug, slug);
     
     if (!user) {
       console.log('Streamer not found for slug/domain:', slug);
