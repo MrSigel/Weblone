@@ -1822,7 +1822,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     setStatus('Richte alles ein...');
 
     const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
-    const themeMap = { 1: 'neon', 2: 'minimal', 3: 'casino' };
+    const themeMap = { 1: 'casino_midnightblue', 2: 'template2_draft', 3: 'template3_draft' };
     const backgroundTheme = themeMap[templateId] || 'dark';
 
     try {
