@@ -134,29 +134,143 @@ const theme = {
 };
 
 const landingBackgroundThemes = {
+  neon: {
+    label: 'Neon Night (Template 1)',
+    siteClass: 'bg-[#05000A]',
+    previewClass: 'bg-[#05000A]',
+    bubbles: false,
+    component: 'NeonParticles'
+  },
+  minimal: {
+    label: 'Minimal Pro (Template 2)',
+    siteClass: 'bg-[#0A0A0A]',
+    previewClass: 'bg-[#0A0A0A]',
+    bubbles: false,
+    component: 'MinimalWaves'
+  },
+  casino: {
+    label: 'Casino Master (Template 3)',
+    siteClass: 'bg-[#0A0000]',
+    previewClass: 'bg-[#0A0000]',
+    bubbles: false,
+    component: 'CasinoGlow'
+  },
   dark: {
     label: 'Dark Classic',
     siteClass: 'bg-[#050505]',
     previewClass: 'bg-[#050505]',
     bubbles: true
-  },
-  ocean: {
-    label: 'Ocean Blue',
-    siteClass: 'bg-gradient-to-br from-[#0b1020] via-[#10223f] to-[#0a1730]',
-    previewClass: 'bg-gradient-to-br from-[#0b1020] via-[#10223f] to-[#0a1730]',
-    bubbles: false
-  },
-  sunset: {
-    label: 'Sunset Gold',
-    siteClass: 'bg-gradient-to-br from-[#1a1020] via-[#3a1b2f] to-[#4a2a12]',
-    previewClass: 'bg-gradient-to-br from-[#1a1020] via-[#3a1b2f] to-[#4a2a12]',
-    bubbles: false
-  },
-  emerald: {
-    label: 'Emerald Night',
-    siteClass: 'bg-gradient-to-br from-[#071713] via-[#0f2a22] to-[#102720]',
-    previewClass: 'bg-gradient-to-br from-[#071713] via-[#0f2a22] to-[#102720]',
-    bubbles: false
+  }
+};
+
+const NeonParticles = () => {
+  const particles = Array.from({ length: 30 }).map((_, i) => ({
+    id: i,
+    size: Math.random() * 3 + 1,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    duration: Math.random() * 10 + 5,
+    delay: Math.random() * 5,
+    color: Math.random() > 0.5 ? '#6366f1' : '#a855f7'
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#05000A]" style={{ zIndex: -1 }}>
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#312e81_0%,transparent_50%)]" />
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            backgroundColor: p.color,
+            filter: 'blur(1px)',
+            boxShadow: `0 0 10px ${p.color}`
+          }}
+          animate={{
+            y: [0, -100, 0],
+            opacity: [0.2, 0.6, 0.2],
+            scale: [1, 1.5, 1]
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "linear"
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const MinimalWaves = () => (
+  <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#0A0A0A]" style={{ zIndex: -1 }}>
+    <motion.div 
+      animate={{
+        opacity: [0.05, 0.1, 0.05],
+        scale: [1, 1.1, 1],
+      }}
+      transition={{ duration: 10, repeat: Infinity }}
+      className="absolute -top-[20%] -left-[10%] w-[80%] h-[80%] rounded-full bg-indigo-500/20 blur-[120px]"
+    />
+    <motion.div 
+      animate={{
+        opacity: [0.03, 0.08, 0.03],
+        scale: [1.1, 1, 1.1],
+      }}
+      transition={{ duration: 12, repeat: Infinity }}
+      className="absolute -bottom-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-emerald-500/10 blur-[120px]"
+    />
+    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150" />
+  </div>
+);
+
+const CasinoGlow = () => {
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#0A0000]" style={{ zIndex: -1 }}>
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#450a0a_0%,transparent_70%)] opacity-40" />
+      <motion.div 
+        animate={{
+          opacity: [0.1, 0.3, 0.1],
+          y: [0, 50, 0],
+        }}
+        transition={{ duration: 8, repeat: Infinity }}
+        className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-amber-500/10 to-transparent blur-3xl"
+      />
+      {Array.from({ length: 15 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-1 h-1 bg-amber-500/40 rounded-full"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            scale: [1, 3, 1],
+            opacity: [0, 0.5, 0],
+          }}
+          transition={{
+            duration: Math.random() * 4 + 3,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const TemplateBackground = ({ themeId }) => {
+  switch(themeId) {
+    case 'neon': return <NeonParticles />;
+    case 'minimal': return <MinimalWaves />;
+    case 'casino': return <CasinoGlow />;
+    case 'dark': return <BackgroundBubbles />;
+    default: return <BackgroundBubbles />;
   }
 };
 
@@ -1700,6 +1814,9 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     setStatus('Richte alles ein...');
 
     const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
+    const themeMap = { 1: 'neon', 2: 'minimal', 3: 'casino' };
+    const backgroundTheme = themeMap[templateId] || 'dark';
+
     try {
       // Step A: setup account/site basics
       if (!user.isSetupComplete) {
@@ -1710,7 +1827,8 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             templateId,
             username: basic.streamerName,
             siteSlug: slug,
-            category: basic.category
+            category: basic.category,
+            backgroundTheme
           })
         });
         const setupData = await setupRes.json();
@@ -5537,7 +5655,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
 
   return (
     <div className={`min-h-screen text-white font-sans selection:bg-indigo-500/30 flex flex-col ${siteTheme.siteClass}`}>
-      {siteTheme.bubbles && <BackgroundBubbles />}
+      <TemplateBackground themeId={settings?.backgroundTheme} />
       
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 py-3 md:py-6">
