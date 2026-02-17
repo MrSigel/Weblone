@@ -164,19 +164,21 @@ const landingBackgroundThemes = {
 };
 
 const NeonParticles = () => {
-  const particles = Array.from({ length: 30 }).map((_, i) => ({
+  const particles = Array.from({ length: 40 }).map((_, i) => ({
     id: i,
-    size: Math.random() * 3 + 1,
+    size: Math.random() * 4 + 1,
     x: Math.random() * 100,
     y: Math.random() * 100,
-    duration: Math.random() * 10 + 5,
+    duration: Math.random() * 12 + 8,
     delay: Math.random() * 5,
-    color: Math.random() > 0.5 ? '#6366f1' : '#a855f7'
+    color: Math.random() > 0.5 ? '#818cf8' : '#c084fc'
   }));
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#05000A]" style={{ zIndex: -1 }}>
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-20%,#312e81_0%,transparent_50%)]" />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#030005]" style={{ zIndex: -1 }}>
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_-10%,#312e81_0%,transparent_60%)] opacity-40" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-600/10 blur-[120px] rounded-full" />
+      <div className="absolute top-1/2 left-0 -translate-y-1/2 w-[300px] h-[600px] bg-indigo-600/5 blur-[100px] rounded-full" />
       {particles.map((p) => (
         <motion.div
           key={p.id}
@@ -188,12 +190,12 @@ const NeonParticles = () => {
             top: `${p.y}%`,
             backgroundColor: p.color,
             filter: 'blur(1px)',
-            boxShadow: `0 0 10px ${p.color}`
+            boxShadow: `0 0 15px ${p.color}`
           }}
           animate={{
-            y: [0, -100, 0],
-            opacity: [0.2, 0.6, 0.2],
-            scale: [1, 1.5, 1]
+            y: [0, -150, 0],
+            opacity: [0.1, 0.4, 0.1],
+            scale: [1, 2, 1]
           }}
           transition={{
             duration: p.duration,
@@ -208,53 +210,61 @@ const NeonParticles = () => {
 };
 
 const MinimalWaves = () => (
-  <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#0A0A0A]" style={{ zIndex: -1 }}>
+  <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#050505]" style={{ zIndex: -1 }}>
     <motion.div 
       animate={{
-        opacity: [0.05, 0.1, 0.05],
-        scale: [1, 1.1, 1],
+        opacity: [0.03, 0.06, 0.03],
+        scale: [1, 1.05, 1],
       }}
-      transition={{ duration: 10, repeat: Infinity }}
-      className="absolute -top-[20%] -left-[10%] w-[80%] h-[80%] rounded-full bg-indigo-500/20 blur-[120px]"
+      transition={{ duration: 15, repeat: Infinity }}
+      className="absolute top-[-10%] left-[-5%] w-[60%] h-[60%] rounded-full bg-white/5 blur-[120px]"
     />
     <motion.div 
       animate={{
-        opacity: [0.03, 0.08, 0.03],
-        scale: [1.1, 1, 1.1],
+        opacity: [0.02, 0.05, 0.02],
+        scale: [1.05, 1, 1.05],
       }}
-      transition={{ duration: 12, repeat: Infinity }}
-      className="absolute -bottom-[20%] -right-[10%] w-[70%] h-[70%] rounded-full bg-emerald-500/10 blur-[120px]"
+      transition={{ duration: 18, repeat: Infinity }}
+      className="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-neutral-500/5 blur-[120px]"
     />
-    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] brightness-100 contrast-150" />
+    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay" />
   </div>
 );
 
 const CasinoGlow = () => {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#0A0000]" style={{ zIndex: -1 }}>
-      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#450a0a_0%,transparent_70%)] opacity-40" />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#080000]" style={{ zIndex: -1 }}>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#450a0a_0%,transparent_80%)] opacity-30" />
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-amber-900/10 via-transparent to-red-900/5" />
+      
       <motion.div 
         animate={{
-          opacity: [0.1, 0.3, 0.1],
-          y: [0, 50, 0],
+          opacity: [0.1, 0.2, 0.1],
+          y: [-20, 20, -20],
         }}
-        transition={{ duration: 8, repeat: Infinity }}
-        className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-amber-500/10 to-transparent blur-3xl"
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-[10%] left-0 w-full h-1/2 bg-amber-500/5 blur-[140px]"
       />
-      {Array.from({ length: 15 }).map((_, i) => (
+
+      {Array.from({ length: 20 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 bg-amber-500/40 rounded-full"
+          className="absolute rounded-full"
           style={{
+            width: Math.random() * 2 + 1,
+            height: Math.random() * 2 + 1,
+            backgroundColor: Math.random() > 0.5 ? '#f59e0b' : '#ef4444',
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
+            boxShadow: `0 0 10px ${Math.random() > 0.5 ? '#f59e0b' : '#ef4444'}`
           }}
           animate={{
-            scale: [1, 3, 1],
-            opacity: [0, 0.5, 0],
+            scale: [1, 2.5, 1],
+            opacity: [0, 0.4, 0],
+            y: [0, -40, 0]
           }}
           transition={{
-            duration: Math.random() * 4 + 3,
+            duration: Math.random() * 6 + 4,
             repeat: Infinity,
             delay: Math.random() * 5,
           }}
