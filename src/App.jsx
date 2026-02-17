@@ -5780,11 +5780,10 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
           </div>
           <div className="flex flex-col items-center md:items-end gap-4">
             <div className="flex gap-6">
-               <a href="/privacy" className="text-xs text-[#555] hover:text-white transition-colors">Datenschutz</a>
-               <a href="/imprint" className="text-xs text-[#555] hover:text-white transition-colors">Impressum</a>
+               <a href="https://weblone.de" target="_blank" rel="noopener noreferrer" className="text-xs text-[#555] hover:text-white transition-colors">weblone.de</a>
             </div>
             <p className="text-[10px] text-[#333] font-bold uppercase tracking-[0.2em]">
-              © 2026 {user.username} ? Created by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500/50 hover:text-indigo-500">Weblone</a>
+              © 2026 {user.username} ? Erstellt ueber <a href="https://weblone.de" target="_blank" rel="noopener noreferrer" className="text-blue-400/70 hover:text-blue-400">weblone.de</a>
             </p>
           </div>
         </div>
@@ -5885,4 +5884,5 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
 
