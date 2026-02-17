@@ -2012,70 +2012,74 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-[#050505]/95 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
           >
             <motion.div 
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
-              className="w-full max-w-5xl h-[80vh] bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden flex flex-col relative"
+              className="w-full max-w-6xl h-full max-h-[90vh] bg-[#0A0A0A] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col relative"
             >
               <div className="p-6 border-b border-white/5 flex items-center justify-between bg-[#0F0F0F]">
                 <div>
-                  <h3 className="text-xl font-bold text-white">Vorschau: {showDemo.name}</h3>
-                  <p className="text-sm text-[#A1A1A1]">{showDemo.preset}</p>
+                  <h2 className="text-2xl font-black text-white">Vorschau: {showDemo.name}</h2>
+                  <p className="text-sm text-[#A1A1A1] italic">So sieht deine Seite für Besucher aus</p>
                 </div>
                 <button 
                   onClick={() => setShowDemo(null)}
-                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-all"
+                  className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
                 >
-                  ✕
+                  <Plus className="rotate-45 text-white" />
                 </button>
               </div>
-              
-              <div className="flex-1 overflow-y-auto relative p-8 custom-scrollbar">
+
+              <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#050505] relative">
                 <div className="absolute inset-0 z-0">
-                  <TemplateBackground themeId={showDemo.id === 1 ? 'neon' : showDemo.id === 2 ? 'minimal' : 'casino'} />
+                   {showDemo.id === 1 && <NeonParticles />}
+                   {showDemo.id === 2 && <MinimalWaves />}
+                   {showDemo.id === 3 && <CasinoGlow />}
                 </div>
-                
-                {/* Mockup of a real streamer landing page */}
-                <div className="max-w-2xl mx-auto space-y-12 py-10 relative z-10">
-                  <header className="text-center space-y-4">
-                    <div className="w-24 h-24 rounded-full bg-indigo-600 mx-auto shadow-2xl shadow-indigo-600/40 border-4 border-[#0A0A0A]" />
-                    <h2 className="text-4xl font-black text-white tracking-tight uppercase">STREAMER NAME</h2>
-                    <p className="text-indigo-400 font-medium">LIVE AUF TWITCH & KICK</p>
+
+                <div className={`max-w-4xl mx-auto py-20 px-6 space-y-16 relative z-10 ${showDemo.id === 2 ? 'text-left' : 'text-center'}`}>
+                  <header className={`space-y-6 ${showDemo.id === 2 ? 'flex items-center gap-8' : ''}`}>
+                    <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${showDemo.id === 2 ? 'mx-0 rounded-2xl' : 'mx-auto'} p-1 bg-gradient-to-tr ${showDemo.id === 1 ? 'from-indigo-600 to-purple-600 shadow-indigo-500/20' : showDemo.id === 2 ? 'from-white/10 to-white/5' : 'from-amber-600 to-orange-600 shadow-amber-500/20'} shadow-2xl`}>
+                       <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-white/5">
+                          <User size={64} className="text-white/20" />
+                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className={`text-5xl md:text-7xl font-black tracking-tighter ${showDemo.id === 3 ? 'uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500' : showDemo.id === 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400' : 'text-white'}`}>
+                        @{user?.username || 'Streamer'}
+                      </h2>
+                      <p className="text-xl text-[#A1A1A1] font-medium tracking-tight">Dein professioneller Stream-Hub</p>
+                    </div>
                   </header>
 
-                  <div className="grid gap-4">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className={`p-5 rounded-2xl border flex items-center justify-between transition-all backdrop-blur-md ${showDemo.id === 1 ? 'bg-indigo-600/20 border-indigo-500/30' : showDemo.id === 2 ? 'bg-white/5 border-white/10' : 'bg-amber-600/20 border-amber-500/30'}`}>
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-xl ${showDemo.id === 1 ? 'bg-indigo-500/40' : showDemo.id === 2 ? 'bg-white/10' : 'bg-amber-500/40'}`} />
-                          <div>
-                            <p className="font-bold text-white uppercase tracking-tight">Exklusiver Deal #{i}</p>
-                            <p className={`text-xs ${showDemo.id === 1 ? 'text-indigo-300' : showDemo.id === 2 ? 'text-white/50' : 'text-amber-300'}`}>100% Bonus + 50 Freispiele</p>
-                          </div>
-                        </div>
-                        <div className={`w-24 h-10 rounded-lg ${showDemo.id === 1 ? 'bg-indigo-500' : showDemo.id === 2 ? 'bg-white text-black' : 'bg-amber-500'}`} />
-                      </div>
-                    ))}
+                  <div className={`grid gap-6 ${showDemo.id === 2 ? 'max-w-xl' : 'max-w-2xl mx-auto'}`}>
+                    <div className={`w-full px-10 py-5 rounded-[1.5rem] font-black text-xl shadow-2xl transform transition-transform ${showDemo.id === 1 ? 'bg-indigo-600 text-white shadow-indigo-900/40' : showDemo.id === 2 ? 'bg-white text-black shadow-white/5' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-amber-900/40'}`}>
+                      JETZT BONUS SICHERN
+                    </div>
+                    <div className="px-6 py-4 rounded-xl border border-white/5 bg-white/5 text-[10px] font-black text-[#666] tracking-[0.2em] uppercase">
+                      Verifiziert | 18+ | Verantwortungsvoll spielen
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md" />
-                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     {[1,2,3,4].map(i => (
+                       <div key={i} className="h-24 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md animate-pulse" />
+                     ))}
                   </div>
                 </div>
               </div>
 
-              <div className="p-6 border-t border-white/5 bg-[#0F0F0F] flex justify-center">
+              <div className="p-8 border-t border-white/5 bg-[#0F0F0F] flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
                 <button 
                   onClick={() => {
                     setTemplateId(showDemo.id);
                     setShowDemo(null);
                   }}
-                  className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20"
+                  className="px-12 py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-xl hover:bg-indigo-500 transition-all shadow-2xl shadow-indigo-600/40 hover:scale-105 active:scale-95"
                 >
-                  Dieses Design wählen
+                  Dieses Design wählen & Fortfahren
                 </button>
               </div>
             </motion.div>
@@ -5510,66 +5514,6 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
     </article>
   );
 };
-              onError={(e) => { e.currentTarget.style.display = 'none'; }}
-            />
-            <p className="text-xs text-[#d8def1]">Curacao</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="p-4 border-b border-[#2a385c]">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
-          {providers.map((provider) => (
-            <div key={provider.name} className="rounded bg-white/5 border border-white/10 py-2 px-2 flex items-center justify-center h-10">
-              <img
-                src={provider.src}
-                alt={provider.name}
-                className="max-h-5 w-auto"
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.textContent = provider.name; }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="p-4">
-        <p className="font-bold">
-          Berechne dein Bonusguthaben:
-          <span className="font-normal italic text-[#d8def1]"> (Maximaler Bonus bei einer Einzahlung von 300EUR)</span>
-        </p>
-        <div className="mt-3 grid md:grid-cols-[220px_1fr_1fr_1fr] gap-3 items-end">
-          <div>
-            <label className="text-xs text-[#d8def1] block mb-1">Einzahlungsbetrag</label>
-            <div className="flex rounded border border-white/20 overflow-hidden">
-              <input
-                type="number"
-                min="0"
-                value={deposit}
-                onChange={(e) => setDeposit(Math.max(0, Number(e.target.value || 0)))}
-                className="w-full bg-[#0f172a] px-3 py-2 text-xl font-bold outline-none"
-              />
-              <span className="px-3 py-2 bg-[#1e293b] text-[#d8def1]">EUR</span>
-            </div>
-          </div>
-          <div className="text-center">
-            <p className="text-4xl font-black text-amber-300">{total.toLocaleString('de-DE')}EUR</p>
-            <p className="text-xs text-[#d8def1]">Gesamtguthaben</p>
-          </div>
-          <div className="text-center">
-            <p className="text-4xl font-black text-amber-300">{bonus.toLocaleString('de-DE')}EUR</p>
-            <p className="text-xs text-[#d8def1]">Bonusguthaben</p>
-          </div>
-          <div className="text-center">
-            <p className="text-4xl font-black text-amber-300">{wager.toLocaleString('de-DE')}EUR</p>
-            <p className="text-xs text-[#d8def1]">Wager (D+B)</p>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-};
-
 const CasinoDealsSection = ({ deals = [], compact = false, ctaHref = '#' }) => {
   if (!deals.length) {
     return (
