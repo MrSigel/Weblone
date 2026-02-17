@@ -1988,14 +1988,14 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
 // --- DASHBOARD COMPONENTS ---
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, isSetupComplete }) => {
   const menuItems = [
     { id: 'overview', name: 'Overview', icon: Layout },
-    { id: 'builder', name: 'Site Builder', icon: Monitor },
-    { id: 'deals', name: 'Deals / Sponsorships', icon: Briefcase },
-    { id: 'tools', name: 'Tools', icon: Wrench },
-    { id: 'domain', name: 'Domain', icon: Globe },
-    { id: 'settings', name: 'Settings', icon: Settings }
+    { id: 'builder', name: 'Site Builder', icon: Monitor, restricted: true },
+    { id: 'deals', name: 'Deals / Sponsorships', icon: Briefcase, restricted: true },
+    { id: 'tools', name: 'Tools', icon: Wrench, restricted: true },
+    { id: 'domain', name: 'Domain', icon: Globe, restricted: true },
+    { id: 'settings', name: 'Settings', icon: Settings, restricted: true }
   ];
 
   const handleLogout = () => {
@@ -2011,16 +2011,27 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-2">
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${activeTab === item.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-[#A1A1A1] hover:bg-white/5 hover:text-[#EDEDED]'}`}
-          >
-            <item.icon size={20} />
-            <span className="font-medium">{item.name}</span>
-          </button>
-        ))}
+        {menuItems.map((item) => {
+          const isDisabled = item.restricted && !isSetupComplete;
+          return (
+            <button
+              key={item.id}
+              onClick={() => !isDisabled && setActiveTab(item.id)}
+              disabled={isDisabled}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                activeTab === item.id 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                  : isDisabled
+                    ? 'opacity-30 cursor-not-allowed text-[#A1A1A1]'
+                    : 'text-[#A1A1A1] hover:bg-white/5 hover:text-[#EDEDED]'
+              }`}
+            >
+              <item.icon size={20} />
+              <span className="font-medium">{item.name}</span>
+              {isDisabled && <Lock size={14} className="ml-auto" />}
+            </button>
+          );
+        })}
       </nav>
       <div className="p-4 border-t border-white/5 space-y-2">
         <button 
