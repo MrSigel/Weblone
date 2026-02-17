@@ -2019,33 +2019,37 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto bg-[#050505] p-8 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto relative p-8 custom-scrollbar">
+                <div className="absolute inset-0 z-0">
+                  <TemplateBackground themeId={showDemo.id === 1 ? 'neon' : showDemo.id === 2 ? 'minimal' : 'casino'} />
+                </div>
+                
                 {/* Mockup of a real streamer landing page */}
-                <div className="max-w-2xl mx-auto space-y-12 py-10">
+                <div className="max-w-2xl mx-auto space-y-12 py-10 relative z-10">
                   <header className="text-center space-y-4">
                     <div className="w-24 h-24 rounded-full bg-indigo-600 mx-auto shadow-2xl shadow-indigo-600/40 border-4 border-[#0A0A0A]" />
-                    <h2 className="text-4xl font-black text-white tracking-tight">STREAMER NAME</h2>
+                    <h2 className="text-4xl font-black text-white tracking-tight uppercase">STREAMER NAME</h2>
                     <p className="text-indigo-400 font-medium">LIVE AUF TWITCH & KICK</p>
                   </header>
 
                   <div className="grid gap-4">
                     {[1, 2, 3].map(i => (
-                      <div key={i} className={`p-5 rounded-2xl border flex items-center justify-between transition-all ${showDemo.id === 1 ? 'bg-indigo-600 border-indigo-400' : showDemo.id === 2 ? 'bg-[#111] border-white/10' : 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-400'}`}>
+                      <div key={i} className={`p-5 rounded-2xl border flex items-center justify-between transition-all backdrop-blur-md ${showDemo.id === 1 ? 'bg-indigo-600/20 border-indigo-500/30' : showDemo.id === 2 ? 'bg-white/5 border-white/10' : 'bg-amber-600/20 border-amber-500/30'}`}>
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-white/20" />
+                          <div className={`w-12 h-12 rounded-xl ${showDemo.id === 1 ? 'bg-indigo-500/40' : showDemo.id === 2 ? 'bg-white/10' : 'bg-amber-500/40'}`} />
                           <div>
-                            <p className="font-bold text-white">Exklusiver Deal #{i}</p>
-                            <p className="text-xs text-white/70">100% Bonus + 50 Freispiele</p>
+                            <p className="font-bold text-white uppercase tracking-tight">Exklusiver Deal #{i}</p>
+                            <p className={`text-xs ${showDemo.id === 1 ? 'text-indigo-300' : showDemo.id === 2 ? 'text-white/50' : 'text-amber-300'}`}>100% Bonus + 50 Freispiele</p>
                           </div>
                         </div>
-                        <div className="w-24 h-10 rounded-lg bg-white/20" />
+                        <div className={`w-24 h-10 rounded-lg ${showDemo.id === 1 ? 'bg-indigo-500' : showDemo.id === 2 ? 'bg-white text-black' : 'bg-amber-500'}`} />
                       </div>
                     ))}
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10" />
-                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10" />
+                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md" />
+                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md" />
                   </div>
                 </div>
               </div>
@@ -3256,72 +3260,77 @@ const BuilderPreview = ({ user, deals = [], settings, pages, blocks, activePageI
         <span className="text-xs text-[#A1A1A1]">Änderungen erscheinen sofort</span>
       </div>
 
-      <div className={`rounded-2xl border border-white/10 overflow-hidden ${previewTheme.previewClass}`}>
-        <div className="px-4 py-3 border-b border-white/10 bg-[#0A0A0A] flex items-center justify-between">
-          <span className="font-bold text-white">{settings.navTitle || user?.username || 'Streamer'}</span>
-          <span className="text-xs text-[#A1A1A1]">{activePage?.title || 'Seite'}</span>
+      <div className={`rounded-2xl border border-white/10 overflow-hidden relative ${previewTheme.previewClass}`}>
+        <div className="absolute inset-0 z-0">
+          <TemplateBackground themeId={settings?.backgroundTheme} />
         </div>
-
-        <div className="px-4 py-3 border-b border-white/10 flex flex-wrap gap-2">
-          {(visiblePages.length ? visiblePages : pages).map((page) => (
-            <button
-              key={page.id}
-              onClick={() => setActivePageId(page.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${page.id === activePageId ? 'bg-indigo-600 text-white' : 'bg-white/5 text-[#A1A1A1] hover:text-white'}`}
-            >
-              {page.title}
-            </button>
-          ))}
-        </div>
-
-        <div className="p-6 space-y-6">
-          {!!conversionBoosterEnabled && !!settings.urgencyText && (
-            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-              {settings.urgencyText}
-            </div>
-          )}
-
-          {!!conversionBoosterEnabled && !!settings.primaryCtaUrl && (
-            <a
-              href={settings.primaryCtaUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition-all"
-            >
-              {settings.primaryCtaText || 'Jetzt Bonus sichern'}
-            </a>
-          )}
-
-          {isCasinoPage ? (
-            <CasinoDealsSection deals={deals} compact />
-          ) : pageBlocks.length === 0 ? (
-            <div className="text-center py-12 text-[#A1A1A1]">
-              Diese Seite hat noch keine Blöcke.
-            </div>
-          ) : (
-            pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
-          )}
-
-          {!!conversionBoosterEnabled && !!settings.trustBadgeText && (
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-              {settings.trustBadgeText}
-            </div>
-          )}
-        </div>
-
-        {!!conversionBoosterEnabled && !!settings.stickyCtaEnabled && (
-          <div className="sticky bottom-0 border-t border-white/10 bg-[#0A0A0A] px-4 py-3 flex items-center justify-between gap-3">
-            <p className="text-xs text-[#A1A1A1] truncate">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
-            <a
-              href={settings.stickyCtaUrl || settings.primaryCtaUrl || '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all"
-            >
-              Zum Angebot
-            </a>
+        <div className="relative z-10">
+          <div className="px-4 py-3 border-b border-white/10 bg-[#0A0A0A]/60 backdrop-blur-md flex items-center justify-between">
+            <span className="font-bold text-white">{settings.navTitle || user?.username || 'Streamer'}</span>
+            <span className="text-xs text-[#A1A1A1]">{activePage?.title || 'Seite'}</span>
           </div>
-        )}
+
+          <div className="px-4 py-3 border-b border-white/10 flex flex-wrap gap-2 bg-black/20 backdrop-blur-sm">
+            {(visiblePages.length ? visiblePages : pages).map((page) => (
+              <button
+                key={page.id}
+                onClick={() => setActivePageId(page.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${page.id === activePageId ? 'bg-indigo-600 text-white' : 'bg-white/5 text-[#A1A1A1] hover:text-white'}`}
+              >
+                {page.title}
+              </button>
+            ))}
+          </div>
+
+          <div className="p-6 space-y-6">
+            {!!conversionBoosterEnabled && !!settings.urgencyText && (
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
+                {settings.urgencyText}
+              </div>
+            )}
+
+            {!!conversionBoosterEnabled && !!settings.primaryCtaUrl && (
+              <a
+                href={settings.primaryCtaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition-all"
+              >
+                {settings.primaryCtaText || 'Jetzt Bonus sichern'}
+              </a>
+            )}
+
+            {isCasinoPage ? (
+              <CasinoDealsSection deals={deals} compact />
+            ) : pageBlocks.length === 0 ? (
+              <div className="text-center py-12 text-[#A1A1A1]">
+                Diese Seite hat noch keine Blöcke.
+              </div>
+            ) : (
+              pageBlocks.map((block) => <RenderBlock key={block.id} block={block} deals={[]} />)
+            )}
+
+            {!!conversionBoosterEnabled && !!settings.trustBadgeText && (
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+                {settings.trustBadgeText}
+              </div>
+            )}
+          </div>
+
+          {!!conversionBoosterEnabled && !!settings.stickyCtaEnabled && (
+            <div className="sticky bottom-0 border-t border-white/10 bg-[#0A0A0A]/80 backdrop-blur-md px-4 py-3 flex items-center justify-between gap-3">
+              <p className="text-xs text-[#A1A1A1] truncate">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
+              <a
+                href={settings.stickyCtaUrl || settings.primaryCtaUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-indigo-500 transition-all"
+              >
+                Zum Angebot
+              </a>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
