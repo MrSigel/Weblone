@@ -1550,6 +1550,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     hunt: true,
     giveaway: true
   });
+  const [showDemo, setShowDemo] = useState(null);
 
   const isValidUrl = (value) => {
     if (!value) return true;
