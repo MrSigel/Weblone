@@ -1275,9 +1275,6 @@ app.post('/api/user/:id/setup', (req, res) => {
   try {
     // Start transaction to ensure everything is created or nothing
     const transaction = db.transaction(() => {
-      const existingUser = db.prepare('SELECT isSetupComplete FROM users WHERE id = ?').get(userId);
-      const isFirstSetup = !existingUser || Number(existingUser.isSetupComplete || 0) === 0;
-
       // 2. Update user setup data
       db.prepare(`
         UPDATE users 
@@ -1290,9 +1287,6 @@ app.post('/api/user/:id/setup', (req, res) => {
         .run(userId, username, normalizedBackgroundTheme);
       db.prepare('UPDATE streamer_site_settings SET navTitle = ?, backgroundTheme = ? WHERE userId = ?')
         .run(username, normalizedBackgroundTheme, userId);
-
-      // Seed defaults only on first setup to avoid overriding existing custom work
-      if (!isFirstSetup) return;
 
       // 3. Clear existing blocks/pages to avoid duplicates
       db.prepare('DELETE FROM site_blocks WHERE userId = ?').run(userId);
