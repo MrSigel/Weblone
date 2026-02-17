@@ -1052,7 +1052,8 @@ const Login = ({ onLogin }) => {
         if (data.user?.isSuperadmin) {
           navigate('/superadmin');
         } else {
-          navigate(data.user.isSetupComplete ? '/dashboard' : '/onboarding');
+          // Immer zum Dashboard, Setupwizard ist nun optionaler Startbutton dort
+          navigate('/dashboard');
         }
       } else {
         setError(data.error);
@@ -1214,7 +1215,8 @@ const Register = ({ onRegister }) => {
       const data = await response.json();
       if (data.success) {
         onRegister(data.user);
-        navigate('/onboarding');
+        // Immer zum Dashboard, Setupwizard ist nun optionaler Startbutton dort
+        navigate('/dashboard');
       } else {
         setError(data.error);
       }
