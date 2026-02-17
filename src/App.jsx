@@ -1565,8 +1565,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
   const stepLabels = [
     'Basisdaten',
     'Template',
-    'Social Tokens',
-    'Landingpage',
     'Verbindung starten'
   ];
 
@@ -1680,18 +1678,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
       if (!slugState.available) return slugState.message || 'Name ist nicht verfügbar.';
       return '';
     }
-    if (currentStep === 2) {
-      if ((social.twitchOauthToken && !social.twitchBotUsername) || (!social.twitchOauthToken && social.twitchBotUsername)) {
-        return 'Für Twitch Bot müssen Username und OAuth Token gemeinsam gesetzt werden.';
-      }
-      if (social.kickWebhookUrl && !isValidUrl(social.kickWebhookUrl)) return 'Kick Webhook URL ist ungültig.';
-      return '';
-    }
-    if (currentStep === 3) {
-      if (landing.primaryCtaUrl && !isValidUrl(landing.primaryCtaUrl)) return 'Primary CTA URL ist ungültig.';
-      if (landing.stickyCtaUrl && !isValidUrl(landing.stickyCtaUrl)) return 'Sticky CTA URL ist ungültig.';
-      return '';
-    }
     return '';
   };
 
@@ -1704,7 +1690,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
   const finalizeWizard = async () => {
     if (!user?.id) return;
-    const blockers = [0, 2, 3].map((s) => getStepError(s)).filter(Boolean);
+    const blockers = [0].map((s) => getStepError(s)).filter(Boolean);
     if (blockers.length > 0) {
       setError(blockers[0]);
       return;
@@ -1729,79 +1715,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
         });
         const setupData = await setupRes.json();
         if (!setupRes.ok || !setupData.success) throw new Error(setupData.error || 'Setup fehlgeschlagen.');
-      }
-
-      setStatus('Speichere Tools und Social...');
-      const dashboardRes = await fetch(`${API_BASE}/api/user/${user.id}/dashboard`);
-      const dashboardData = await dashboardRes.json();
-      const currentUser = dashboardData?.data?.user || user;
-      const currentDeals = dashboardData?.data?.deals || [];
-
-      let toolsConfig = {};
-      try {
-        toolsConfig = typeof currentUser?.toolsConfig === 'string'
-          ? JSON.parse(currentUser.toolsConfig || '{}')
-          : (currentUser?.toolsConfig || {});
-      } catch (e) {}
-
-      toolsConfig.chatAuth = {
-        ...(toolsConfig.chatAuth || {}),
-        twitchBotUsername: social.twitchBotUsername,
-        twitchOauthToken: social.twitchOauthToken
-      };
-      toolsConfig.kickBridge = {
-        ...(toolsConfig.kickBridge || {}),
-        webhookUrl: social.kickWebhookUrl,
-        webhookSecret: social.kickWebhookSecret
-      };
-
-      ['bonushunt', 'wagerbar', 'slottracker', 'tournament'].forEach((toolId) => {
-        toolsConfig[toolId] = {
-          ...(toolsConfig[toolId] || {}),
-          twitch: bot.twitchChannel,
-          kick: bot.kickChannel
-        };
-      });
-
-      await fetch(`${API_BASE}/api/user/${user.id}/tools`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ toolsConfig })
-      });
-
-      if (social.kickChannel?.trim()) {
-        await fetch(`${API_BASE}/api/user/${user.id}/social/kick/connect`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ channel: social.kickChannel.trim() })
-        });
-      }
-
-      setStatus('Speichere Landingpage...');
-      await fetch(`${API_BASE}/api/site/${user.id}/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...landing,
-          navTitle: landing.navTitle || basic.streamerName
-        })
-      });
-
-      const pagesRes = await fetch(`${API_BASE}/api/site/${user.id}/pages`);
-      const pagesData = await pagesRes.json();
-      for (const p of (pagesData.pages || [])) {
-        const key = p.slug || '';
-        if (typeof pageVisibility[key] === 'boolean') {
-          await fetch(`${API_BASE}/api/site/${user.id}/pages/${p.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: p.title, slug: p.slug, visible: pageVisibility[key] ? 1 : 0 })
-          });
-        }
-      }
-
-      if (bot.autoStartReader && social.twitchBotUsername && social.twitchOauthToken) {
-        await fetch(`${API_BASE}/api/user/${user.id}/tools/chat-reader/start`, { method: 'POST' });
       }
 
       onComplete?.({
