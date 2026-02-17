@@ -1626,7 +1626,7 @@ const BaseSetup = ({ user, onComplete }) => {
 
 const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(initialStep);
+  const [step, setStep] = useState(Math.min(1, Math.max(0, Number(initialStep) || 0)));
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
@@ -1638,120 +1638,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     siteSlug: user?.siteSlug || '',
     category: user?.category || 'Casino'
   });
-  const [templateId, setTemplateId] = useState(user?.templateId || 2);
-  const [social, setSocial] = useState({
-    twitchBotUsername: '',
-    twitchOauthToken: '',
-    kickChannel: '',
-    kickWebhookUrl: '',
-    kickWebhookSecret: ''
-  });
-  const [bot, setBot] = useState({
-    twitchChannel: '',
-    kickChannel: '',
-    adIntervalMinutes: 15,
-    adMessage: 'Werbung: Checkt meine Deals auf der Landingpage.',
-    autoStartReader: false
-  });
-  const [dealSelections, setDealSelections] = useState({});
-  const [deals, setDeals] = useState([]);
-  const [landing, setLanding] = useState({
-    navTitle: user?.username || '',
-    slogan: '',
-    primaryCtaText: 'Jetzt Bonus sichern',
-    primaryCtaUrl: '',
-    stickyCtaEnabled: 1,
-    stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
-    stickyCtaUrl: '',
-    trustBadgeText: '',
-    urgencyText: ''
-  });
-  const [pageVisibility, setPageVisibility] = useState({
-    '': true,
-    shop: true,
-    hunt: true,
-    giveaway: true
-  });
-  const [showDemo, setShowDemo] = useState(null);
 
-  const isValidUrl = (value) => {
-    if (!value) return true;
-    try {
-      const u = new URL(value);
-      return ['http:', 'https:'].includes(u.protocol);
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const stepLabels = [
-    'Basisdaten',
-    'Template',
-    'Verbindung starten'
-  ];
+  const stepLabels = ['Basisdaten', 'Verbindung starten'];
 
   useEffect(() => {
     if (!user) navigate('/login');
   }, [user, navigate]);
-
-  useEffect(() => {
-    const load = async () => {
-      if (!user?.id) return;
-      try {
-        const [dashRes, settingsRes, pagesRes] = await Promise.all([
-          fetch(`${API_BASE}/api/user/${user.id}/dashboard`),
-          fetch(`${API_BASE}/api/site/${user.id}/settings`),
-          fetch(`${API_BASE}/api/site/${user.id}/pages`)
-        ]);
-
-        const dash = await dashRes.json();
-        const settings = await settingsRes.json();
-        const pages = await pagesRes.json();
-
-        if (dash.success) {
-          setDeals(dash.data?.deals || []);
-          const next = {};
-          (dash.data?.deals || []).forEach((d) => { next[d.id] = d.status !== 'Deaktiviert'; });
-          setDealSelections(next);
-
-          let parsedTools = {};
-          try {
-            parsedTools = typeof dash.data?.user?.toolsConfig === 'string'
-              ? JSON.parse(dash.data.user.toolsConfig || '{}')
-              : (dash.data?.user?.toolsConfig || {});
-          } catch (e) {}
-
-          setSocial((prev) => ({
-            ...prev,
-            twitchBotUsername: parsedTools?.chatAuth?.twitchBotUsername || '',
-            twitchOauthToken: parsedTools?.chatAuth?.twitchOauthToken || '',
-            kickChannel: parsedTools?.socialAuth?.kick?.channel || '',
-            kickWebhookUrl: parsedTools?.kickBridge?.webhookUrl || '',
-            kickWebhookSecret: parsedTools?.kickBridge?.webhookSecret || ''
-          }));
-          setBot((prev) => ({
-            ...prev,
-            twitchChannel: parsedTools?.bonushunt?.twitch || '',
-            kickChannel: parsedTools?.bonushunt?.kick || ''
-          }));
-        }
-
-        if (settings.success) {
-          setLanding((prev) => ({ ...prev, ...(settings.settings || {}) }));
-        }
-        if (pages.success) {
-          const vis = { ...pageVisibility };
-          (pages.pages || []).forEach((p) => {
-            vis[p.slug || ''] = !!p.visible;
-          });
-          setPageVisibility(vis);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    load();
-  }, [user?.id]);
 
   const normalizeSlug = (value) => String(value || '').toLowerCase().trim().replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-');
 
@@ -1773,12 +1665,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     }
 
     const timeoutId = setTimeout(async () => {
-      setSlugState({ checking: true, available: false, message: 'Prüfe Verfügbarkeit...' });
+      setSlugState({ checking: true, available: false, message: 'Pruefe Verfuegbarkeit...' });
       try {
         const res = await fetch(`${API_BASE}/api/check-slug/${encodeURIComponent(slug)}`);
         const data = await res.json();
         if (data.available) {
-          setSlugState({ checking: false, available: true, message: 'Name ist verfügbar.' });
+          setSlugState({ checking: false, available: true, message: 'Name ist verfuegbar.' });
         } else {
           setSlugState({ checking: false, available: false, message: 'Dieser Name ist bereits vergeben.' });
         }
@@ -1797,18 +1689,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
       if (!basic.streamerName.trim()) return 'Streamername ist erforderlich.';
       if (!slug) return 'Seiten-Name ist erforderlich.';
       if (slug.length < 3) return 'Name muss mindestens 3 Zeichen haben.';
-      if (!slugState.available) return slugState.message || 'Name ist nicht verfügbar.';
-      return '';
+      if (!slugState.available) return slugState.message || 'Name ist nicht verfuegbar.';
     }
     return '';
   };
 
   const currentStepError = getStepError(step);
-
-  const connectTwitchOauth = () => {
-    if (!user?.id) return;
-    window.location.href = `${API_BASE}/api/social/twitch/start?userId=${user.id}`;
-  };
 
   const finalizeWizard = async () => {
     if (!user?.id) return;
@@ -1817,25 +1703,21 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
       setError(blockers[0]);
       return;
     }
+
     setSaving(true);
     setError('');
     setStatus('Richte alles ein...');
 
     const slug = normalizeSlug(basic.siteSlug || basic.streamerName);
-    const themeMap = { 1: 'casino_midnightblue', 2: 'template2_draft', 3: 'template3_draft' };
-    const backgroundTheme = themeMap[templateId] || 'dark';
 
     try {
-      // Step A: setup account/site basics
       const setupRes = await fetch(`${API_BASE}/api/user/${user.id}/setup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          templateId,
           username: basic.streamerName,
           siteSlug: slug,
-          category: basic.category,
-          backgroundTheme
+          category: basic.category
         })
       });
       const setupData = await setupRes.json();
@@ -1846,7 +1728,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
         username: basic.streamerName,
         siteSlug: slug,
         category: basic.category,
-        templateId,
         isSetupComplete: 1
       });
       navigate(`/dashboard/${slug}`);
@@ -1870,17 +1751,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
           </div>
           <div className="mt-5 w-full h-2 rounded-full bg-white/10 overflow-hidden">
             <div className="h-full bg-indigo-600 transition-all" style={{ width: `${((step + 1) / stepLabels.length) * 100}%` }} />
-          </div>
-          <div className="mt-5 grid grid-cols-2 md:grid-cols-7 gap-2">
-            {stepLabels.map((label, idx) => (
-              <button
-                key={label}
-                onClick={() => idx <= step && !saving ? setStep(idx) : null}
-                className={`px-3 py-2 rounded-xl text-xs font-bold border ${idx === step ? 'bg-indigo-600 border-indigo-500 text-white' : idx < step ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200' : 'bg-white/5 border-white/10 text-[#A1A1A1]'}`}
-              >
-                {idx + 1}. {label}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -1912,59 +1782,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
           )}
 
           {step === 1 && (
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                { id: 1, name: 'Casino Midnightblue', preset: 'Clean Premium Casino Layout mit Blue/Midnight Gradient', enabled: true },
-                { id: 2, name: 'Template 2', preset: 'Wird gemeinsam mit dir neu definiert', enabled: false },
-                { id: 3, name: 'Template 3', preset: 'Wird gemeinsam mit dir neu definiert', enabled: false }
-              ].map((tpl) => (
-                <div key={tpl.id} className={`p-6 rounded-xl border flex flex-col transition-all ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
-                  <div 
-                    onClick={() => tpl.enabled && setTemplateId(tpl.id)}
-                    className="w-full h-24 mb-3 rounded-lg bg-indigo-500/20 flex items-center justify-center overflow-hidden border border-white/5 cursor-pointer"
-                  >
-                     {tpl.id === 1 && <div className="w-16 h-12 border-2 border-blue-500/60 rounded flex flex-col gap-1 p-1"><div className="w-full h-1 bg-blue-500/60"></div><div className="w-1/2 h-1 bg-blue-400/40"></div><div className="grid grid-cols-2 gap-1 flex-1"><div className="bg-blue-500/20 rounded"></div><div className="bg-indigo-500/20 rounded"></div></div></div>}
-                     {tpl.id !== 1 && <div className="text-xs font-black uppercase text-white/40 tracking-widest">In Planung</div>}
-                  </div>
-                  <p className="font-bold text-white">Vorlage: {tpl.name}</p>
-                  <p className="text-xs text-[#A1A1A1] mt-1">Design #{tpl.id}</p>
-                  <p className="text-xs text-[#A1A1A1] mt-2 flex-1">{tpl.preset}</p>
-                  
-                  <div className="mt-4 flex gap-2">
-                    <button 
-                      onClick={() => tpl.enabled && setTemplateId(tpl.id)}
-                      disabled={!tpl.enabled}
-                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${!tpl.enabled ? 'bg-white/5 text-white/30 cursor-not-allowed' : templateId === tpl.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-[#A1A1A1] hover:bg-white/10'}`}
-                    >
-                      Auswaehlen
-                    </button>
-                    <button 
-                      onClick={() => {
-                        if (!tpl.enabled) return;
-                        setTemplateId(tpl.id);
-                        setShowDemo(tpl);
-                      }}
-                      disabled={!tpl.enabled}
-                      className={`px-3 py-2 rounded-lg border text-xs font-bold transition-all ${tpl.enabled ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20' : 'bg-white/5 text-white/30 border-white/10 cursor-not-allowed'}`}
-                    >
-                      Demo ansehen
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          {step === 2 && (
             <div className="space-y-4">
-              <p className="text-[#A1A1A1]">Wenn du auf "Verbindung starten" klickst, wird alles automatisch eingerichtet:</p>
+              <p className="text-[#A1A1A1]">Wenn du auf "Verbindung starten" klickst, wird deine bisherige Landing-Struktur ersetzt.</p>
               <ul className="text-sm text-[#EDEDED] space-y-2">
                 <li>- Basisdaten und Account-Struktur</li>
-                <li>- Dein gewähltes Design-Template</li>
-                <li>- Automatische Landingpage-Erstellung</li>
+                <li>- Landingpages ohne Templates</li>
               </ul>
-              <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20">
-                <p className="text-xs text-indigo-300">Hinweis: Social Tokens, Deals und detaillierte Einstellungen kannst du nach dem Setup bequem in deinem Dashboard vornehmen.</p>
-              </div>
               <button
                 onClick={finalizeWizard}
                 disabled={saving || !!getStepError(0) || slugState.checking}
@@ -1981,9 +1804,9 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               disabled={step === 0 || saving}
               className="px-4 py-2 rounded-xl bg-white/10 text-white disabled:opacity-30"
             >
-              Zurück
+              Zurueck
             </button>
-            {step < 2 && (
+            {step < 1 && (
               <button
                 onClick={() => {
                   const msg = getStepError(step);
@@ -1992,7 +1815,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                     return;
                   }
                   setError('');
-                  setStep((s) => Math.min(2, s + 1));
+                  setStep(1);
                 }}
                 disabled={saving || !!currentStepError || (step === 0 && slugState.checking)}
                 className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 disabled:opacity-50"
@@ -2001,96 +1824,11 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               </button>
             )}
           </div>
-          {!!currentStepError && step < 2 && (
-            <p className="text-xs text-amber-300">{currentStepError}</p>
-          )}
         </div>
       </div>
-
-      <AnimatePresence>
-        {showDemo && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-4 md:p-10"
-          >
-            <motion.div 
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              className="w-full max-w-6xl h-full max-h-[90vh] bg-[#0A0A0A] rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden flex flex-col relative"
-            >
-              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-[#0F0F0F]">
-                <div>
-                  <h2 className="text-2xl font-black text-white">Vorschau: {showDemo.name}</h2>
-                  <p className="text-sm text-[#A1A1A1] italic">So sieht deine Seite für Besucher aus</p>
-                </div>
-                <button 
-                  onClick={() => setShowDemo(null)}
-                  className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
-                >
-                  <Plus className="rotate-45 text-white" />
-                </button>
-              </div>
-
-              <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#050505] relative">
-                <div className="absolute inset-0 z-0">
-                   {showDemo.id === 1 && <MidnightParticles />}
-                   {showDemo.id === 2 && <BackgroundBubbles />}
-                   {showDemo.id === 3 && <BackgroundBubbles />}
-                </div>
-
-                <div className={`max-w-4xl mx-auto py-20 px-6 space-y-16 relative z-10 ${showDemo.id === 2 ? 'text-left' : 'text-center'}`}>
-                  <header className={`space-y-6 ${showDemo.id === 2 ? 'flex items-center gap-8' : ''}`}>
-                    <div className={`w-24 h-24 md:w-32 md:h-32 rounded-full ${showDemo.id === 2 ? 'mx-0 rounded-2xl' : 'mx-auto'} p-1 bg-gradient-to-tr ${showDemo.id === 1 ? 'from-blue-700 to-indigo-900 shadow-blue-500/20' : showDemo.id === 2 ? 'from-white/10 to-white/5' : 'from-amber-600 to-orange-600 shadow-amber-500/20'} shadow-2xl`}>
-                       <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden border-2 border-white/5">
-                          <User size={64} className="text-white/20" />
-                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h2 className={`text-5xl md:text-7xl font-black tracking-tighter ${showDemo.id === 3 ? 'uppercase text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500' : showDemo.id === 1 ? 'text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-indigo-300' : 'text-white'}`}>
-                        @{user?.username || 'Streamer'}
-                      </h2>
-                      <p className="text-xl text-[#A1A1A1] font-medium tracking-tight">Dein professioneller Stream-Hub</p>
-                    </div>
-                  </header>
-
-                  <div className={`grid gap-6 ${showDemo.id === 2 ? 'max-w-xl' : 'max-w-2xl mx-auto'}`}>
-                    <div className={`w-full px-10 py-5 rounded-[1.5rem] font-black text-xl shadow-2xl transform transition-transform ${showDemo.id === 1 ? 'bg-blue-600 text-white shadow-blue-900/40' : showDemo.id === 2 ? 'bg-white text-black shadow-white/5' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-amber-900/40'}`}>
-                      JETZT BONUS SICHERN
-                    </div>
-                    <div className="px-6 py-4 rounded-xl border border-white/5 bg-white/5 text-[10px] font-black text-[#666] tracking-[0.2em] uppercase">
-                      Verifiziert | 18+ | Verantwortungsvoll spielen
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     {[1,2,3,4].map(i => (
-                       <div key={i} className="h-24 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md animate-pulse" />
-                     ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-8 border-t border-white/5 bg-[#0F0F0F] flex justify-center shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
-                <button 
-                  onClick={() => {
-                    setTemplateId(showDemo.id);
-                    setShowDemo(null);
-                  }}
-                  className="px-12 py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-xl hover:bg-indigo-500 transition-all shadow-2xl shadow-indigo-600/40 hover:scale-105 active:scale-95"
-                >
-                  Dieses Design wählen & Fortfahren
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
-
 // --- DASHBOARD COMPONENTS ---
 
 const Sidebar = ({ activeTab, setActiveTab, isSetupComplete }) => {
@@ -5884,5 +5622,6 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
 
 
