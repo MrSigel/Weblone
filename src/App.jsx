@@ -1541,8 +1541,8 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     stickyCtaEnabled: 1,
     stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl: '',
-    trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler'
+    trustBadgeText: '',
+    urgencyText: ''
   });
   const [pageVisibility, setPageVisibility] = useState({
     '': true,
