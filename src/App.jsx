@@ -4668,13 +4668,19 @@ const SuperAdminPage = () => {
     <div className="min-h-screen bg-[#050505] text-white pt-20 relative overflow-hidden">
       <BackgroundBubbles />
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 relative z-10">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Superadmin Dashboard</h1>
-            <p className="text-[#A1A1A1] text-sm">Nutzer, Registrierungen, Streamer-Seiten und Deals zentral verwalten.</p>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-500 border border-indigo-500/30">
+              <ShieldCheck size={28} />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black tracking-tight">Superadmin Dashboard</h1>
+              <p className="text-[#A1A1A1] text-xs font-medium uppercase tracking-widest mt-1">Weblone Cloud Management v2.0</p>
+            </div>
           </div>
-          <button onClick={handleLogout} className="bg-red-500/10 text-red-400 border border-red-500/20 px-4 py-2 rounded-xl">
-            Logout
+          <button onClick={handleLogout} className="bg-red-500/10 text-red-400 border border-red-500/20 px-6 py-2.5 rounded-2xl font-bold hover:bg-red-500/20 transition-all flex items-center gap-2">
+            <ArrowRight size={18} className="rotate-180" />
+            Logout Session
           </button>
         </div>
 
