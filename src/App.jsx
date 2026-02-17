@@ -5500,11 +5500,20 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
       </div>
 
       <div className="grid md:grid-cols-[1fr_auto] items-center gap-4 px-8 py-4 bg-black/30 border-t border-white/5">
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-bold text-white/60 uppercase tracking-wider">
-           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Blitzschnelle Auszahlung</span>
-           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Keine 5 Sek. Regel</span>
-           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Alle Provider</span>
-           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> VPN Erlaubt</span>
+        <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
+           <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Providers</span>
+              <div className="flex -space-x-2">
+                 {[1,2,3,4].map(i => <div key={i} className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden backdrop-blur-md shadow-lg"><Activity size={12} className="text-white/40" /></div>)}
+              </div>
+           </div>
+           <div className="h-4 w-px bg-white/10 hidden md:block" />
+           <div className="flex items-center gap-2">
+              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Payments</span>
+              <div className="flex gap-2">
+                 {[1,2,3].map(i => <div key={i} className="w-8 h-5 rounded-md bg-white/5 border border-white/5 flex items-center justify-center opacity-50"><Zap size={10} className="text-white" /></div>)}
+              </div>
+           </div>
         </div>
         <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Code:</span>
