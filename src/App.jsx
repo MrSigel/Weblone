@@ -1850,12 +1850,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
           {step === 0 && (
             <div className="grid md:grid-cols-2 gap-4">
-              <input value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} placeholder="Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={basic.streamerName} onChange={(e) => setBasic({ ...basic, streamerName: e.target.value })} placeholder="Streamername" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} placeholder="Dein echter Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
+              <input value={basic.streamerName} onChange={(e) => setBasic({ ...basic, streamerName: e.target.value })} placeholder="Streamer Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
               <input
                 value={basic.siteSlug}
                 onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })}
-                placeholder="URL-Name (slug)"
+                placeholder="Wunsch-Name für deine Seite (z.B. dein-name)"
                 className={`bg-[#0A0A0A] border rounded-xl px-4 py-3 ${slugState.checking ? 'border-amber-500/40' : slugState.available ? 'border-emerald-500/40' : 'border-red-500/40'}`}
               />
               <select value={basic.category} onChange={(e) => setBasic({ ...basic, category: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3">
@@ -1875,10 +1875,15 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                 { id: 2, name: 'Minimal Pro', preset: 'Klarer Baukasten für einfache Link-Pflege' },
                 { id: 3, name: 'Casino Master', preset: 'Conversion-fokussiertes Setup für Casino Traffic' }
               ].map((tpl) => (
-                <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
-                  <p className="font-bold text-white">{tpl.name}</p>
-                  <p className="text-xs text-[#A1A1A1] mt-1">Template #{tpl.id}</p>
-                  <p className="text-xs text-[#A1A1A1] mt-2">{tpl.preset}</p>
+                <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left flex flex-col ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div className="w-full h-24 mb-3 rounded-lg bg-indigo-500/20 flex items-center justify-center overflow-hidden border border-white/5">
+                     {tpl.id === 1 && <div className="w-16 h-12 border-2 border-indigo-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-1 bg-indigo-500/50"></div><div className="w-1/2 h-1 bg-indigo-500/30"></div><div className="grid grid-cols-2 gap-1 flex-1"><div className="bg-indigo-500/20 rounded"></div><div className="bg-indigo-500/20 rounded"></div></div></div>}
+                     {tpl.id === 2 && <div className="w-16 h-12 border-2 border-emerald-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-2 bg-emerald-500/40 rounded"></div><div className="flex-1 space-y-1"><div className="w-full h-1 bg-emerald-500/20"></div><div className="w-full h-1 bg-emerald-500/20"></div><div className="w-full h-1 bg-emerald-500/20"></div></div></div>}
+                     {tpl.id === 3 && <div className="w-16 h-12 border-2 border-amber-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-1 bg-amber-500/50"></div><div className="flex-1 flex gap-1"><div className="w-1/3 bg-amber-500/20"></div><div className="flex-1 bg-amber-500/10"></div></div></div>}
+                  </div>
+                  <p className="font-bold text-white">Vorlage: {tpl.name}</p>
+                  <p className="text-xs text-[#A1A1A1] mt-1">Design #{tpl.id}</p>
+                  <p className="text-xs text-[#A1A1A1] mt-2 flex-1">{tpl.preset}</p>
                 </button>
               ))}
             </div>
@@ -1898,38 +1903,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
           )}
 
           {step === 3 && (
-            <div className="space-y-3">
-              {deals.length === 0 && <p className="text-sm text-[#A1A1A1]">Noch keine Deals vorhanden. Du kannst später im Dashboard entscheiden.</p>}
-              {deals.map((deal) => (
-                <label key={deal.id} className="flex items-center justify-between gap-3 p-4 rounded-xl border border-white/10 bg-white/5">
-                  <div>
-                    <p className="font-bold text-white">{deal.name}</p>
-                    <p className="text-sm text-[#A1A1A1]">{deal.deal}</p>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={dealSelections[deal.id] !== false}
-                    onChange={(e) => setDealSelections({ ...dealSelections, [deal.id]: e.target.checked })}
-                  />
-                </label>
-              ))}
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="grid md:grid-cols-2 gap-4">
-              <input value={bot.twitchChannel} onChange={(e) => setBot({ ...bot, twitchChannel: e.target.value })} placeholder="Bot Twitch Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={bot.kickChannel} onChange={(e) => setBot({ ...bot, kickChannel: e.target.value })} placeholder="Bot Kick Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input type="number" min="1" value={bot.adIntervalMinutes} onChange={(e) => setBot({ ...bot, adIntervalMinutes: Number(e.target.value || 15) })} placeholder="Werbeintervall (Min)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={bot.adMessage} onChange={(e) => setBot({ ...bot, adMessage: e.target.value })} placeholder="Werbenachricht" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <label className="md:col-span-2 flex items-center justify-between p-3 rounded-xl border border-white/10 bg-white/5">
-                <span className="text-sm text-white">Chat Reader nach Setup direkt starten</span>
-                <input type="checkbox" checked={bot.autoStartReader} onChange={(e) => setBot({ ...bot, autoStartReader: e.target.checked })} />
-              </label>
-            </div>
-          )}
-
-          {step === 5 && (
             <div className="grid md:grid-cols-2 gap-4">
               <input value={landing.navTitle || ''} onChange={(e) => setLanding({ ...landing, navTitle: e.target.value })} placeholder="Navigationstitel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
               <input value={landing.slogan || ''} onChange={(e) => setLanding({ ...landing, slogan: e.target.value })} placeholder="Slogan" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
@@ -1960,18 +1933,17 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             </div>
           )}
 
-          {step === 6 && (
+          {step === 4 && (
             <div className="space-y-4">
               <p className="text-[#A1A1A1]">Wenn du auf "Verbindung starten" klickst, wird alles automatisch eingerichtet:</p>
               <ul className="text-sm text-[#EDEDED] space-y-2">
                 <li>- Basisdaten und Template</li>
-                <li>- Deals (akzeptieren/ablehnen)</li>
-                <li>- Bot und Social Konfiguration</li>
+                <li>- Social Konfiguration</li>
                 <li>- Landingpage Buttons und Seiten</li>
               </ul>
               <button
                 onClick={finalizeWizard}
-                disabled={saving || !!getStepError(0) || !!getStepError(2) || !!getStepError(4) || !!getStepError(5) || slugState.checking}
+                disabled={saving || !!getStepError(0) || !!getStepError(2) || !!getStepError(3) || slugState.checking}
                 className="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-black hover:bg-indigo-500 transition-all disabled:opacity-50"
               >
                 {saving ? 'Richte ein...' : 'Verbindung starten'}
@@ -1987,7 +1959,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             >
               Zurück
             </button>
-            {step < 6 && (
+            {step < 4 && (
               <button
                 onClick={() => {
                   const msg = getStepError(step);
@@ -1996,7 +1968,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                     return;
                   }
                   setError('');
-                  setStep((s) => Math.min(6, s + 1));
+                  setStep((s) => Math.min(4, s + 1));
                 }}
                 disabled={saving || !!currentStepError || (step === 0 && slugState.checking)}
                 className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 disabled:opacity-50"
@@ -2005,7 +1977,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               </button>
             )}
           </div>
-          {!!currentStepError && step < 6 && (
+          {!!currentStepError && step < 4 && (
             <p className="text-xs text-amber-300">{currentStepError}</p>
           )}
         </div>
