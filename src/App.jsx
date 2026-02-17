@@ -5662,15 +5662,25 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const trackedCtaHref = `${API_BASE}/api/public/site/${slug}/cta/${ctaVariant}`;
   const hasAnyCtaTarget = !!(settings.primaryCtaUrl || settings.stickyCtaUrl || settings.ctaAUrl || settings.ctaBUrl);
 
+  const isTemplate1 = Number(user?.templateId) === 1;
+  const isTemplate2 = Number(user?.templateId) === 2;
+  const isTemplate3 = Number(user?.templateId) === 3;
+
   return (
     <div className={`min-h-screen text-white font-sans selection:bg-indigo-500/30 flex flex-col ${siteTheme.siteClass}`}>
       <TemplateBackground themeId={settings?.backgroundTheme} />
       
       {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 py-3 md:py-6">
-        <div className="max-w-5xl mx-auto px-4 md:px-6">
-          <div className="bg-[#0A0A0A]/40 backdrop-blur-xl border border-white/5 rounded-2xl md:rounded-full px-4 md:px-8 py-3 flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0 shadow-2xl">
-            <button onClick={() => setActivePageSlug('')} className="text-xl font-bold tracking-tighter hover:text-indigo-500 transition-colors">
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${isTemplate2 ? 'py-4' : 'py-3 md:py-6'}`}>
+        <div className={`max-w-5xl mx-auto px-4 md:px-6`}>
+          <div className={`backdrop-blur-xl border border-white/5 transition-all duration-500 shadow-2xl ${
+            isTemplate1 ? 'bg-indigo-900/20 rounded-2xl md:rounded-full px-4 md:px-8 py-3 ring-1 ring-indigo-500/20' : 
+            isTemplate2 ? 'bg-white/5 rounded-xl px-6 py-4' : 
+            'bg-amber-900/20 rounded-2xl px-4 md:px-8 py-3 border-amber-500/10'
+          } flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-0`}>
+            <button onClick={() => setActivePageSlug('')} className={`text-xl font-black tracking-tighter hover:scale-105 transition-all ${
+              isTemplate1 ? 'text-indigo-400' : isTemplate2 ? 'text-white' : 'text-amber-500'
+            }`}>
               {settings.navTitle || user.username}
             </button>
             
@@ -5680,9 +5690,18 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
                 <button 
                   key={page.id}
                   onClick={() => setActivePageSlug(page.slug)}
-                  className={`text-sm font-bold transition-all ${activePageSlug === page.slug ? 'text-indigo-500' : 'text-white/50 hover:text-white'}`}
+                  className={`text-sm font-bold transition-all relative group ${
+                    activePageSlug === page.slug 
+                      ? (isTemplate1 ? 'text-indigo-400' : isTemplate2 ? 'text-white' : 'text-amber-500') 
+                      : 'text-white/40 hover:text-white'
+                  }`}
                 >
                   {page.title}
+                  {activePageSlug === page.slug && (
+                    <motion.div layoutId="nav-underline" className={`absolute -bottom-1 left-0 right-0 h-0.5 ${
+                      isTemplate1 ? 'bg-indigo-500' : isTemplate2 ? 'bg-white' : 'bg-amber-500'
+                    }`} />
+                  )}
                 </button>
               ))}
               </div>
@@ -5691,82 +5710,166 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
         </div>
       </nav>
 
-      {/* Hero / Header Area (Dynamic) */}
-      <main className="pt-32 md:pt-40 pb-16 md:pb-20 flex-1">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-20">
-          {!!conversionBoosterEnabled && !!settings.urgencyText && (
-            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-center text-amber-200 font-medium">
-              {settings.urgencyText}
-            </div>
+      {/* Main Content Area */}
+      <main className={`pt-32 md:pt-48 pb-16 md:pb-20 flex-1 relative z-10`}>
+        <div className={`max-w-5xl mx-auto px-4 md:px-6 space-y-12 md:space-y-24`}>
+          
+          {/* Header Branding */}
+          <section className={`text-center space-y-6 ${isTemplate2 ? 'text-left' : ''}`}>
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.9 }}
+               animate={{ opacity: 1, scale: 1 }}
+               className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto p-1 shadow-2xl ${
+                 isTemplate1 ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-indigo-500/20' : 
+                 isTemplate2 ? 'bg-white/10 p-0 rounded-2xl mx-0' : 
+                 'bg-gradient-to-tr from-amber-600 to-orange-600 shadow-amber-500/20'
+               }`}
+             >
+               <div className="w-full h-full rounded-full bg-[#0A0A0A] flex items-center justify-center overflow-hidden border-2 border-white/5">
+                  <User size={isTemplate2 ? 48 : 64} className={isTemplate1 ? 'text-indigo-500' : isTemplate3 ? 'text-amber-500' : 'text-white'} />
+               </div>
+             </motion.div>
+             
+             <div className="space-y-2">
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`text-4xl md:text-7xl font-black tracking-tighter ${isTemplate2 ? 'mx-0' : ''}`}
+                >
+                  {isTemplate1 ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">@{user.username}</span> : 
+                   isTemplate3 ? <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 uppercase">{user.username}</span> :
+                   user.username}
+                </motion.h1>
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className={`text-lg md:text-xl text-[#A1A1A1] max-w-2xl font-medium ${isTemplate2 ? 'mx-0' : 'mx-auto'}`}
+                >
+                  {settings.slogan || 'Exklusive Deals & Stream-Tools'}
+                </motion.p>
+             </div>
+          </section>
+
+          {/* Urgency & Primary CTA */}
+          {(settings.urgencyText || hasAnyCtaTarget) && (
+            <section className={`grid gap-6 ${isTemplate2 ? 'max-w-xl' : 'max-w-2xl mx-auto'}`}>
+              {!!conversionBoosterEnabled && !!settings.urgencyText && (
+                <motion.div 
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className={`rounded-2xl border px-6 py-4 text-center font-bold tracking-tight shadow-lg ${
+                    isTemplate1 ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300' :
+                    isTemplate2 ? 'bg-white/5 border-white/10 text-white uppercase text-sm' :
+                    'bg-amber-500 border-amber-400 text-[#0A0000] animate-pulse'
+                  }`}
+                >
+                  {settings.urgencyText}
+                </motion.div>
+              )}
+
+              {!!conversionBoosterEnabled && !!hasAnyCtaTarget && (
+                <motion.div 
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="text-center"
+                >
+                  <a
+                    href={trackedCtaHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center justify-center w-full px-8 py-5 rounded-2xl font-black text-xl transition-all shadow-2xl ${
+                      isTemplate1 ? 'bg-indigo-600 text-white shadow-indigo-900/40 hover:bg-indigo-500' :
+                      isTemplate2 ? 'bg-white text-black hover:bg-neutral-200 shadow-white/10' :
+                      'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-amber-900/40 hover:brightness-110'
+                    }`}
+                  >
+                    {resolvedCtaText}
+                  </a>
+                </motion.div>
+              )}
+            </section>
           )}
 
-          {!!conversionBoosterEnabled && !!hasAnyCtaTarget && (
-            <div className="text-center">
-              <a
-                href={trackedCtaHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-lg hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-900/40"
-              >
-                {resolvedCtaText}
-              </a>
-            </div>
-          )}
+          {/* Dynamic Content */}
+          <section className="space-y-12 md:space-y-20">
+            {isCasinoPage ? (
+              <CasinoDealsSection deals={activeDeals} ctaHref={trackedCtaHref} />
+            ) : pageBlocks.length === 0 ? (
+              <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/5 backdrop-blur-sm">
+                 <p className="text-[#A1A1A1] font-medium">Noch keine Inhalte auf dieser Seite.</p>
+              </div>
+            ) : (
+              pageBlocks.map(block => (
+                <RenderBlock key={block.id} block={block} deals={deals} />
+              ))
+            )}
+          </section>
 
-          {isCasinoPage ? (
-            <CasinoDealsSection deals={activeDeals} ctaHref={trackedCtaHref} />
-          ) : pageBlocks.length === 0 ? (
-            <div className="text-center py-20">
-               {currentPage?.slug === '' ? (
-                 <div className="space-y-6">
-                    <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tighter">
-                      Willkommen bei <span className="text-indigo-500">{user.username}</span>
-                    </h1>
-                    <p className="text-base md:text-xl text-[#A1A1A1] max-w-2xl mx-auto">
-                      {settings.slogan || 'Entdecke meine exklusiven Deals und Tools.'}
-                    </p>
-                 </div>
-               ) : (
-                 <p className="text-[#A1A1A1]">Diese Seite hat noch keinen Inhalt.</p>
-               )}
-            </div>
-          ) : (
-            pageBlocks.map(block => (
-              <RenderBlock key={block.id} block={block} deals={deals} />
-            ))
-          )}
-
+          {/* Trust Badge */}
           {!!conversionBoosterEnabled && !!settings.trustBadgeText && (
-            <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-center text-emerald-200 text-sm">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              className={`rounded-2xl border px-6 py-4 text-center text-sm font-bold backdrop-blur-md ${
+                isTemplate1 ? 'bg-indigo-950/40 border-indigo-500/20 text-indigo-400' :
+                isTemplate2 ? 'bg-white/5 border-white/5 text-neutral-500 grayscale hover:grayscale-0 transition-all' :
+                'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+              }`}
+            >
               {settings.trustBadgeText}
-            </div>
+            </motion.div>
           )}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 md:py-20 border-t border-white/5 text-center">
-        <div className="max-w-5xl mx-auto px-4 md:px-6">
-          <p className="text-sm text-[#555] font-medium">
-            © 2026 {settings.navTitle || user.username} ? Powered by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500 font-bold hover:text-indigo-400 transition-colors">Weblone</a>
-          </p>
+      {/* Professional Footer */}
+      <footer className="py-12 md:py-24 border-t border-white/5 relative z-10 overflow-hidden bg-black/40 backdrop-blur-xl">
+        <div className="max-w-5xl mx-auto px-4 md:px-6 grid md:grid-cols-2 gap-12 items-center">
+          <div className={isTemplate2 ? '' : 'text-center md:text-left'}>
+            <h3 className="text-2xl font-black tracking-tighter mb-2">{settings.navTitle || user.username}</h3>
+            <p className="text-[#555] text-sm max-w-xs">
+              Dein Partner für professionelles Streaming-Management und exklusive Deals.
+            </p>
+          </div>
+          <div className="flex flex-col items-center md:items-end gap-4">
+            <div className="flex gap-6">
+               <a href="/privacy" className="text-xs text-[#555] hover:text-white transition-colors">Datenschutz</a>
+               <a href="/imprint" className="text-xs text-[#555] hover:text-white transition-colors">Impressum</a>
+            </div>
+            <p className="text-[10px] text-[#333] font-bold uppercase tracking-[0.2em]">
+              © 2026 {user.username} ? Created by <a href="https://weblone.onrender.com" target="_blank" rel="noopener noreferrer" className="text-indigo-500/50 hover:text-indigo-500">Weblone</a>
+            </p>
+          </div>
         </div>
       </footer>
 
+      {/* Sticky Bottom Bar (Conversion) */}
       {!!conversionBoosterEnabled && !!settings.stickyCtaEnabled && !!hasAnyCtaTarget && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl">
-          <div className="max-w-5xl mx-auto px-4 md:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-[#EDEDED]">{settings.stickyCtaText || 'Jetzt registrieren & Bonus aktivieren'}</p>
+        <motion.div 
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-[#0A0A0A]/90 backdrop-blur-2xl shadow-[0_-10px_40px_rgba(0,0,0,0.5)]"
+        >
+          <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+            <div className="hidden sm:block">
+               <p className="text-sm font-black text-white">{settings.stickyCtaText || 'Jetzt Bonus sichern!'}</p>
+               <p className="text-[10px] text-[#A1A1A1] uppercase font-bold tracking-wider">Limitiertes Angebot</p>
+            </div>
             <a
               href={trackedCtaHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-indigo-600 text-white px-5 py-2 rounded-xl font-bold hover:bg-indigo-500 transition-all"
+              className={`flex-1 sm:flex-none px-10 py-3 rounded-xl font-black text-sm transition-all text-center shadow-xl ${
+                isTemplate1 ? 'bg-indigo-600 text-white shadow-indigo-600/20' :
+                isTemplate2 ? 'bg-white text-black' :
+                'bg-amber-500 text-black'
+              }`}
             >
-              Zum Angebot
+              JETZT EINLÖSEN
             </a>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
