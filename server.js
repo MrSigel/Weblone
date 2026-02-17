@@ -1190,19 +1190,19 @@ app.get('/api/check-slug/:slug', (req, res) => {
 app.post('/api/user/:id/setup', (req, res) => {
   const { templateId, username, siteSlug, category, backgroundTheme } = req.body;
   const userId = req.params.id;
-  const parsedTemplateId = Number(templateId) || 2;
-  const templateThemeMap = { 1: 'neon', 2: 'minimal', 3: 'casino' };
-  const allowedThemes = new Set(['neon', 'minimal', 'casino', 'dark']);
+  const parsedTemplateId = Number(templateId) || 1;
+  const templateThemeMap = { 1: 'casino_midnightblue', 2: 'template2_draft', 3: 'template3_draft' };
+  const allowedThemes = new Set(['casino_midnightblue', 'template2_draft', 'template3_draft', 'dark']);
   const normalizedBackgroundTheme = allowedThemes.has(String(backgroundTheme || '').toLowerCase())
     ? String(backgroundTheme).toLowerCase()
     : (templateThemeMap[parsedTemplateId] || 'dark');
   const landingPresetsByTemplate = {
     1: {
       home: [
-        { blockType: 'Hero', dataJson: { title: 'Neon Night Deals', subtitle: 'Schnelle Bonus-Highlights für deine Community.' } },
-        { blockType: 'Text', dataJson: { content: 'Hier findest du meine handverlesenen Partner inklusive exklusiver Vorteile. Trage unten nur noch deine finalen Deal-Links ein.' } },
-        { blockType: 'Button', dataJson: { label: 'Hauptdeal Link einfuegen', url: 'https://example.com/deal-main' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Twitch', url: 'https://twitch.tv/' }, { label: 'Kick', url: 'https://kick.com/' }] } }
+        { blockType: 'Hero', dataJson: { title: 'Casino Midnightblue', subtitle: 'Exklusive Casino-Deals, Hunt-Updates und Giveaways an einem Ort.' } },
+        { blockType: 'Text', dataJson: { content: 'About: Willkommen auf meiner Seite. Hier findest du handverlesene Partner, transparente Bonusinfos und alle relevanten Updates zum Stream.' } },
+        { blockType: 'Text', dataJson: { content: 'Contact: Für Kooperationen oder Rückfragen erreichst du mich direkt über meine offiziellen Kanäle.' } },
+        { blockType: 'Button', dataJson: { label: 'Jetzt zum Hauptangebot', url: 'https://example.com/deal-main' } }
       ],
       shop: [
         { blockType: 'Hero', dataJson: { title: 'Top Bonus Auswahl', subtitle: 'Fuer schnelle Conversions auf einen Blick.' } },
@@ -1264,7 +1264,7 @@ app.post('/api/user/:id/setup', (req, res) => {
       ]
     }
   };
-  const selectedPreset = landingPresetsByTemplate[parsedTemplateId] || landingPresetsByTemplate[2];
+  const selectedPreset = landingPresetsByTemplate[parsedTemplateId] || landingPresetsByTemplate[1];
   
   // 1. Check if slug is taken
   const existing = db.prepare('SELECT id FROM users WHERE siteSlug = ? AND id != ?').get(siteSlug, userId);
