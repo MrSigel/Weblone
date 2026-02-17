@@ -1829,27 +1829,26 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
     try {
       // Step A: setup account/site basics
-      if (!user.isSetupComplete) {
-        const setupRes = await fetch(`${API_BASE}/api/user/${user.id}/setup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            templateId,
-            username: basic.streamerName,
-            siteSlug: slug,
-            category: basic.category,
-            backgroundTheme
-          })
-        });
-        const setupData = await setupRes.json();
-        if (!setupRes.ok || !setupData.success) throw new Error(setupData.error || 'Setup fehlgeschlagen.');
-      }
+      const setupRes = await fetch(`${API_BASE}/api/user/${user.id}/setup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          templateId,
+          username: basic.streamerName,
+          siteSlug: slug,
+          category: basic.category,
+          backgroundTheme
+        })
+      });
+      const setupData = await setupRes.json();
+      if (!setupRes.ok || !setupData.success) throw new Error(setupData.error || 'Setup fehlgeschlagen.');
 
       onComplete?.({
         ...user,
         username: basic.streamerName,
         siteSlug: slug,
         category: basic.category,
+        templateId,
         isSetupComplete: 1
       });
       navigate(`/dashboard/${slug}`);
@@ -1942,7 +1941,10 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                       Auswählen
                     </button>
                     <button 
-                      onClick={() => setShowDemo(tpl)}
+                      onClick={() => {
+                        setTemplateId(tpl.id);
+                        setShowDemo(tpl);
+                      }}
                       className="px-3 py-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-bold hover:bg-indigo-500/20 transition-all"
                     >
                       Demo ansehen

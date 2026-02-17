@@ -1188,9 +1188,14 @@ app.get('/api/check-slug/:slug', (req, res) => {
 });
 
 app.post('/api/user/:id/setup', (req, res) => {
-  const { templateId, username, siteSlug, category } = req.body;
+  const { templateId, username, siteSlug, category, backgroundTheme } = req.body;
   const userId = req.params.id;
   const parsedTemplateId = Number(templateId) || 2;
+  const templateThemeMap = { 1: 'neon', 2: 'minimal', 3: 'casino' };
+  const allowedThemes = new Set(['neon', 'minimal', 'casino', 'dark']);
+  const normalizedBackgroundTheme = allowedThemes.has(String(backgroundTheme || '').toLowerCase())
+    ? String(backgroundTheme).toLowerCase()
+    : (templateThemeMap[parsedTemplateId] || 'dark');
   const landingPresetsByTemplate = {
     1: {
       home: [
@@ -1280,8 +1285,11 @@ app.post('/api/user/:id/setup', (req, res) => {
         WHERE id = ?
       `).run(parsedTemplateId, username, siteSlug, category, userId);
 
-      // Ensure settings row exists in any case
-      db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle) VALUES (?, ?)').run(userId, username);
+      // Ensure settings row exists and keep template-related styling in sync
+      db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle, backgroundTheme) VALUES (?, ?, ?)')
+        .run(userId, username, normalizedBackgroundTheme);
+      db.prepare('UPDATE streamer_site_settings SET navTitle = ?, backgroundTheme = ? WHERE userId = ?')
+        .run(username, normalizedBackgroundTheme, userId);
 
       // Seed defaults only on first setup to avoid overriding existing custom work
       if (!isFirstSetup) return;
