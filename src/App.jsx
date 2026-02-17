@@ -4687,8 +4687,8 @@ const SuperAdminPage = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6 relative overflow-hidden">
-        <BackgroundBubbles />
+      <div className="min-h-screen bg-[#050B18] text-white flex items-center justify-center px-6 relative overflow-hidden font-sans">
+        <MidnightParticles />
         <div className="w-full max-w-md p-10 rounded-[2.5rem] border border-white/5 bg-[#0A0A0A]/60 backdrop-blur-2xl shadow-2xl relative z-10">
           <div className="flex flex-col items-center mb-10">
             <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-500 border border-indigo-500/30 mb-6">
@@ -4750,8 +4750,8 @@ const SuperAdminPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white pt-20 relative overflow-hidden">
-      <BackgroundBubbles />
+    <div className="min-h-screen bg-[#050B18] text-white pt-20 relative overflow-hidden font-sans">
+      <MidnightParticles />
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6 relative z-10">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
