@@ -5445,111 +5445,71 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
   const licenseLogo = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_Cura%C3%A7ao.svg';
 
   return (
-    <article className="rounded-2xl border border-[#253252] bg-[#161d2f] overflow-hidden shadow-2xl">
-      <div className="grid md:grid-cols-[180px_1fr_auto] items-center border-b border-[#2a385c]">
-        <div className="h-full min-h-[90px] bg-[#11192b] border-r border-[#2a385c] flex items-center justify-center p-3">
+    <article className={`rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:scale-[1.01] duration-500 group border ${
+      deal.isPremium ? 'border-amber-500/50 bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] ring-1 ring-amber-500/20' : 'border-white/5 bg-[#111111]'
+    }`}>
+      <div className="grid md:grid-cols-[200px_1fr_220px] items-center">
+        <div className="h-full min-h-[120px] bg-black/20 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-white/5">
           {deal.imageUrl ? (
-            <img src={deal.imageUrl} alt={deal.name} className="max-h-14 md:max-h-16 max-w-full object-contain" />
+            <img src={deal.imageUrl} alt={deal.name} className="max-h-16 md:max-h-20 max-w-full object-contain filter drop-shadow-lg group-hover:scale-110 transition-transform duration-500" />
           ) : (
-            <p className="text-xl font-black tracking-tight text-white">{deal.name}</p>
+            <p className="text-2xl font-black tracking-tight text-white uppercase italic">{deal.name}</p>
           )}
         </div>
-        <div className="px-4 py-4">
-          <p className="text-3xl md:text-5xl font-black text-amber-300 leading-none">{deal.deal}</p>
-          <p className="text-sm text-white/80 mt-1"><span className="text-amber-300">&#9733;</span> 5.0/5</p>
+        
+        <div className="p-6 md:p-8 space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+             <div className="flex gap-0.5">
+               {[1,2,3,4,5].map(i => <motion.span key={i} initial={{opacity:0}} animate={{opacity:1}} transition={{delay: i*0.1}} className="text-amber-400 text-xs">★</motion.span>)}
+             </div>
+             <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Top Rated Deal</span>
+          </div>
+          <h3 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70 leading-none tracking-tighter uppercase">
+            {deal.deal}
+          </h3>
+          <p className="text-sm font-medium text-white/50 flex items-center gap-2">
+             <Check size={14} className="text-emerald-500" /> {deal.bonusTerms || '100% Sticky - 40x Wager - High Roller Friendly'}
+          </p>
         </div>
-        <div className="px-4 pb-4 md:pb-0">
+
+        <div className="p-6 md:p-8 flex flex-col gap-3 justify-center bg-white/5 md:bg-transparent">
           <a
             href={deal.ctaUrl || ctaHref || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center bg-green-600 hover:bg-green-500 text-white font-black px-7 py-3 rounded-md border border-green-300/20"
+            className={`group/btn relative inline-flex items-center justify-center overflow-hidden rounded-2xl px-8 py-4 font-black text-lg transition-all shadow-2xl ${
+              deal.isPremium ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-white text-black hover:bg-neutral-200'
+            }`}
           >
-            SPIELEN
+            <span className="relative z-10">SPIELEN</span>
+            <motion.div 
+              className="absolute inset-0 bg-white/20"
+              initial={{ x: '-100%' }}
+              whileHover={{ x: '100%' }}
+              transition={{ duration: 0.5 }}
+            />
           </a>
-        </div>
-      </div>
-
-      <div className="px-4 py-3 border-b border-[#2a385c] text-center text-sm font-bold text-white">
-        {deal.bonusTerms || '100% Sticky - 300EUR Max Bonus - 40x Wager'}
-      </div>
-      <div className="px-4 py-3 border-b border-[#2a385c] text-sm text-[#d8def1]">
-        <span className="text-amber-300">&#10003;</span> Book of Ra
-        <span className="mx-3 text-amber-300">&#10003;</span> Lucky Lady
-        <span className="mx-3 text-amber-300">&#10003;</span> Keine 5 Sekunden Pause
-        <span className="mx-3 text-amber-300">&#10003;</span> Keine Maxbet-Sperre
-      </div>
-      <div className="px-4 py-3 border-b border-[#2a385c] text-center text-lg font-black text-amber-300">
-        Einfacher / Schneller VIP Transfer <span className="text-white font-semibold">Code:</span> {deal.promoCode || 'DIEGAWINOS'}
-      </div>
-
-      <div className="grid md:grid-cols-[1.6fr_0.8fr_0.8fr] gap-4 p-4 border-b border-[#2a385c]">
-        <div>
-          <p className="font-bold mb-2">Features:</p>
-          <ul className="space-y-1 text-sm text-[#d8def1]">
-            <li><span className="text-emerald-400">+</span> Reloadboni über den VIP-Support anfragbar</li>
-            <li><span className="text-emerald-400">+</span> Alle Auszahlungen binnen Minuten auf dem Konto</li>
-            <li><span className="text-emerald-400">+</span> Keine verbotenen Spiele im Bonus</li>
-            <li><span className="text-emerald-400">+</span> VPN - Freundlich</li>
-            <li><span className="text-emerald-400">+</span> Paysafecard & Klarna ab der 2. Einzahlung</li>
-            <li><span className="text-red-400">-</span> Max-Cashout nur im Willkommensbonus</li>
-          </ul>
-        </div>
-        <div className="md:border-l md:border-[#2a385c] md:pl-4">
-          <p className="font-bold mb-2">Verfügbarkeit:</p>
-          <div className="grid grid-cols-3 gap-1.5">
-            {countries.map((country) => (
-              <div key={country.code} className="rounded bg-white/10 border border-white/10 p-1 flex items-center justify-center">
-                <img
-                  src={country.src}
-                  alt={country.code}
-                  className="h-4 w-auto"
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="md:border-l md:border-[#2a385c] md:pl-4">
-          <p className="font-bold mb-2">Einzahlung:</p>
-          <div className="grid grid-cols-2 gap-1.5">
-            {payments.map((method) => (
-              <div key={method.name} className="rounded bg-white/10 border border-white/10 p-1 flex items-center justify-center h-8">
-                <img
-                  src={method.src}
-                  alt={method.name}
-                  className="max-h-5 w-auto"
-                  loading="lazy"
-                  onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement.textContent = method.name; }}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="mt-2 text-center rounded bg-[#11192b] border border-white/10 text-xs py-2">
-            Crypto Guide
+          <div className="flex items-center justify-center gap-2 text-[10px] font-black tracking-widest text-white/30 uppercase">
+             <ShieldCheck size={12} /> Sicher & Verifiziert
           </div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 text-center border-b border-[#2a385c]">
-        <div className="p-4 md:border-r md:border-[#2a385c]">
-          <p className="text-sm font-bold">Max bet:</p>
-          <p className="text-4xl font-black text-amber-300">5EUR</p>
+      <div className="grid md:grid-cols-[1fr_auto] items-center gap-4 px-8 py-4 bg-black/30 border-t border-white/5">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-bold text-white/60 uppercase tracking-wider">
+           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Blitzschnelle Auszahlung</span>
+           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Keine 5 Sek. Regel</span>
+           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Alle Provider</span>
+           <span className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> VPN Erlaubt</span>
         </div>
-        <div className="p-4 md:border-r md:border-[#2a385c]">
-          <p className="text-sm font-bold">Freispiele:</p>
-          <p className="text-4xl font-black text-amber-300">100</p>
-          <p className="text-sm text-white/80 italic">(in Sugar Rush 1000)</p>
+        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
+           <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Code:</span>
+           <span className="text-sm font-black text-amber-500 tracking-tighter">{deal.promoCode || 'DIEGAWINOS'}</span>
         </div>
-        <div className="p-4">
-          <p className="text-sm font-bold">Lizenz:</p>
-          <div className="mt-2 flex flex-col items-center gap-1">
-            <img
-              src={licenseLogo}
-              alt="Curacao Lizenz"
-              className="h-8 w-auto rounded-sm border border-white/20"
-              loading="lazy"
+      </div>
+    </article>
+  );
+};
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
             <p className="text-xs text-[#d8def1]">Curacao</p>
