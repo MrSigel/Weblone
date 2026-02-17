@@ -4218,7 +4218,11 @@ const ToolsContent = ({ user, onUpdate }) => {
   );
 };
 const DomainContent = ({ user }) => {
-  const [customDomain, setCustomDomain] = useState(user?.category || '');
+  const inferLegacyDomain = (value) => {
+    const normalized = String(value || '').trim();
+    return normalized.includes('.') ? normalized : '';
+  };
+  const [customDomain, setCustomDomain] = useState(user?.customDomain || inferLegacyDomain(user?.category));
   const [isSaving, setIsLoading] = useState(false);
 
   const handleSave = async () => {
@@ -5297,15 +5301,20 @@ const App = () => {
   useEffect(() => {
     const host = window.location.hostname.toLowerCase();
     const parts = host.split('.');
-    const isRenderHost = host.endsWith('.onrender.com');
-    
-    // Main domains list
-    const mainDomains = ['localhost', 'weblone.de', 'onrender.com'];
-    const isMainDomain = isRenderHost || mainDomains.some(d => host === d || host === 'www.' + d);
+    const mainHosts = new Set([
+      'localhost',
+      '127.0.0.1',
+      'weblone.de',
+      'www.weblone.de',
+      'onrender.com',
+      'www.onrender.com',
+      'weblone.onrender.com'
+    ]);
+    const isMainDomain = mainHosts.has(host);
 
     if (!isMainDomain) {
       // If it's something like streamer.weblone.de or streamer.onrender.com
-      if (parts.length > (host.includes('localhost') ? 1 : 2)) {
+      if (parts.length > 2 && (host.endsWith('.weblone.de') || host.endsWith('.onrender.com'))) {
         const sub = parts[0].toLowerCase();
         if (sub !== 'www') {
           setSubdomain(sub);
