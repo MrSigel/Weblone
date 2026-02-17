@@ -1885,12 +1885,15 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             <div className="grid md:grid-cols-2 gap-4">
               <input value={basic.fullName} onChange={(e) => setBasic({ ...basic, fullName: e.target.value })} placeholder="Dein echter Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
               <input value={basic.streamerName} onChange={(e) => setBasic({ ...basic, streamerName: e.target.value })} placeholder="Streamer Name" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input
-                value={basic.siteSlug}
-                onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })}
-                placeholder="Wunsch-Name für deine Seite (z.B. dein-name)"
-                className={`bg-[#0A0A0A] border rounded-xl px-4 py-3 ${slugState.checking ? 'border-amber-500/40' : slugState.available ? 'border-emerald-500/40' : 'border-red-500/40'}`}
-              />
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-[#A1A1A1] ml-1 uppercase tracking-wider">Webseiten-Adresse (z.B. weblone.ai/dein-name)</label>
+                <input
+                  value={basic.siteSlug}
+                  onChange={(e) => setBasic({ ...basic, siteSlug: normalizeSlug(e.target.value) })}
+                  placeholder="wunsch-name"
+                  className={`w-full bg-[#050505] border rounded-2xl px-5 py-4 focus:outline-none transition-all ${slugState.checking ? 'border-amber-500/40' : slugState.available ? 'border-emerald-500/40' : 'border-red-500/40'}`}
+                />
+              </div>
               <select value={basic.category} onChange={(e) => setBasic({ ...basic, category: e.target.value })} className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3">
                 <option>Casino</option>
                 <option>Gaming</option>
@@ -2613,8 +2616,8 @@ const SiteBuilder = ({ user, deals = [], onUpdate }) => {
     stickyCtaEnabled: 1,
     stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl: '',
-    trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler',
+    trustBadgeText: '',
+    urgencyText: '',
     abTestEnabled: 0,
     ctaAText: 'Jetzt Bonus sichern',
     ctaAUrl: '',
