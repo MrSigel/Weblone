@@ -4686,33 +4686,26 @@ const SuperAdminPage = () => {
 
         {error && <p className="text-red-400 text-sm">{error}</p>}
 
-        <section className={`p-5 rounded-2xl border ${theme.border} ${theme.surface} shadow-2xl`}>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">User</p>
-              <p className="text-2xl font-bold">{analytics?.totalUsers ?? '-'}</p>
+        <section className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          {[
+            { label: 'Total Users', value: analytics?.totalUsers, icon: User, color: 'text-indigo-500' },
+            { label: 'Setup Rate', value: `${analytics?.setupRate}%`, icon: Zap, color: 'text-amber-500' },
+            { label: 'Active Deals', value: analytics?.activeDeals, icon: Trophy, color: 'text-emerald-500' },
+            { label: 'Open Tickets', value: analytics?.openTickets, icon: Briefcase, color: 'text-red-500' },
+            { label: 'Pending Payouts', value: analytics?.pendingPayouts, icon: PieChart, color: 'text-blue-500' },
+            { label: 'Bots Online', value: analytics?.botOnline, icon: Activity, color: 'text-purple-500' }
+          ].map((stat, i) => (
+            <div key={i} className={`p-6 rounded-[2rem] border border-white/5 bg-[#0A0A0A]/40 backdrop-blur-xl hover:border-white/10 transition-all group relative overflow-hidden`}>
+              <div className="relative z-10">
+                <stat.icon size={20} className={`${stat.color} mb-4`} />
+                <p className="text-[10px] font-black text-[#A1A1A1] uppercase tracking-[0.2em] mb-1">{stat.label}</p>
+                <p className="text-2xl font-black text-white">{stat.value ?? '-'}</p>
+              </div>
+              <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity">
+                <stat.icon size={80} />
+              </div>
             </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">Setup Rate</p>
-              <p className="text-2xl font-bold">{analytics?.setupRate ?? '-'}%</p>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">Aktive Deals</p>
-              <p className="text-2xl font-bold">{analytics?.activeDeals ?? '-'}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">Offene Tickets</p>
-              <p className="text-2xl font-bold">{analytics?.openTickets ?? '-'}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">Pending Payouts</p>
-              <p className="text-2xl font-bold">{analytics?.pendingPayouts ?? '-'}</p>
-            </div>
-            <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-              <p className="text-xs text-[#A1A1A1]">Bots Online</p>
-              <p className="text-2xl font-bold">{analytics?.botOnline ?? '-'}</p>
-            </div>
-          </div>
+          ))}
         </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
