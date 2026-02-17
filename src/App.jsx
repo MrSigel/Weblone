@@ -1790,8 +1790,11 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                 { id: 2, name: 'Minimal Pro', preset: 'Klarer Baukasten für einfache Link-Pflege' },
                 { id: 3, name: 'Casino Master', preset: 'Conversion-fokussiertes Setup für Casino Traffic' }
               ].map((tpl) => (
-                <button key={tpl.id} onClick={() => setTemplateId(tpl.id)} className={`p-6 rounded-xl border text-left flex flex-col ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
-                  <div className="w-full h-24 mb-3 rounded-lg bg-indigo-500/20 flex items-center justify-center overflow-hidden border border-white/5">
+                <div key={tpl.id} className={`p-6 rounded-xl border flex flex-col transition-all ${templateId === tpl.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div 
+                    onClick={() => setTemplateId(tpl.id)}
+                    className="w-full h-24 mb-3 rounded-lg bg-indigo-500/20 flex items-center justify-center overflow-hidden border border-white/5 cursor-pointer"
+                  >
                      {tpl.id === 1 && <div className="w-16 h-12 border-2 border-indigo-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-1 bg-indigo-500/50"></div><div className="w-1/2 h-1 bg-indigo-500/30"></div><div className="grid grid-cols-2 gap-1 flex-1"><div className="bg-indigo-500/20 rounded"></div><div className="bg-indigo-500/20 rounded"></div></div></div>}
                      {tpl.id === 2 && <div className="w-16 h-12 border-2 border-emerald-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-2 bg-emerald-500/40 rounded"></div><div className="flex-1 space-y-1"><div className="w-full h-1 bg-emerald-500/20"></div><div className="w-full h-1 bg-emerald-500/20"></div><div className="w-full h-1 bg-emerald-500/20"></div></div></div>}
                      {tpl.id === 3 && <div className="w-16 h-12 border-2 border-amber-500/50 rounded flex flex-col gap-1 p-1"><div className="w-full h-1 bg-amber-500/50"></div><div className="flex-1 flex gap-1"><div className="w-1/3 bg-amber-500/20"></div><div className="flex-1 bg-amber-500/10"></div></div></div>}
@@ -1799,66 +1802,40 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                   <p className="font-bold text-white">Vorlage: {tpl.name}</p>
                   <p className="text-xs text-[#A1A1A1] mt-1">Design #{tpl.id}</p>
                   <p className="text-xs text-[#A1A1A1] mt-2 flex-1">{tpl.preset}</p>
-                </button>
+                  
+                  <div className="mt-4 flex gap-2">
+                    <button 
+                      onClick={() => setTemplateId(tpl.id)}
+                      className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${templateId === tpl.id ? 'bg-indigo-600 text-white' : 'bg-white/5 text-[#A1A1A1] hover:bg-white/10'}`}
+                    >
+                      Auswählen
+                    </button>
+                    <button 
+                      onClick={() => setShowDemo(tpl)}
+                      className="px-3 py-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs font-bold hover:bg-indigo-500/20 transition-all"
+                    >
+                      Demo ansehen
+                    </button>
+                  </div>
+                </div>
               ))}
             </div>
           )}
 
           {step === 2 && (
-            <div className="grid md:grid-cols-2 gap-4">
-              <input value={social.twitchBotUsername} onChange={(e) => setSocial({ ...social, twitchBotUsername: e.target.value })} placeholder="Twitch Bot Username" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={social.twitchOauthToken} onChange={(e) => setSocial({ ...social, twitchOauthToken: e.target.value })} placeholder="Twitch OAuth Token" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={social.kickChannel} onChange={(e) => setSocial({ ...social, kickChannel: e.target.value })} placeholder="Kick Channel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={social.kickWebhookUrl} onChange={(e) => setSocial({ ...social, kickWebhookUrl: e.target.value })} placeholder="Kick Webhook URL (optional)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={social.kickWebhookSecret} onChange={(e) => setSocial({ ...social, kickWebhookSecret: e.target.value })} placeholder="Kick Webhook Secret (optional)" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
-              <button onClick={connectTwitchOauth} className="md:col-span-2 bg-indigo-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-indigo-500 transition-all">
-                Optional: Twitch Account via OAuth verbinden
-              </button>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="grid md:grid-cols-2 gap-4">
-              <input value={landing.navTitle || ''} onChange={(e) => setLanding({ ...landing, navTitle: e.target.value })} placeholder="Navigationstitel" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.slogan || ''} onChange={(e) => setLanding({ ...landing, slogan: e.target.value })} placeholder="Slogan" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.primaryCtaText || ''} onChange={(e) => setLanding({ ...landing, primaryCtaText: e.target.value })} placeholder="CTA Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.primaryCtaUrl || ''} onChange={(e) => setLanding({ ...landing, primaryCtaUrl: e.target.value })} placeholder="CTA URL" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.stickyCtaText || ''} onChange={(e) => setLanding({ ...landing, stickyCtaText: e.target.value })} placeholder="Sticky CTA Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.stickyCtaUrl || ''} onChange={(e) => setLanding({ ...landing, stickyCtaUrl: e.target.value })} placeholder="Sticky CTA URL" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3" />
-              <input value={landing.trustBadgeText || ''} onChange={(e) => setLanding({ ...landing, trustBadgeText: e.target.value })} placeholder="Trust Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
-              <input value={landing.urgencyText || ''} onChange={(e) => setLanding({ ...landing, urgencyText: e.target.value })} placeholder="FOMO Text" className="bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3 md:col-span-2" />
-              <div className="md:col-span-2 p-4 rounded-xl border border-white/10 bg-white/5 space-y-2">
-                <p className="text-sm font-bold text-white">Seiten Sichtbarkeit</p>
-                {[
-                  { key: '', label: 'Home' },
-                  { key: 'shop', label: 'Casinos' },
-                  { key: 'hunt', label: 'Hunt' },
-                  { key: 'giveaway', label: 'Giveaway' }
-                ].map((page) => (
-                  <label key={page.key || 'home'} className="flex items-center justify-between">
-                    <span className="text-sm text-[#EDEDED]">{page.label}</span>
-                    <input
-                      type="checkbox"
-                      checked={!!pageVisibility[page.key]}
-                      onChange={(e) => setPageVisibility({ ...pageVisibility, [page.key]: e.target.checked })}
-                    />
-                  </label>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {step === 4 && (
             <div className="space-y-4">
               <p className="text-[#A1A1A1]">Wenn du auf "Verbindung starten" klickst, wird alles automatisch eingerichtet:</p>
               <ul className="text-sm text-[#EDEDED] space-y-2">
-                <li>- Basisdaten und Template</li>
-                <li>- Social Konfiguration</li>
-                <li>- Landingpage Buttons und Seiten</li>
+                <li>- Basisdaten und Account-Struktur</li>
+                <li>- Dein gewähltes Design-Template</li>
+                <li>- Automatische Landingpage-Erstellung</li>
               </ul>
+              <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/20">
+                <p className="text-xs text-indigo-300">Hinweis: Social Tokens, Deals und detaillierte Einstellungen kannst du nach dem Setup bequem in deinem Dashboard vornehmen.</p>
+              </div>
               <button
                 onClick={finalizeWizard}
-                disabled={saving || !!getStepError(0) || !!getStepError(2) || !!getStepError(3) || slugState.checking}
+                disabled={saving || !!getStepError(0) || slugState.checking}
                 className="w-full bg-indigo-600 text-white px-6 py-4 rounded-xl font-black hover:bg-indigo-500 transition-all disabled:opacity-50"
               >
                 {saving ? 'Richte ein...' : 'Verbindung starten'}
@@ -1874,7 +1851,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
             >
               Zurück
             </button>
-            {step < 4 && (
+            {step < 2 && (
               <button
                 onClick={() => {
                   const msg = getStepError(step);
@@ -1883,7 +1860,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
                     return;
                   }
                   setError('');
-                  setStep((s) => Math.min(4, s + 1));
+                  setStep((s) => Math.min(2, s + 1));
                 }}
                 disabled={saving || !!currentStepError || (step === 0 && slugState.checking)}
                 className="px-5 py-2 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 disabled:opacity-50"
@@ -1892,11 +1869,84 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
               </button>
             )}
           </div>
-          {!!currentStepError && step < 4 && (
+          {!!currentStepError && step < 2 && (
             <p className="text-xs text-amber-300">{currentStepError}</p>
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {showDemo && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-[#050505]/95 backdrop-blur-xl flex items-center justify-center p-6"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              className="w-full max-w-5xl h-[80vh] bg-[#0A0A0A] border border-white/10 rounded-3xl overflow-hidden flex flex-col relative"
+            >
+              <div className="p-6 border-b border-white/5 flex items-center justify-between bg-[#0F0F0F]">
+                <div>
+                  <h3 className="text-xl font-bold text-white">Vorschau: {showDemo.name}</h3>
+                  <p className="text-sm text-[#A1A1A1]">{showDemo.preset}</p>
+                </div>
+                <button 
+                  onClick={() => setShowDemo(null)}
+                  className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white hover:bg-white/10 transition-all"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto bg-[#050505] p-8 custom-scrollbar">
+                {/* Mockup of a real streamer landing page */}
+                <div className="max-w-2xl mx-auto space-y-12 py-10">
+                  <header className="text-center space-y-4">
+                    <div className="w-24 h-24 rounded-full bg-indigo-600 mx-auto shadow-2xl shadow-indigo-600/40 border-4 border-[#0A0A0A]" />
+                    <h2 className="text-4xl font-black text-white tracking-tight">STREAMER NAME</h2>
+                    <p className="text-indigo-400 font-medium">LIVE AUF TWITCH & KICK</p>
+                  </header>
+
+                  <div className="grid gap-4">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className={`p-5 rounded-2xl border flex items-center justify-between transition-all ${showDemo.id === 1 ? 'bg-indigo-600 border-indigo-400' : showDemo.id === 2 ? 'bg-[#111] border-white/10' : 'bg-gradient-to-r from-amber-600 to-orange-600 border-amber-400'}`}>
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-white/20" />
+                          <div>
+                            <p className="font-bold text-white">Exklusiver Deal #{i}</p>
+                            <p className="text-xs text-white/70">100% Bonus + 50 Freispiele</p>
+                          </div>
+                        </div>
+                        <div className="w-24 h-10 rounded-lg bg-white/20" />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10" />
+                    <div className="h-32 rounded-2xl bg-white/5 border border-white/10" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-white/5 bg-[#0F0F0F] flex justify-center">
+                <button 
+                  onClick={() => {
+                    setTemplateId(showDemo.id);
+                    setShowDemo(null);
+                  }}
+                  className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-black hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20"
+                >
+                  Dieses Design wählen
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
