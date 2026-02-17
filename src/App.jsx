@@ -26,7 +26,8 @@ import {
   Trophy,
   PieChart,
   HardDrive,
-  Trash2
+  Trash2,
+  Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -2161,9 +2162,11 @@ const Dashboard = ({ user }) => {
     }
   };
 
+  const isSetupComplete = !!(data.user?.isSetupComplete || user.isSetupComplete);
+
   return (
     <div className="flex h-screen bg-[#050505] overflow-hidden pt-20 relative">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} isSetupComplete={isSetupComplete} />
       <main className="flex-1 overflow-y-auto p-12 custom-scrollbar relative">
         <BackgroundBubbles />
         <div className="max-w-5xl mx-auto relative z-10">
@@ -2413,7 +2416,7 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} flex items-center justify-between group hover:border-indigo-500/30 transition-all`}
+        className={`p-6 rounded-2xl border ${theme.border} ${theme.surface} flex items-center justify-between group transition-all ${!data.user?.isSetupComplete ? 'opacity-40 grayscale pointer-events-none' : 'hover:border-indigo-500/30'}`}
       >
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500">
@@ -2421,7 +2424,7 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
           </div>
           <div>
             <span className="text-sm text-[#A1A1A1] block">Deine Website</span>
-            <a href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{window.location.host}/{data.user?.siteSlug}</a>
+            <a href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`} target="_blank" rel="noopener noreferrer" className="text-[#EDEDED] font-bold hover:text-indigo-500 transition-colors">{window.location.host}/{data.user?.siteSlug || '...'}</a>
           </div>
         </div>
         <div className="flex gap-2">
@@ -2429,13 +2432,15 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
             href={`${window.location.protocol}//${window.location.host}/${data.user?.siteSlug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-500 transition-all"
+            className={`bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all ${!data.user?.isSetupComplete ? 'cursor-not-allowed opacity-50' : 'hover:bg-indigo-500'}`}
+            onClick={(e) => !data.user?.isSetupComplete && e.preventDefault()}
           >
             Seite besuchen
           </a>
           <button
             onClick={() => setActiveTab('builder')}
-            className="bg-[#EDEDED] text-[#050505] px-4 py-2 rounded-lg text-sm font-bold hover:bg-[#D4D4D4] transition-all"
+            disabled={!data.user?.isSetupComplete}
+            className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${!data.user?.isSetupComplete ? 'bg-white/5 text-[#A1A1A1] cursor-not-allowed' : 'bg-[#EDEDED] text-[#050505] hover:bg-[#D4D4D4]'}`}
           >
             Editor
           </button>
@@ -2489,16 +2494,23 @@ const DashboardOverview = ({ data, setActiveTab, onRefresh }) => {
             { id: 'deals', name: 'Deals', icon: Briefcase },
             { id: 'tools', name: 'Tools', icon: Wrench },
             { id: 'domain', name: 'Domain', icon: Globe }
-          ].map((link, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveTab(link.id)}
-              className={`p-4 rounded-xl border ${theme.border} ${theme.surface} hover:border-indigo-500/50 transition-all text-left group`}
-            >
-              <link.icon size={20} className="text-[#A1A1A1] group-hover:text-indigo-500 transition-colors mb-3" />
-              <span className="text-sm font-bold text-[#EDEDED]">{link.name}</span>
-            </button>
-          ))}
+          ].map((link, i) => {
+            const isDisabled = !data.user?.isSetupComplete;
+            return (
+              <button
+                key={i}
+                onClick={() => !isDisabled && setActiveTab(link.id)}
+                disabled={isDisabled}
+                className={`p-4 rounded-xl border transition-all text-left group ${theme.border} ${theme.surface} ${isDisabled ? 'opacity-40 grayscale cursor-not-allowed' : 'hover:border-indigo-500/50'}`}
+              >
+                <link.icon size={20} className={`mb-3 transition-colors ${isDisabled ? 'text-[#A1A1A1]' : 'text-[#A1A1A1] group-hover:text-indigo-500'}`} />
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold text-[#EDEDED]">{link.name}</span>
+                  {isDisabled && <Lock size={12} className="text-[#A1A1A1]" />}
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
