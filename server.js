@@ -1,4 +1,4 @@
-ï»¿import express from 'express';
+import express from 'express';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -185,11 +185,11 @@ ensureColumn('streamer_site_settings', 'stickyCtaEnabled', 'INTEGER DEFAULT 1');
 ensureColumn('streamer_site_settings', 'stickyCtaText', "TEXT DEFAULT 'Jetzt registrieren & Bonus aktivieren'");
 ensureColumn('streamer_site_settings', 'stickyCtaUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'trustBadgeText', "TEXT DEFAULT 'Verifiziert | 18+ | Verantwortungsvoll spielen'");
-ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele fÃ¼r neue Spieler'");
+ensureColumn('streamer_site_settings', 'urgencyText', "TEXT DEFAULT 'Nur heute: exklusive Freispiele für neue Spieler'");
 ensureColumn('streamer_site_settings', 'abTestEnabled', 'INTEGER DEFAULT 0');
 ensureColumn('streamer_site_settings', 'ctaAText', "TEXT DEFAULT 'Jetzt Bonus sichern'");
 ensureColumn('streamer_site_settings', 'ctaAUrl', "TEXT DEFAULT ''");
-ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus fÃ¼r neue Spieler holen'");
+ensureColumn('streamer_site_settings', 'ctaBText', "TEXT DEFAULT 'Bonus für neue Spieler holen'");
 ensureColumn('streamer_site_settings', 'ctaBUrl', "TEXT DEFAULT ''");
 ensureColumn('streamer_site_settings', 'conversionBoosterEnabled', 'INTEGER DEFAULT 1');
 ensureColumn('streamer_site_settings', 'backgroundTheme', "TEXT DEFAULT 'dark'");
@@ -304,7 +304,7 @@ const refreshTwitchAccessToken = async (refreshToken) => {
 
 const fetchTwitchMetrics = async (auth) => {
   if (!auth?.accessToken || !auth?.twitchUserId) {
-    throw new Error('Twitch Auth nicht vollstÃ¤ndig.');
+    throw new Error('Twitch Auth nicht vollständig.');
   }
 
   const headers = {
@@ -326,7 +326,7 @@ const fetchTwitchMetrics = async (auth) => {
     if (subsRes.ok) {
       subs = subsData.total ?? 0;
     } else {
-      subsError = subsData.message || 'Subs nicht verfÃ¼gbar.';
+      subsError = subsData.message || 'Subs nicht verfügbar.';
     }
   } catch (err) {
     subsError = err.message;
@@ -382,7 +382,7 @@ const collectToolChannels = (toolsConfig) => {
 const sendTwitchChatMessage = ({ botUsername, oauthToken, channel, message }) => {
   return new Promise((resolve, reject) => {
     if (!botUsername || !oauthToken || !channel || !message) {
-      return reject(new Error('Twitch-Konfiguration unvollstÃ¤ndig.'));
+      return reject(new Error('Twitch-Konfiguration unvollständig.'));
     }
 
     const token = oauthToken.startsWith('oauth:') ? oauthToken : `oauth:${oauthToken}`;
@@ -615,7 +615,7 @@ app.post('/api/auth/login', (req, res) => {
       }
     });
   } else {
-    res.status(401).json({ success: false, error: 'UngÃ¼ltige Anmeldedaten.' });
+    res.status(401).json({ success: false, error: 'Ungültige Anmeldedaten.' });
   }
 });
 
@@ -623,7 +623,7 @@ app.post('/api/auth/register', (req, res) => {
   const { email, password, inviteCode } = req.body;
   
   if (inviteCode !== 'weblone2026!') {
-    return res.status(400).json({ success: false, error: 'UngÃ¼ltiger Einladungscode.' });
+    return res.status(400).json({ success: false, error: 'Ungültiger Einladungscode.' });
   }
 
   try {
@@ -726,10 +726,10 @@ app.get('/api/social/twitch/callback', async (req, res) => {
 app.post('/api/superadmin/login', (req, res) => {
   const { email, password, twoFactorCode } = req.body;
   if (email !== SUPERADMIN_EMAIL || password !== SUPERADMIN_PASSWORD) {
-    return res.status(401).json({ success: false, error: 'UngÃ¼ltige Superadmin-Zugangsdaten.' });
+    return res.status(401).json({ success: false, error: 'Ungültige Superadmin-Zugangsdaten.' });
   }
   if (SUPERADMIN_2FA_CODE && twoFactorCode !== SUPERADMIN_2FA_CODE) {
-    return res.status(401).json({ success: false, error: '2FA Code ungÃ¼ltig.' });
+    return res.status(401).json({ success: false, error: '2FA Code ungültig.' });
   }
 
   const token = randomBytes(32).toString('hex');
@@ -844,7 +844,7 @@ app.delete('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
   try {
     const userId = Number(req.params.id);
     if (!Number.isFinite(userId)) {
-      return res.status(400).json({ success: false, error: 'UngÃ¼ltige User-ID.' });
+      return res.status(400).json({ success: false, error: 'Ungültige User-ID.' });
     }
 
     const user = db.prepare('SELECT id, email, username, siteSlug FROM users WHERE id = ?').get(userId);
@@ -854,7 +854,7 @@ app.delete('/api/superadmin/user/:id', requireSuperadmin, (req, res) => {
 
     const protectedEmails = new Set([SUPERADMIN_EMAIL, 'admin@weblone.de']);
     if (protectedEmails.has(String(user.email || '').toLowerCase())) {
-      return res.status(403).json({ success: false, error: 'Dieser Account kann nicht gelÃ¶scht werden.' });
+      return res.status(403).json({ success: false, error: 'Dieser Account kann nicht gelöscht werden.' });
     }
 
     // Stop and cleanup runtime jobs/sessions before deleting persisted data
@@ -963,11 +963,11 @@ app.post('/api/superadmin/deal-template/apply', requireSuperadmin, (req, res) =>
 
   const templates = {
     starter: [
-      { name: 'Starter Deal', deal: '100% Bonus bis 100â‚¬', performance: '0 clicks', status: 'Aktiv', imageUrl: '', promoCode: 'DIEGAWINOS', bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager' }
+      { name: 'Starter Deal', deal: '100% Bonus bis 100€', performance: '0 clicks', status: 'Aktiv', imageUrl: '', promoCode: 'DIEGAWINOS', bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager' }
     ],
     pro: [
       { name: 'VIP Cashback', deal: '15% Weekly Cashback', performance: '0 clicks', status: 'Aktiv', imageUrl: '', promoCode: 'DIEGAWINOS', bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager' },
-      { name: 'Reload Bonus', deal: '50% bis 500â‚¬', performance: '0 clicks', status: 'Aktiv', imageUrl: '', promoCode: 'DIEGAWINOS', bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager' }
+      { name: 'Reload Bonus', deal: '50% bis 500€', performance: '0 clicks', status: 'Aktiv', imageUrl: '', promoCode: 'DIEGAWINOS', bonusTerms: '100% Sticky - 300EUR Max Bonus - 40x Wager' }
     ]
   };
   const selected = templates[template] || templates.starter;
@@ -1188,130 +1188,37 @@ app.get('/api/check-slug/:slug', (req, res) => {
 });
 
 app.post('/api/user/:id/setup', (req, res) => {
-  const { templateId, username, siteSlug, category, backgroundTheme } = req.body;
+  const { username, siteSlug, category } = req.body;
   const userId = req.params.id;
-  const parsedTemplateId = Number(templateId) || 1;
-  const templateThemeMap = { 1: 'casino_midnightblue', 2: 'template2_draft', 3: 'template3_draft' };
-  const allowedThemes = new Set(['casino_midnightblue', 'template2_draft', 'template3_draft', 'dark']);
-  const normalizedBackgroundTheme = allowedThemes.has(String(backgroundTheme || '').toLowerCase())
-    ? String(backgroundTheme).toLowerCase()
-    : (templateThemeMap[parsedTemplateId] || 'dark');
-  const landingPresetsByTemplate = {
-    1: {
-      home: [
-        { blockType: 'Hero', dataJson: { title: 'Casino Midnightblue', subtitle: 'Exklusive Casino-Deals, Hunt-Updates und Giveaways an einem Ort.' } },
-        { blockType: 'Text', dataJson: { content: 'About: Willkommen auf meiner Seite. Hier findest du handverlesene Partner, transparente Bonusinfos und alle relevanten Updates zum Stream.' } },
-        { blockType: 'Text', dataJson: { content: 'Contact: FÃ¼r Kooperationen oder RÃ¼ckfragen erreichst du mich direkt Ã¼ber meine offiziellen KanÃ¤le.' } },
-        { blockType: 'Button', dataJson: { label: 'Jetzt zum Hauptangebot', url: 'https://example.com/deal-main' } }
-      ],
-      shop: [
-        { blockType: 'Hero', dataJson: { title: 'Top Bonus Auswahl', subtitle: 'Fuer schnelle Conversions auf einen Blick.' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Casino Deal 1', url: 'https://example.com/deal-1' }, { label: 'Casino Deal 2', url: 'https://example.com/deal-2' }, { label: 'VIP Deal', url: 'https://example.com/deal-vip' }] } }
-      ],
-      hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Center', subtitle: 'Alle Infos fÃ¼r den naechsten Hunt-Stream.' } },
-        { blockType: 'Text', dataJson: { content: 'Poste hier Regeln, Streamzeiten und Teilnahmehinweise fÃ¼r die Community.' } },
-        { blockType: 'Button', dataJson: { label: 'Hunt Teilnahme Link', url: 'https://example.com/hunt' } }
-      ],
-      giveaway: [
-        { blockType: 'Hero', dataJson: { title: 'Giveaway Zone', subtitle: 'Aktionen und Teilnahme in wenigen Klicks.' } },
-        { blockType: 'Text', dataJson: { content: 'Beschreibe Gewinn, Laufzeit und Bedingungen. Der Link unten fuehrt direkt zur Teilnahme.' } },
-        { blockType: 'Button', dataJson: { label: 'Giveaway Link', url: 'https://example.com/giveaway' } }
-      ]
-    },
-    2: {
-      home: [
-        { blockType: 'Hero', dataJson: { title: 'Willkommen auf meiner Landingpage', subtitle: 'Exklusive Deals, klar strukturiert und direkt klickbar.' } },
-        { blockType: 'Text', dataJson: { content: 'Dieses Template ist auf maximale Uebersicht optimiert. Ersetze nur die Platzhalter-Links mit deinen Partner-Links.' } },
-        { blockType: 'Button', dataJson: { label: 'Jetzt zum Hauptangebot', url: 'https://example.com/main-offer' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Discord Community', url: 'https://discord.com/' }, { label: 'Telegram News', url: 'https://t.me/' }] } }
-      ],
-      shop: [
-        { blockType: 'Hero', dataJson: { title: 'Deal Shop', subtitle: 'Die besten Angebote fÃ¼r neue und bestehende Spieler.' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Willkommensbonus', url: 'https://example.com/welcome' }, { label: 'Reload Bonus', url: 'https://example.com/reload' }, { label: 'Highroller Deal', url: 'https://example.com/highroller' }] } }
-      ],
-      hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Hunt Plan', subtitle: 'Zeiten, Punkte und Teilnahmelinks.' } },
-        { blockType: 'Text', dataJson: { content: 'Erklaere hier kurz, wann Punkte gesammelt werden und wann Belohnungen abgeholt werden koennen.' } },
-        { blockType: 'Button', dataJson: { label: 'Zum Hunt-Portal', url: 'https://example.com/hunt-portal' } }
-      ],
-      giveaway: [
-        { blockType: 'Hero', dataJson: { title: 'Community Giveaway', subtitle: 'Belohnungen fÃ¼r aktive Zuschauer.' } },
-        { blockType: 'Text', dataJson: { content: 'Definiere Teilnahmebedingungen transparent, damit Zuschauer schnell verstehen, wie sie mitmachen.' } },
-        { blockType: 'Button', dataJson: { label: 'Jetzt teilnehmen', url: 'https://example.com/giveaway-entry' } }
-      ]
-    },
-    3: {
-      home: [
-        { blockType: 'Hero', dataJson: { title: 'Casino Master Hub', subtitle: 'Premium Deals und starke CTAs fÃ¼r maximale Einzahlungen.' } },
-        { blockType: 'Text', dataJson: { content: 'Dieses Preset ist conversion-orientiert. Trage deine Partner-Links ein und starte direkt mit einer professionellen Struktur.' } },
-        { blockType: 'Button', dataJson: { label: 'VIP Bonus aktivieren', url: 'https://example.com/vip-bonus' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Live Stream', url: 'https://twitch.tv/' }, { label: 'Kick Stream', url: 'https://kick.com/' }, { label: 'Kontakt', url: 'mailto:kontakt@weblone.de' }] } }
-      ],
-      shop: [
-        { blockType: 'Hero', dataJson: { title: 'Casino Deals', subtitle: 'Schneller Zugriff auf die besten Partnerangebote.' } },
-        { blockType: 'LinkList', dataJson: { links: [{ label: 'Top Casino #1', url: 'https://example.com/casino-1' }, { label: 'Top Casino #2', url: 'https://example.com/casino-2' }, { label: 'Exklusiv Deal', url: 'https://example.com/exclusive' }] } }
-      ],
-      hunt: [
-        { blockType: 'Hero', dataJson: { title: 'Bonus Hunt Mission', subtitle: 'Alles fÃ¼r deinen naechsten Live-Hunt.' } },
-        { blockType: 'Text', dataJson: { content: 'Nutze diese Seite fÃ¼r Ablaufplan, Regeln und special Aktionen waehrend des Streams.' } },
-        { blockType: 'Button', dataJson: { label: 'Hunt Event starten', url: 'https://example.com/hunt-start' } }
-      ],
-      giveaway: [
-        { blockType: 'Hero', dataJson: { title: 'Giveaway & Rewards', subtitle: 'Belohne deine treusten Zuschauer.' } },
-        { blockType: 'Text', dataJson: { content: 'Erklaere die Teilnahme in 2-3 Saetzen und leite ueber den Button direkt zur Aktionsseite weiter.' } },
-        { blockType: 'Button', dataJson: { label: 'Rewards Seite', url: 'https://example.com/rewards' } }
-      ]
-    }
-  };
-  const selectedPreset = landingPresetsByTemplate[parsedTemplateId] || landingPresetsByTemplate[1];
-  
-  // 1. Check if slug is taken
+
+  if (!username || !siteSlug) {
+    return res.status(400).json({ success: false, error: 'username und siteSlug sind erforderlich.' });
+  }
+
   const existing = db.prepare('SELECT id FROM users WHERE siteSlug = ? AND id != ?').get(siteSlug, userId);
   if (existing) {
     return res.status(400).json({ success: false, error: 'Dieser Name ist bereits vergeben.' });
   }
 
   try {
-    // Start transaction to ensure everything is created or nothing
     const transaction = db.transaction(() => {
-      // 2. Update user setup data
       db.prepare(`
-        UPDATE users 
-        SET templateId = ?, username = ?, siteSlug = ?, category = ?, isSetupComplete = 1 
+        UPDATE users
+        SET templateId = NULL, username = ?, siteSlug = ?, category = ?, isSetupComplete = 1
         WHERE id = ?
-      `).run(parsedTemplateId, username, siteSlug, category, userId);
+      `).run(username, siteSlug, category, userId);
 
-      // Ensure settings row exists and keep template-related styling in sync
       db.prepare('INSERT OR IGNORE INTO streamer_site_settings (userId, navTitle, backgroundTheme) VALUES (?, ?, ?)')
-        .run(userId, username, normalizedBackgroundTheme);
+        .run(userId, username, 'dark');
       db.prepare('UPDATE streamer_site_settings SET navTitle = ?, backgroundTheme = ? WHERE userId = ?')
-        .run(username, normalizedBackgroundTheme, userId);
+        .run(username, 'dark', userId);
 
-      // 3. Clear existing blocks/pages to avoid duplicates
+      // Remove old landing/template data completely
       db.prepare('DELETE FROM site_blocks WHERE userId = ?').run(userId);
       db.prepare('DELETE FROM page_blocks WHERE userId = ?').run(userId);
       db.prepare('DELETE FROM streamer_pages WHERE userId = ?').run(userId);
 
-      // 4. Create dashboard blocks
-      const defaultBlocks = [
-        { name: 'Willkommen', type: 'Hero', orderIndex: 1 },
-        { name: 'Meine Top Deals', type: 'Grid', orderIndex: 2 },
-        { name: 'Social Media', type: 'List', orderIndex: 3 }
-      ];
-      const insertSiteBlock = db.prepare('INSERT INTO site_blocks (userId, name, type, status, orderIndex) VALUES (?, ?, ?, ?, ?)');
-      for (const block of defaultBlocks) {
-        insertSiteBlock.run(userId, block.name, block.type, 'Active', block.orderIndex);
-      }
-
-      // 5. Create a default deal only when no deal exists yet
-      const existingDealCount = db.prepare('SELECT COUNT(*) as c FROM deals WHERE userId = ?').get(userId)?.c || 0;
-      if (existingDealCount === 0) {
-        db.prepare('INSERT INTO deals (userId, name, deal, performance, status, ctaUrl) VALUES (?, ?, ?, ?, ?, ?)')
-          .run(userId, 'Weblone Partner', '100% Bonus bis 500â‚¬', 'Top Deal', 'Aktiv', '');
-      }
-
-      // 7. Create default pages
+      // Recreate bare pages without template content
       const defaultPages = [
         { title: 'Home', slug: '', type: 'system', sortOrder: 1 },
         { title: 'Casinos', slug: 'shop', type: 'system', sortOrder: 2 },
@@ -1319,37 +1226,9 @@ app.post('/api/user/:id/setup', (req, res) => {
         { title: 'Giveaway', slug: 'giveaway', type: 'system', sortOrder: 4 }
       ];
       const insertPage = db.prepare('INSERT INTO streamer_pages (userId, title, slug, type, sortOrder) VALUES (?, ?, ?, ?, ?)');
-      const pageIdBySlug = {};
       for (const page of defaultPages) {
-        const info = insertPage.run(userId, page.title, page.slug, page.type, page.sortOrder);
-        pageIdBySlug[page.slug] = Number(info.lastInsertRowid);
+        insertPage.run(userId, page.title, page.slug, page.type, page.sortOrder);
       }
-
-      // 8. Create predefined landing page content from selected template
-      const pageBlocksBySlug = {
-        '': selectedPreset.home || [],
-        shop: selectedPreset.shop || [],
-        hunt: selectedPreset.hunt || [],
-        giveaway: selectedPreset.giveaway || []
-      };
-      const insertPageBlock = db.prepare(`
-        INSERT INTO page_blocks (userId, pageId, blockType, dataJson, visible, sortOrder)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `);
-      Object.entries(pageBlocksBySlug).forEach(([slug, blocks]) => {
-        const pageId = pageIdBySlug[slug];
-        if (!pageId) return;
-        blocks.forEach((block, index) => {
-          insertPageBlock.run(
-            userId,
-            pageId,
-            block.blockType,
-            JSON.stringify(block.dataJson || {}),
-            1,
-            index + 1
-          );
-        });
-      });
     });
 
     transaction();
@@ -1359,7 +1238,6 @@ app.post('/api/user/:id/setup', (req, res) => {
     res.status(500).json({ success: false, error: 'Fehler beim Erstellen deiner Landingpage.' });
   }
 });
-
 app.post('/api/user/:id/block', (req, res) => {
   const { name, type } = req.body;
   try {
@@ -1451,7 +1329,7 @@ app.post('/api/user/:id/social/disconnect', (req, res) => {
     delete toolsConfig.socialAuth.kick;
     delete toolsConfig.socialMetrics.kick;
   } else {
-    return res.status(400).json({ success: false, error: 'UngÃ¼ltige Plattform.' });
+    return res.status(400).json({ success: false, error: 'Ungültige Plattform.' });
   }
 
   writeUserToolsConfig(req.params.id, toolsConfig);
@@ -1468,7 +1346,7 @@ app.post('/api/user/:id/social/refresh', async (req, res) => {
     try {
       let twitchAuth = toolsConfig.socialAuth.twitch;
       if (!TWITCH_CLIENT_ID || !TWITCH_CLIENT_SECRET) throw new Error('Twitch OAuth nicht konfiguriert.');
-      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollstÃ¤ndig verbunden.');
+      if (!twitchAuth.accessToken || !twitchAuth.refreshToken || !twitchAuth.twitchUserId) throw new Error('Twitch Account nicht vollständig verbunden.');
 
       if (!twitchAuth.expiresAt || twitchAuth.expiresAt <= Date.now() + 60_000) {
         const refreshed = await refreshTwitchAccessToken(twitchAuth.refreshToken);
@@ -1534,7 +1412,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
     if (minutes > 0) {
       const timeoutId = setTimeout(async () => {
         try {
-          await broadcastToolsMessage(userId, `Punkte zum Abholen fÃ¼r "${tournamentTitle}" sind jetzt verfÃ¼gbar.`);
+          await broadcastToolsMessage(userId, `Punkte zum Abholen für "${tournamentTitle}" sind jetzt verfügbar.`);
         } catch (err) {
           console.error('Pickup reminder error:', err.message);
         } finally {
@@ -1552,7 +1430,7 @@ app.post('/api/user/:id/tools/tournament/start', async (req, res) => {
 
 app.post('/api/user/:id/tools/tournament/pickup', async (req, res) => {
   const { message } = req.body;
-  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfÃ¼gbar.').toString().trim();
+  const pickupMessage = (message || 'Punkte zum Abholen sind jetzt verfügbar.').toString().trim();
   try {
     const result = await broadcastToolsMessage(req.params.id, pickupMessage);
     res.json({ success: true, result });
@@ -1576,7 +1454,7 @@ app.get('/api/user/:id/tools/ad-timer/status', (req, res) => {
 app.post('/api/user/:id/tools/ad-timer/start', async (req, res) => {
   const userId = String(req.params.id);
   const intervalMinutes = Number(req.body.intervalMinutes || 15);
-  const message = (req.body.message || 'Werbung: UnterstÃ¼tze den Stream Ã¼ber die Links auf meiner Seite.').toString().trim();
+  const message = (req.body.message || 'Werbung: Unterstütze den Stream über die Links auf meiner Seite.').toString().trim();
 
   if (!Number.isFinite(intervalMinutes) || intervalMinutes < 1 || intervalMinutes > 240) {
     return res.status(400).json({ success: false, error: 'intervalMinutes muss zwischen 1 und 240 liegen.' });
@@ -1828,11 +1706,11 @@ app.get('/api/site/:id/settings', (req, res) => {
       stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
       stickyCtaUrl: '',
       trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-      urgencyText: 'Nur heute: exklusive Freispiele fÃ¼r neue Spieler',
+      urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler',
       abTestEnabled: 0,
       ctaAText: 'Jetzt Bonus sichern',
       ctaAUrl: '',
-      ctaBText: 'Bonus fÃ¼r neue Spieler holen',
+      ctaBText: 'Bonus für neue Spieler holen',
       ctaBUrl: '',
       conversionBoosterEnabled: 1,
       backgroundTheme: 'dark',
@@ -1892,11 +1770,11 @@ app.put('/api/site/:id/settings', (req, res) => {
     stickyCtaText || 'Jetzt registrieren & Bonus aktivieren',
     stickyCtaUrl || '',
     trustBadgeText || 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-    urgencyText || 'Nur heute: exklusive Freispiele fÃ¼r neue Spieler',
+    urgencyText || 'Nur heute: exklusive Freispiele für neue Spieler',
     abTestEnabled ? 1 : 0,
     ctaAText || 'Jetzt Bonus sichern',
     ctaAUrl || '',
-    ctaBText || 'Bonus fÃ¼r neue Spieler holen',
+    ctaBText || 'Bonus für neue Spieler holen',
     ctaBUrl || '',
     conversionBoosterEnabled ? 1 : 0,
     backgroundTheme || 'dark'
@@ -1928,7 +1806,7 @@ app.put('/api/site/:id/pages/:pageId', (req, res) => {
 app.delete('/api/site/:id/pages/:pageId', (req, res) => {
   const page = db.prepare('SELECT type FROM streamer_pages WHERE id = ? AND userId = ?').get(req.params.pageId, req.params.id);
   if (page?.type === 'system') {
-    return res.status(400).json({ success: false, error: 'Systemseiten kÃ¶nnen nicht gelÃ¶scht werden.' });
+    return res.status(400).json({ success: false, error: 'Systemseiten können nicht gelöscht werden.' });
   }
   db.prepare('DELETE FROM streamer_pages WHERE id = ? AND userId = ?').run(req.params.pageId, req.params.id);
   db.prepare('DELETE FROM page_blocks WHERE pageId = ?').run(req.params.pageId);
@@ -2046,11 +1924,11 @@ app.get('/api/public/site/:slug', (req, res) => {
           stickyCtaText: 'Jetzt registrieren & Bonus aktivieren',
           stickyCtaUrl: '',
           trustBadgeText: 'Verifiziert | 18+ | Verantwortungsvoll spielen',
-          urgencyText: 'Nur heute: exklusive Freispiele fÃ¼r neue Spieler',
+          urgencyText: 'Nur heute: exklusive Freispiele für neue Spieler',
           abTestEnabled: 0,
           ctaAText: 'Jetzt Bonus sichern',
           ctaAUrl: '',
-          ctaBText: 'Bonus fÃ¼r neue Spieler holen',
+          ctaBText: 'Bonus für neue Spieler holen',
           ctaBUrl: '',
           conversionBoosterEnabled: 1,
           backgroundTheme: 'dark',
@@ -2229,3 +2107,4 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Database path: ${activeDbPath}`);
 });
+

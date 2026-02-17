@@ -134,25 +134,6 @@ const theme = {
 };
 
 const landingBackgroundThemes = {
-  casino_midnightblue: {
-    label: 'Casino Midnightblue (Template 1)',
-    siteClass: 'bg-[#040A1A]',
-    previewClass: 'bg-[#040A1A]',
-    bubbles: false,
-    component: 'MidnightParticles'
-  },
-  template2_draft: {
-    label: 'Template 2 (In Planung)',
-    siteClass: 'bg-[#070707]',
-    previewClass: 'bg-[#070707]',
-    bubbles: true
-  },
-  template3_draft: {
-    label: 'Template 3 (In Planung)',
-    siteClass: 'bg-[#070707]',
-    previewClass: 'bg-[#070707]',
-    bubbles: true
-  },
   dark: {
     label: 'Dark Classic',
     siteClass: 'bg-[#050505]',
@@ -274,9 +255,6 @@ const CasinoGlow = () => {
 
 const TemplateBackground = ({ themeId }) => {
   switch(themeId) {
-    case 'casino_midnightblue': return <MidnightParticles />;
-    case 'template2_draft': return <BackgroundBubbles />;
-    case 'template3_draft': return <BackgroundBubbles />;
     case 'dark': return <BackgroundBubbles />;
     default: return <BackgroundBubbles />;
   }
