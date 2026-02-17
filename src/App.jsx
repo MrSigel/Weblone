@@ -5077,8 +5077,6 @@ const App = () => {
             <Route path="/login" element={<Login onLogin={handleSetUser} />} />
             <Route path="/register" element={<Register onRegister={handleSetUser} />} />
             <Route path="/onboarding" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={0} />} />
-            <Route path="/onboarding/template" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={1} />} />
-            <Route path="/onboarding/setup" element={<OnboardingWizard user={user} onComplete={(updatedUser) => handleSetUser({ ...user, ...updatedUser })} initialStep={2} />} />
             <Route path="/dashboard" element={<Dashboard user={user} />} />
             <Route path="/dashboard/:slug" element={<Dashboard user={user} />} />
             <Route path="/superadmin" element={<SuperAdminPage />} />
@@ -5324,9 +5322,9 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const trackedCtaHref = `${API_BASE}/api/public/site/${slug}/cta/${ctaVariant}`;
   const hasAnyCtaTarget = !!(settings.primaryCtaUrl || settings.stickyCtaUrl || settings.ctaAUrl || settings.ctaBUrl);
 
-  const isTemplate1 = Number(user?.templateId) === 1;
-  const isTemplate2 = Number(user?.templateId) === 2;
-  const isTemplate3 = Number(user?.templateId) === 3;
+  const isTemplate1 = false;
+  const isTemplate2 = true;
+  const isTemplate3 = false;
 
   return (
     <div className={`min-h-screen text-white font-sans selection:bg-indigo-500/30 flex flex-col ${siteTheme.siteClass}`}>
