@@ -1421,7 +1421,7 @@ const OnboardingStart = ({ user }) => {
             Wir führen dich durch den Prozess, um deine Marke zu stärken und deine Community zu begeistern.
           </p>
           <button 
-            onClick={() => navigate('/onboarding/template')}
+            onClick={() => navigate('/onboarding')}
             className="bg-[#EDEDED] text-[#050505] px-10 py-4 rounded-full font-bold text-lg hover:bg-[#D4D4D4] transition-all inline-flex items-center gap-2 group"
           >
             Setup starten <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -1432,68 +1432,12 @@ const OnboardingStart = ({ user }) => {
   );
 };
 
-const TemplateSelection = ({ user }) => {
+const TemplateSelection = () => {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(null);
-  
   useEffect(() => {
-    if (!user) navigate('/login');
-  }, [user, navigate]);
-
-  const handleNext = () => {
-    localStorage.setItem('selectedTemplate', selected);
-    navigate('/onboarding/setup');
-  };
-
-  const templates = [
-    { id: 1, name: 'Neon Night', image: 'bg-gradient-to-br from-purple-900 to-black' },
-    { id: 2, name: 'Minimal Pro', image: 'bg-gradient-to-br from-zinc-800 to-black' },
-    { id: 3, name: 'Casino Master', image: 'bg-gradient-to-br from-green-900 to-black' }
-  ];
-
-  return (
-    <div className={`${theme.bg} min-h-screen pt-32 pb-20 px-6 relative overflow-hidden`}>
-      <BackgroundBubbles />
-      <div className="max-w-4xl mx-auto relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold text-[#EDEDED] mb-4">Wähle dein Template</h2>
-          <p className="text-[#A1A1A1]">Dieses Design wird die Basis für deine neue Website sein.</p>
-        </div>
-        
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          {templates.map((tpl) => (
-            <motion.div 
-              key={tpl.id}
-              whileHover={{ y: -5 }}
-              onClick={() => setSelected(tpl.id)}
-              className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden ${selected === tpl.id ? 'border-indigo-500 ring-4 ring-indigo-500/10' : `border-white/5 ${theme.surface}`}`}
-            >
-              <div className={`aspect-[4/5] ${tpl.image} flex items-end p-6`}>
-                <div className="w-full h-1/3 bg-black/40 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                  <div className="h-2 w-2/3 bg-white/20 rounded-full mb-2" />
-                  <div className="h-2 w-1/2 bg-white/10 rounded-full" />
-                </div>
-              </div>
-              <div className="p-4 flex justify-between items-center">
-                <span className="font-bold text-[#EDEDED]">{tpl.name}</span>
-                {selected === tpl.id && <Check size={18} className="text-indigo-500" />}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        
-        <div className="flex justify-center">
-          <button 
-            disabled={!selected}
-            onClick={handleNext}
-            className={`px-10 py-4 rounded-full font-bold text-lg transition-all ${selected ? 'bg-[#EDEDED] text-[#050505] hover:bg-[#D4D4D4]' : 'bg-white/5 text-white/20 cursor-not-allowed'}`}
-          >
-            Weiter
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    navigate('/onboarding', { replace: true });
+  }, [navigate]);
+  return null;
 };
 
 const BaseSetup = ({ user, onComplete }) => {
@@ -1518,16 +1462,14 @@ const BaseSetup = ({ user, onComplete }) => {
     // Normalize slug: lowercase and remove special chars/spaces
     const normalizedSlug = formData.siteSlug.toLowerCase().trim().replace(/[^a-z0-9]/g, '-');
     
-    const templateId = localStorage.getItem('selectedTemplate');
     try {
       const response = await fetch(`${API_BASE}/api/user/${user.id}/setup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, siteSlug: normalizedSlug, templateId })
+        body: JSON.stringify({ ...formData, siteSlug: normalizedSlug })
       });
       const data = await response.json();
       if (data.success) {
-        localStorage.removeItem('selectedTemplate');
         onComplete({ isSetupComplete: 1, ...formData, siteSlug: normalizedSlug });
         navigate(`/dashboard/${normalizedSlug}`);
       } else {
@@ -5598,6 +5540,7 @@ const RenderBlock = ({ block, deals }) => {
 };
 
 export default App;
+
 
 
 
