@@ -134,26 +134,24 @@ const theme = {
 };
 
 const landingBackgroundThemes = {
-  neon: {
-    label: 'Neon Night (Template 1)',
-    siteClass: 'bg-[#05000A]',
-    previewClass: 'bg-[#05000A]',
+  casino_midnightblue: {
+    label: 'Casino Midnightblue (Template 1)',
+    siteClass: 'bg-[#040A1A]',
+    previewClass: 'bg-[#040A1A]',
     bubbles: false,
-    component: 'NeonParticles'
+    component: 'MidnightParticles'
   },
-  minimal: {
-    label: 'Minimal Pro (Template 2)',
-    siteClass: 'bg-[#0A0A0A]',
-    previewClass: 'bg-[#0A0A0A]',
-    bubbles: false,
-    component: 'MinimalWaves'
+  template2_draft: {
+    label: 'Template 2 (In Planung)',
+    siteClass: 'bg-[#070707]',
+    previewClass: 'bg-[#070707]',
+    bubbles: true
   },
-  casino: {
-    label: 'Casino Master (Template 3)',
-    siteClass: 'bg-[#0A0000]',
-    previewClass: 'bg-[#0A0000]',
-    bubbles: false,
-    component: 'CasinoGlow'
+  template3_draft: {
+    label: 'Template 3 (In Planung)',
+    siteClass: 'bg-[#070707]',
+    previewClass: 'bg-[#070707]',
+    bubbles: true
   },
   dark: {
     label: 'Dark Classic',
@@ -276,9 +274,9 @@ const CasinoGlow = () => {
 
 const TemplateBackground = ({ themeId }) => {
   switch(themeId) {
-    case 'neon': return <NeonParticles />;
-    case 'minimal': return <MinimalWaves />;
-    case 'casino': return <CasinoGlow />;
+    case 'casino_midnightblue': return <MidnightParticles />;
+    case 'template2_draft': return <BackgroundBubbles />;
+    case 'template3_draft': return <BackgroundBubbles />;
     case 'dark': return <BackgroundBubbles />;
     default: return <BackgroundBubbles />;
   }
