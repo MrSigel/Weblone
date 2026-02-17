@@ -598,7 +598,22 @@ app.post('/api/auth/login', (req, res) => {
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
   
   if (user && user.password === password) {
-    res.json({ success: true, user: { id: user.id, email: user.email, username: user.username, isSetupComplete: user.isSetupComplete, isSuperadmin: false } });
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        templateId: user.templateId,
+        siteSlug: user.siteSlug,
+        category: user.category,
+        customDomain: user.customDomain,
+        avatarUrl: user.avatarUrl,
+        toolsConfig: user.toolsConfig,
+        isSetupComplete: user.isSetupComplete,
+        isSuperadmin: false
+      }
+    });
   } else {
     res.status(401).json({ success: false, error: 'Ungültige Anmeldedaten.' });
   }
@@ -613,7 +628,18 @@ app.post('/api/auth/register', (req, res) => {
 
   try {
     const info = db.prepare('INSERT INTO users (email, password) VALUES (?, ?)').run(email, password);
-    res.json({ success: true, user: { id: info.lastInsertRowid, email, isSetupComplete: 0 } });
+    res.json({
+      success: true,
+      user: {
+        id: info.lastInsertRowid,
+        email,
+        username: '',
+        siteSlug: '',
+        category: '',
+        customDomain: '',
+        isSetupComplete: 0
+      }
+    });
   } catch (err) {
     res.status(400).json({ success: false, error: 'Email bereits registriert.' });
   }
@@ -2041,7 +2067,14 @@ app.get('/api/public/site/:slug', (req, res) => {
 
 app.post('/api/public/site/:slug/cta-impression', (req, res) => {
   try {
-    const user = db.prepare('SELECT id FROM users WHERE siteSlug = ?').get(req.params.slug);
+    const slug = String(req.params.slug || '').trim().toLowerCase();
+    const user = db.prepare(`
+      SELECT id
+      FROM users
+      WHERE lower(siteSlug) = ?
+         OR lower(customDomain) = ?
+         OR (lower(category) = ? AND instr(category, '.') > 0)
+    `).get(slug, slug, slug);
     if (!user) return res.status(404).json({ success: false, error: 'Streamer not found' });
     const variant = String(req.body?.variant || 'default').toLowerCase();
     db.prepare(`
@@ -2063,7 +2096,14 @@ app.post('/api/public/site/:slug/cta-impression', (req, res) => {
 
 app.get('/api/public/site/:slug/cta/:variant', (req, res) => {
   try {
-    const user = db.prepare('SELECT id FROM users WHERE siteSlug = ?').get(req.params.slug);
+    const slug = String(req.params.slug || '').trim().toLowerCase();
+    const user = db.prepare(`
+      SELECT id
+      FROM users
+      WHERE lower(siteSlug) = ?
+         OR lower(customDomain) = ?
+         OR (lower(category) = ? AND instr(category, '.') > 0)
+    `).get(slug, slug, slug);
     if (!user) return res.status(404).send('Streamer not found');
 
     const settings = db.prepare('SELECT * FROM streamer_site_settings WHERE userId = ?').get(user.id) || {};

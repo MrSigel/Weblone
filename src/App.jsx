@@ -5567,7 +5567,7 @@ const PublicStreamerSite = ({ data, activePageSlug, setActivePageSlug }) => {
   const currentPage = pages.find(p => p.slug === activePageSlug) || pages[0];
   const pageBlocks = blocks.filter(b => b.pageId === currentPage?.id);
   const isCasinoPage = currentPage?.slug === 'shop';
-  const slug = user?.siteSlug;
+  const slug = user?.siteSlug || user?.customDomain || '';
   const activeDeals = (deals || []).filter((d) => d.status !== 'Deaktiviert');
   const conversionBoosterEnabled = Number(settings?.conversionBoosterEnabled ?? 1) === 1;
   const siteTheme = landingBackgroundThemes[settings?.backgroundTheme] || landingBackgroundThemes.dark;
