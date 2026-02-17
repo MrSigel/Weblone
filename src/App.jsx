@@ -4628,37 +4628,63 @@ const SuperAdminPage = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6">
-        <div className={`w-full max-w-md p-8 rounded-2xl border ${theme.border} ${theme.surface}`}>
-          <h1 className="text-2xl font-bold mb-2">Superadmin Login</h1>
-          <p className="text-[#A1A1A1] text-sm mb-6">Nur feste Zugangsdaten sind erlaubt.</p>
+      <div className="min-h-screen bg-[#050505] text-white flex items-center justify-center px-6 relative overflow-hidden">
+        <BackgroundBubbles />
+        <div className="w-full max-w-md p-10 rounded-[2.5rem] border border-white/5 bg-[#0A0A0A]/60 backdrop-blur-2xl shadow-2xl relative z-10">
+          <div className="flex flex-col items-center mb-10">
+            <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-500 border border-indigo-500/30 mb-6">
+              <ShieldCheck size={32} />
+            </div>
+            <h1 className="text-3xl font-black tracking-tight">Access Control</h1>
+            <p className="text-[#A1A1A1] text-xs font-bold uppercase tracking-[0.2em] mt-2">Weblone Superadmin v2.0</p>
+          </div>
+
           <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@weblone2026.com"
-              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Passwort"
-              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
-            />
-            <input
-              type="text"
-              value={twoFactorCode}
-              onChange={(e) => setTwoFactorCode(e.target.value)}
-              placeholder="2FA Code (optional)"
-              className="w-full bg-[#0A0A0A] border border-white/10 rounded-xl px-4 py-3"
-            />
-            {error && <p className="text-red-400 text-sm">{error}</p>}
-            <button type="submit" className="w-full bg-indigo-600 rounded-xl py-3 font-bold hover:bg-indigo-500 transition-all">
-              Einloggen
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Administrator Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@weblone.com"
+                className="w-full bg-[#050505] border border-white/5 rounded-2xl px-5 py-4 text-sm focus:border-indigo-500/50 outline-none transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">Secure Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full bg-[#050505] border border-white/5 rounded-2xl px-5 py-4 text-sm focus:border-indigo-500/50 outline-none transition-all"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-white/30 uppercase tracking-widest ml-1">2FA Authenticator Code</label>
+              <input
+                type="text"
+                value={twoFactorCode}
+                onChange={(e) => setTwoFactorCode(e.target.value)}
+                placeholder="000 000"
+                className="w-full bg-[#050505] border border-white/5 rounded-2xl px-5 py-4 text-sm focus:border-indigo-500/50 outline-none transition-all"
+              />
+            </div>
+            
+            {error && (
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[11px] font-bold text-center">
+                {error}
+              </div>
+            )}
+            
+            <button type="submit" className="w-full bg-indigo-600 rounded-2xl py-4 font-black uppercase tracking-widest text-xs hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 mt-4">
+              Authorize Access
             </button>
           </form>
+          
+          <div className="mt-8 pt-8 border-t border-white/5 text-center">
+            <p className="text-[10px] font-bold text-white/10 uppercase tracking-[0.3em]">Authorized Personnel Only</p>
+          </div>
         </div>
       </div>
     );
@@ -4788,27 +4814,37 @@ const SuperAdminPage = () => {
           </aside>
           )}
 
-          <main className={`${activeSection === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'} p-6 rounded-2xl border ${theme.border} ${theme.surface} space-y-6 shadow-2xl`}>
-            <div>
-              <h2 className="text-2xl font-bold">{sectionMeta[activeSection]?.title || 'Overview'}</h2>
-              <p className="text-sm text-[#A1A1A1]">{sectionMeta[activeSection]?.text || ''}</p>
+          <main className={`${activeSection === 'overview' ? 'lg:col-span-8' : 'lg:col-span-12'} p-8 rounded-[2.5rem] border border-white/5 bg-[#0A0A0A]/40 backdrop-blur-xl space-y-8 shadow-2xl`}>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <h2 className="text-3xl font-black tracking-tight">{sectionMeta[activeSection]?.title || 'Overview'}</h2>
+                <p className="text-sm text-[#A1A1A1] mt-1 font-medium">{sectionMeta[activeSection]?.text || ''}</p>
+              </div>
+              <div className="flex flex-wrap gap-2 bg-[#050505] p-1.5 rounded-[1.2rem] border border-white/5">
+                {tabItems.map(({ id, label, badge }) => (
+                  <button
+                    key={id}
+                    onClick={() => navigate(`/superadmin/${id}`)}
+                    className={`px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
+                      activeSection === id 
+                      ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' 
+                      : 'text-white/30 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {label}
+                    {typeof badge === 'number' && badge > 0 && (
+                      <span className={`min-w-5 h-5 px-1 rounded-full text-[9px] font-black inline-flex items-center justify-center ${
+                        id === 'support' ? 'bg-red-500 text-white' : 'bg-amber-500 text-black'
+                      }`}>
+                        {badge}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 border-b border-white/10 pb-4">
-              {tabItems.map(({ id, label, badge }) => (
-                <button
-                  key={id}
-                  onClick={() => navigate(`/superadmin/${id}`)}
-                  className={`px-3 py-2 rounded-xl text-sm border flex items-center gap-2 ${activeSection === id ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' : 'bg-white/5 border-white/10 hover:bg-white/10 text-[#EDEDED]'}`}
-                >
-                  {label}
-                  {typeof badge === 'number' && badge > 0 && (
-                    <span className={`min-w-6 h-6 px-1 rounded-full text-[11px] font-bold inline-flex items-center justify-center ${id === 'support' ? 'bg-red-500/20 text-red-300' : 'bg-amber-500/20 text-amber-300'}`}>
-                      {badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
+
+            <div className="h-px w-full bg-gradient-to-r from-white/5 via-white/10 to-transparent" />
 
             {loadingDetails && <p className="text-sm text-[#A1A1A1]">Lade Nutzerdetails...</p>}
             {!loadingDetails && activeSection === 'overview' && !selectedData && <p className="text-sm text-[#A1A1A1]">Wähle links einen Nutzer aus.</p>}
