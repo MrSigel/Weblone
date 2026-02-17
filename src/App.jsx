@@ -1564,8 +1564,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     'Basisdaten',
     'Template',
     'Social Tokens',
-    'Deals',
-    'Bot Setup',
     'Landingpage',
     'Verbindung starten'
   ];
@@ -1642,13 +1640,13 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
       return;
     }
     if (slug.length < 3) {
-      setSlugState({ checking: false, available: false, message: 'Slug muss mindestens 3 Zeichen haben.' });
+      setSlugState({ checking: false, available: false, message: 'Name muss mindestens 3 Zeichen haben.' });
       return;
     }
 
     const isOwnSlug = user?.siteSlug && slug === user.siteSlug;
     if (isOwnSlug) {
-      setSlugState({ checking: false, available: true, message: 'Dein aktueller Slug.' });
+      setSlugState({ checking: false, available: true, message: 'Dein aktueller Name.' });
       return;
     }
 
@@ -1658,12 +1656,12 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
         const res = await fetch(`${API_BASE}/api/check-slug/${encodeURIComponent(slug)}`);
         const data = await res.json();
         if (data.available) {
-          setSlugState({ checking: false, available: true, message: 'Slug ist verfügbar.' });
+          setSlugState({ checking: false, available: true, message: 'Name ist verfügbar.' });
         } else {
-          setSlugState({ checking: false, available: false, message: 'Slug ist bereits vergeben.' });
+          setSlugState({ checking: false, available: false, message: 'Dieser Name ist bereits vergeben.' });
         }
       } catch (err) {
-        setSlugState({ checking: false, available: false, message: 'Slug-Check fehlgeschlagen.' });
+        setSlugState({ checking: false, available: false, message: 'Check fehlgeschlagen.' });
       }
     }, 450);
 
@@ -1675,9 +1673,9 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
     if (currentStep === 0) {
       if (!basic.fullName.trim()) return 'Name ist erforderlich.';
       if (!basic.streamerName.trim()) return 'Streamername ist erforderlich.';
-      if (!slug) return 'Slug ist erforderlich.';
-      if (slug.length < 3) return 'Slug muss mindestens 3 Zeichen haben.';
-      if (!slugState.available) return slugState.message || 'Slug ist nicht verfügbar.';
+      if (!slug) return 'Seiten-Name ist erforderlich.';
+      if (slug.length < 3) return 'Name muss mindestens 3 Zeichen haben.';
+      if (!slugState.available) return slugState.message || 'Name ist nicht verfügbar.';
       return '';
     }
     if (currentStep === 2) {
@@ -1687,12 +1685,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
       if (social.kickWebhookUrl && !isValidUrl(social.kickWebhookUrl)) return 'Kick Webhook URL ist ungültig.';
       return '';
     }
-    if (currentStep === 4) {
-      if (bot.adIntervalMinutes < 1 || bot.adIntervalMinutes > 240) return 'Werbeintervall muss zwischen 1 und 240 Minuten liegen.';
-      if (!bot.adMessage.trim()) return 'Werbenachricht darf nicht leer sein.';
-      return '';
-    }
-    if (currentStep === 5) {
+    if (currentStep === 3) {
       if (landing.primaryCtaUrl && !isValidUrl(landing.primaryCtaUrl)) return 'Primary CTA URL ist ungültig.';
       if (landing.stickyCtaUrl && !isValidUrl(landing.stickyCtaUrl)) return 'Sticky CTA URL ist ungültig.';
       return '';
@@ -1709,7 +1702,7 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
 
   const finalizeWizard = async () => {
     if (!user?.id) return;
-    const blockers = [0, 2, 4, 5].map((s) => getStepError(s)).filter(Boolean);
+    const blockers = [0, 2, 3].map((s) => getStepError(s)).filter(Boolean);
     if (blockers.length > 0) {
       setError(blockers[0]);
       return;
@@ -1779,18 +1772,6 @@ const OnboardingWizard = ({ user, onComplete, initialStep = 0 }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ channel: social.kickChannel.trim() })
-        });
-      }
-
-      setStatus('Speichere Deals...');
-      for (const deal of currentDeals) {
-        const accepted = dealSelections[deal.id];
-        if (accepted === undefined) continue;
-        const nextStatus = accepted ? 'Aktiv' : 'Deaktiviert';
-        await fetch(`${API_BASE}/api/user/${user.id}/deal/${deal.id}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...deal, status: nextStatus })
         });
       }
 
