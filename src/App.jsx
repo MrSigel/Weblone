@@ -5405,59 +5405,27 @@ const StreamerPageOverride = ({ slug }) => {
 
 const CasinoDealCard = ({ deal, ctaHref }) => {
   const [deposit, setDeposit] = useState(60);
-  const bonus = Math.max(0, Number(deposit) || 0);
-  const total = bonus * 2;
+  const bonusMultiplier = 2; // Mock
+  const total = deposit * bonusMultiplier;
   const wager = total * 40;
-  const countries = [
-    { code: 'DE', src: 'https://flagcdn.com/w80/de.png' },
-    { code: 'AT', src: 'https://flagcdn.com/w80/at.png' },
-    { code: 'CH', src: 'https://flagcdn.com/w80/ch.png' },
-    { code: 'CA', src: 'https://flagcdn.com/w80/ca.png' },
-    { code: 'NO', src: 'https://flagcdn.com/w80/no.png' },
-    { code: 'SE', src: 'https://flagcdn.com/w80/se.png' },
-    { code: 'FI', src: 'https://flagcdn.com/w80/fi.png' },
-    { code: 'DK', src: 'https://flagcdn.com/w80/dk.png' },
-    { code: 'NL', src: 'https://flagcdn.com/w80/nl.png' }
-  ];
+
   const payments = [
     { name: 'Visa', src: 'https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg' },
     { name: 'Mastercard', src: 'https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg' },
-    { name: 'PaySafe', src: 'https://logo.clearbit.com/paysafecard.com' },
     { name: 'BTC', src: 'https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg' },
     { name: 'ETH', src: 'https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg' }
   ];
-  const providers = [
-    { name: 'Playn GO', src: 'https://logo.clearbit.com/playngo.com' },
-    { name: 'Big Time', src: 'https://logo.clearbit.com/bigtimegaming.com' },
-    { name: 'Pragmatic', src: 'https://logo.clearbit.com/pragmaticplay.com' },
-    { name: 'Merkur', src: 'https://logo.clearbit.com/merkur-gaming.com' },
-    { name: 'Relax', src: 'https://logo.clearbit.com/relax-gaming.com' },
-    { name: 'Nolimit', src: 'https://logo.clearbit.com/nolimitcity.com' },
-    { name: 'Greentube', src: 'https://logo.clearbit.com/greentube.com' },
-    { name: 'Blueprint', src: 'https://logo.clearbit.com/blueprintgaming.com' },
-    { name: 'Hacksaw', src: 'https://logo.clearbit.com/hacksawgaming.com' },
-    { name: 'Elk', src: 'https://logo.clearbit.com/elk-studios.com' },
-    { name: 'Endorphina', src: 'https://logo.clearbit.com/endorphina.com' },
-    { name: 'NetEnt', src: 'https://logo.clearbit.com/netent.com' },
-    { name: 'Microgaming', src: 'https://logo.clearbit.com/microgaming.co.uk' },
-    { name: 'Push', src: 'https://logo.clearbit.com/pushgaming.com' },
-    { name: 'Quickspin', src: 'https://logo.clearbit.com/quickspin.com' },
-    { name: 'Thunderkick', src: 'https://logo.clearbit.com/thunderkick.com' },
-    { name: 'Yggdrasil', src: 'https://logo.clearbit.com/yggdrasilgaming.com' },
-    { name: 'Red Tiger', src: 'https://logo.clearbit.com/redtigergaming.com' }
-  ];
-  const licenseLogo = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_Cura%C3%A7ao.svg';
 
   return (
     <article className={`rounded-[2rem] overflow-hidden shadow-2xl transition-all hover:scale-[1.01] duration-500 group border ${
-      deal.isPremium ? 'border-amber-500/50 bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] ring-1 ring-amber-500/20' : 'border-white/5 bg-[#111111]'
+      deal.isPremium ? 'border-amber-500/50 bg-gradient-to-br from-[#1A1A1A] to-[#0A0A0A] ring-1 ring-amber-500/20' : 'border-white/5 bg-[#0D0D0D]'
     }`}>
       <div className="grid md:grid-cols-[200px_1fr_220px] items-center">
-        <div className="h-full min-h-[120px] bg-black/20 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-white/5">
+        <div className="h-full min-h-[140px] bg-black/20 flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-white/5">
           {deal.imageUrl ? (
-            <img src={deal.imageUrl} alt={deal.name} className="max-h-16 md:max-h-20 max-w-full object-contain filter drop-shadow-lg group-hover:scale-110 transition-transform duration-500" />
+            <img src={deal.imageUrl} alt={deal.name} className="max-h-16 md:max-h-20 max-w-full object-contain filter drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform duration-500" />
           ) : (
-            <p className="text-2xl font-black tracking-tight text-white uppercase italic">{deal.name}</p>
+            <p className="text-2xl font-black tracking-tight text-white uppercase italic tracking-tighter">{deal.name}</p>
           )}
         </div>
         
@@ -5466,26 +5434,26 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
              <div className="flex gap-0.5">
                {[1,2,3,4,5].map(i => <motion.span key={i} initial={{opacity:0}} animate={{opacity:1}} transition={{delay: i*0.1}} className="text-amber-400 text-xs">★</motion.span>)}
              </div>
-             <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Top Rated Deal</span>
+             <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">High Performance Casino</span>
           </div>
-          <h3 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70 leading-none tracking-tighter uppercase">
+          <h3 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-white via-white/90 to-white/70 leading-none tracking-tighter uppercase italic">
             {deal.deal}
           </h3>
-          <p className="text-sm font-medium text-white/50 flex items-center gap-2">
-             <Check size={14} className="text-emerald-500" /> {deal.bonusTerms || '100% Sticky - 40x Wager - High Roller Friendly'}
+          <p className="text-sm font-bold text-white/50 flex items-center gap-2 tracking-tight">
+             <Check size={14} className="text-emerald-500" /> {deal.bonusTerms || '100% Sticky - 300€ Max - 40x Wager - Crypto friendly'}
           </p>
         </div>
 
-        <div className="p-6 md:p-8 flex flex-col gap-3 justify-center bg-white/5 md:bg-transparent">
+        <div className="p-6 md:p-8 flex flex-col gap-3 justify-center bg-white/5 md:bg-transparent border-t md:border-t-0 border-white/5">
           <a
             href={deal.ctaUrl || ctaHref || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group/btn relative inline-flex items-center justify-center overflow-hidden rounded-2xl px-8 py-4 font-black text-lg transition-all shadow-2xl ${
-              deal.isPremium ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-white text-black hover:bg-neutral-200'
+            className={`group/btn relative inline-flex items-center justify-center overflow-hidden rounded-2xl px-10 py-5 font-black text-xl transition-all shadow-2xl ${
+              deal.isPremium ? 'bg-amber-500 text-black hover:bg-amber-400' : 'bg-white text-black hover:bg-neutral-200 shadow-white/10'
             }`}
           >
-            <span className="relative z-10">SPIELEN</span>
+            <span className="relative z-10">JETZT SPIELEN</span>
             <motion.div 
               className="absolute inset-0 bg-white/20"
               initial={{ x: '-100%' }}
@@ -5493,32 +5461,74 @@ const CasinoDealCard = ({ deal, ctaHref }) => {
               transition={{ duration: 0.5 }}
             />
           </a>
-          <div className="flex items-center justify-center gap-2 text-[10px] font-black tracking-widest text-white/30 uppercase">
-             <ShieldCheck size={12} /> Sicher & Verifiziert
+          <div className="flex items-center justify-center gap-2 text-[10px] font-black tracking-widest text-white/20 uppercase">
+             <ShieldCheck size={12} className="text-emerald-500/50" /> Secure Connection
           </div>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-[1fr_auto] items-center gap-4 px-8 py-4 bg-black/30 border-t border-white/5">
+      {/* Expandable / More Details Info */}
+      <div className="p-6 md:p-8 border-t border-white/5 grid md:grid-cols-2 gap-8 bg-black/40">
+        <div className="space-y-4">
+           <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.2em]">Bonus Calculator</p>
+           <div className="flex items-center gap-4">
+              <div className="flex-1 space-y-1">
+                 <label className="text-[9px] font-bold text-white/30 ml-1 uppercase tracking-widest">Deposit Amount</label>
+                 <div className="flex items-center bg-[#050505] rounded-xl border border-white/10 px-4 py-2 ring-1 ring-white/5">
+                    <input 
+                      type="number" 
+                      value={deposit} 
+                      onChange={(e) => setDeposit(Number(e.target.value))}
+                      className="bg-transparent border-none outline-none text-white font-black text-xl w-full" 
+                    />
+                    <span className="text-white/20 font-black">€</span>
+                 </div>
+              </div>
+              <ArrowRight className="text-white/10 mt-5" />
+              <div className="flex-1 text-center">
+                 <p className="text-[9px] font-bold text-white/30 uppercase tracking-widest mb-1">Total Play</p>
+                 <p className="text-3xl font-black text-amber-500 tracking-tighter italic">{total}€</p>
+              </div>
+           </div>
+        </div>
+
+        <div className="flex flex-col justify-end gap-4">
+           <div className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/5">
+              <div className="space-y-1">
+                 <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">Promotion Code</p>
+                 <p className="text-2xl font-black text-amber-500 tracking-tighter italic">{deal.promoCode || 'DIEGAWINOS'}</p>
+              </div>
+              <div className="text-right">
+                 <p className="text-[10px] font-black text-white/20 uppercase tracking-[0.2em]">License</p>
+                 <div className="flex items-center justify-end gap-2 mt-1">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Flag_of_Cura%C3%A7ao.svg" className="h-4 w-auto rounded-sm opacity-60" />
+                    <span className="text-xs font-bold text-white/40 uppercase">Curacao</span>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-[1fr_auto] items-center gap-4 px-8 py-4 bg-black/50 border-t border-white/5">
         <div className="flex flex-wrap gap-x-6 gap-y-3 items-center">
-           <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Providers</span>
-              <div className="flex -space-x-2">
-                 {[1,2,3,4].map(i => <div key={i} className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden backdrop-blur-md shadow-lg"><Activity size={12} className="text-white/40" /></div>)}
+           <div className="flex items-center gap-3">
+              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Accepted</span>
+              <div className="flex gap-3">
+                 {payments.map((p, i) => (
+                   <img key={i} src={p.src} alt={p.name} className="h-3 w-auto opacity-30 grayscale hover:opacity-100 transition-all cursor-help" title={p.name} />
+                 ))}
               </div>
            </div>
            <div className="h-4 w-px bg-white/10 hidden md:block" />
            <div className="flex items-center gap-2">
-              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Payments</span>
-              <div className="flex gap-2">
-                 {[1,2,3].map(i => <div key={i} className="w-8 h-5 rounded-md bg-white/5 border border-white/5 flex items-center justify-center opacity-50"><Zap size={10} className="text-white" /></div>)}
+              <span className="text-[9px] font-black text-white/20 uppercase tracking-[0.2em]">Highlights</span>
+              <div className="flex gap-4">
+                 <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-tight flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> Instant Payout</span>
+                 <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-tight flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-emerald-500 shadow-[0_0_5px_#10b981]" /> VPN Friendly</span>
               </div>
            </div>
         </div>
-        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-xl border border-white/5">
-           <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Code:</span>
-           <span className="text-sm font-black text-amber-500 tracking-tighter">{deal.promoCode || 'DIEGAWINOS'}</span>
-        </div>
+        <div className="text-[10px] font-bold text-white/10 uppercase tracking-[0.2em]">Official Partner Deal</div>
       </div>
     </article>
   );
