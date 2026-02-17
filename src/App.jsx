@@ -230,6 +230,65 @@ const BackgroundBubbles = () => (
   </div>
 );
 
+const MidnightParticles = () => {
+  const particles = Array.from({ length: 40 }).map((_, i) => ({
+    id: i,
+    size: Math.random() * 2 + 0.5,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    duration: Math.random() * 15 + 10,
+    delay: Math.random() * 10,
+    opacity: Math.random() * 0.4 + 0.1
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden bg-[#050B18]" style={{ zIndex: -1 }}>
+      {/* Mesh Gradients for deep midnight feel */}
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-indigo-950/20 to-transparent" />
+      <motion.div 
+        animate={{
+          scale: [1, 1.1, 1],
+          opacity: [0.15, 0.25, 0.15],
+        }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+        className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full bg-indigo-600/10 blur-[140px]" 
+      />
+      <motion.div 
+        animate={{
+          scale: [1.1, 1, 1.1],
+          opacity: [0.1, 0.2, 0.1],
+        }}
+        transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+        className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full bg-blue-800/10 blur-[140px]" 
+      />
+      
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full bg-white"
+          style={{
+            width: p.size,
+            height: p.size,
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            opacity: p.opacity
+          }}
+          animate={{
+            y: [0, -120, 0],
+            opacity: [p.opacity, p.opacity * 2, p.opacity],
+          }}
+          transition={{
+            duration: p.duration,
+            repeat: Infinity,
+            delay: p.delay,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
